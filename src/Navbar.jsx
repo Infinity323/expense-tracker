@@ -11,7 +11,9 @@ function Navbar() {
       gap='2'
     >
       <Box p='2'>
-        <Heading size='md'>Expense Tracker</Heading>
+        <Heading size='md'>
+          <Link to='/'>Expense Tracker</Link>
+        </Heading>
       </Box>
       <Spacer />
       <ButtonGroup gap='2'>

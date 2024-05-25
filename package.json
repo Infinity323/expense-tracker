@@ -2,11 +2,9 @@
   "name": "expense-tracker",
   "version": "0.1.0",
   "private": true,
-  "main": "public/electron.js",
-  "homepage": "./",
+  "homepage": "/",
   "dependencies": {
     "@chakra-ui/react": "^2.8.2",
-    "@craco/craco": "^7.1.0",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@testing-library/jest-dom": "^5.17.0",
@@ -19,8 +17,8 @@
     "react-scripts": "5.0.1"
   },
   "scripts": {
-    "start": "electron .",
-    "build": "craco build",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -43,7 +41,7 @@
     ]
   },
   "devDependencies": {
-    "electron": "^30.0.8",
-    "webpack-node-externals": "^3.0.0"
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@babel/plugin-transform-private-property-in-object": "^7.24.6"
   }
 }
