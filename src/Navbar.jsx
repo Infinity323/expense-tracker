@@ -1,6 +1,8 @@
 import { Box, Button, ButtonGroup, Flex, Heading, Spacer } from "@chakra-ui/react";
+import { Link } from "react-router-dom";
 
 function Navbar() {
+  
   return (
     <Flex
       minWidth='max-content'
@@ -13,7 +15,9 @@ function Navbar() {
       </Box>
       <Spacer />
       <ButtonGroup gap='2'>
-        <Button colorScheme='teal'>Sign Up</Button>
+        <Button colorScheme='teal'>
+          <Link to='/budgets'>Budgets</Link>
+        </Button>
         <Button colorScheme='teal'>Log In</Button>
       </ButtonGroup>
     </Flex>

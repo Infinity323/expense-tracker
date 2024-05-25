@@ -1,11 +1,8 @@
 import { Box, Flex, Heading, Text } from "@chakra-ui/react";
-import Footer from "./Footer";
-import Navbar from "./Navbar";
 
 function Home() {
   return (
     <>
-      <Navbar />
       <Flex direction='column' paddingTop='7rem' paddingBottom='7rem' align='center'>
         <Box textAlign='center' maxWidth='60em'>
           <Heading size='4xl'>Take command of your spending
@@ -17,7 +14,6 @@ function Home() {
           <Text fontSize='md'></Text>
         </Box>
       </Flex>
-      <Footer />
     </>
   );
 }
