@@ -1,10 +1,12 @@
 {
     "configurations": [
         {
-            "command": "npm start",
-            "name": "Run npm start",
+            "name": "Launch Chrome",
             "request": "launch",
-            "type": "node-terminal"
+            "type": "chrome",
+            // "preLaunchTask": "npm: start",
+            "url": "http://localhost:3000",
+            "webRoot": "${workspaceFolder}"
         }
     ]
 }
