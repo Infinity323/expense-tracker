@@ -17,7 +17,7 @@ function TransactionsTable() {
 
   const loadTransactions = async () => {
     await db.createIndex({
-      index: { fields: ["type", "date"] },
+      index: { fields: ["type"] },
     });
     await db.createIndex({
       index: { fields: ["date"] },
@@ -47,7 +47,7 @@ function TransactionsTable() {
           </Tr>
         </Thead>
         <Tbody>
-          {transactionDocs ? (
+          {transactionDocs && transactionDocs.length ? (
             transactionDocs.map((transaction) => (
               <Tr>
                 <Td>{transaction.date}</Td>
