@@ -1,5 +1,4 @@
 import {
-  CircularProgress,
   Table,
   TableContainer,
   Tbody,
@@ -8,34 +7,31 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { useEffect } from "react";
-import { useFind } from "use-pouchdb";
+import { useContext, useEffect, useState } from "react";
+import { DbContext } from "../DbContext";
 
 function TransactionsTable() {
-  const { transactionDocs, loading, error } = useFind({
-    index: {
-      fields: ["type"],
-      name: "type",
-    },
-    selector: {
-      type: "transaction",
-    },
+  const db = useContext(DbContext);
+
+  const [transactionDocs, setTransactionDocs] = useState();
+
+  const loadTransactions = async () => {
+    await db.createIndex({
+      index: { fields: ["type", "date"] },
+    });
+    await db.createIndex({
+      index: { fields: ["date"] },
+    });
+    let result = await db.find({
+      selector: { type: "transaction", date: { $exists: true } },
+      sort: [{ date: "desc" }],
+    });
+    setTransactionDocs(result.docs);
+  };
+
+  useEffect(() => {
+    loadTransactions();
   });
-
-  useEffect(() => {
-    if (!loading) {
-      console.log(
-        "Finished loading transactions: %s",
-        JSON.stringify(transactionDocs)
-      );
-    }
-  }, [transactionDocs, loading]);
-
-  useEffect(() => {
-    if (error) {
-      console.error("Error: %s", JSON.stringify(error));
-    }
-  }, [error]);
 
   return (
     <TableContainer>
@@ -51,21 +47,7 @@ function TransactionsTable() {
           </Tr>
         </Thead>
         <Tbody>
-          {error && (
-            <Tr>
-              <Td colSpan="100%">
-                Error: {error.status} - {error.name}
-              </Td>
-            </Tr>
-          )}
-          {loading && !transactionDocs && (
-            <Tr>
-              <Td colSpan="100%">
-                <CircularProgress isIndeterminate size="2.5rem" color="teal" />
-              </Td>
-            </Tr>
-          )}
-          {transactionDocs && !error ? (
+          {transactionDocs ? (
             transactionDocs.map((transaction) => (
               <Tr>
                 <Td>{transaction.date}</Td>

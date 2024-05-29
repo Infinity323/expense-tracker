@@ -13,12 +13,12 @@ import {
   Stack,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useState } from "react";
-import { usePouch } from "use-pouchdb";
+import { useContext, useState } from "react";
+import { DbContext } from "../DbContext";
 
 function AddTransaction() {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const db = usePouch();
+  const db = useContext(DbContext);
 
   const [date, setDate] = useState();
   const [name, setName] = useState();

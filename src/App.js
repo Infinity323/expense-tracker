@@ -1,9 +1,8 @@
 import { ChakraProvider } from "@chakra-ui/react";
 import PouchDB from "pouchdb";
 import PouchdbFind from "pouchdb-find";
-import { useEffect, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Provider } from "use-pouchdb";
+import { DbContext } from "./DbContext";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
 import Budgets from "./pages/Budgets";
@@ -11,25 +10,14 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Transactions from "./pages/Transactions";
 
-function App() {
-  const [db, setDb] = useState(() => new PouchDB("local"));
+PouchDB.plugin(PouchdbFind);
 
-  useEffect(() => {
-    PouchDB.plugin(PouchdbFind);
-    const listener = (dbName) => {
-      if (dbName === "local") {
-        setDb(new PouchDB("local"));
-      }
-    };
-    PouchDB.on("destroyed", listener);
-    return () => {
-      PouchDB.removeListener("destroyed", listener);
-    };
-  }, []);
+function App() {
+  const db = new PouchDB("local");
 
   return (
     <ChakraProvider>
-      <Provider pouchdb={db}>
+      <DbContext.Provider value={db}>
         <BrowserRouter>
           <Navbar />
           <Routes>
@@ -40,7 +28,7 @@ function App() {
           </Routes>
           <Footer />
         </BrowserRouter>
-      </Provider>
+      </DbContext.Provider>
     </ChakraProvider>
   );
 }
