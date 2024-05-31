@@ -15,6 +15,7 @@ import {
 } from "@chakra-ui/react";
 import { useContext, useState } from "react";
 import { DbContext } from "../DbContext";
+import BudgetsSelect from "./BudgetsSelect";
 
 function AddTransaction() {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -82,18 +83,7 @@ function AddTransaction() {
                 onChange={(event) => setDescription(event.target.value)}
                 placeholder="Description"
               />
-              <Input
-                value={category}
-                onChange={(event) => setCategory(event.target.value)}
-                placeholder="Category"
-                isInvalid={category === ""}
-              />
-              <Input
-                value={subcategory}
-                onChange={(event) => setSubcategory(event.target.value)}
-                placeholder="Subcategory"
-                isInvalid={subcategory === ""}
-              />
+              <BudgetsSelect />
               <InputGroup>
                 <InputLeftElement pointerEvents="none" color="gray.300">
                   $
