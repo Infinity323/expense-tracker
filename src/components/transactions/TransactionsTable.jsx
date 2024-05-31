@@ -10,6 +10,7 @@ import {
 import { useContext, useEffect, useState } from "react";
 import { DbContext } from "../../DbContext";
 import EditTransaction from "./EditTransaction";
+import DeleteTransaction from "./DeleteTransaction";
 
 function TransactionsTable() {
   const db = useContext(DbContext);
@@ -60,6 +61,10 @@ function TransactionsTable() {
                 <Td isNumeric>${transaction.amount}</Td>
                 <Td padding="0">
                   <EditTransaction transactionDoc={transaction} />
+                  <DeleteTransaction
+                    transactionDoc={transaction}
+                    onDelete={loadTransactions}
+                  />
                 </Td>
               </Tr>
             ))
