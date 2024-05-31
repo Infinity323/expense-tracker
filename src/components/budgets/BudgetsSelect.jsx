@@ -2,9 +2,17 @@ import { Select } from "@chakra-ui/react";
 import { useContext, useEffect, useState } from "react";
 import { DbContext } from "../../DbContext";
 
-function BudgetsSelect() {
+function BudgetsSelect({
+  selectedCategory,
+  selectedSubcategory,
+  setCategory,
+  setSubcategory,
+}) {
   const db = useContext(DbContext);
 
+  // const [selectedCategory, setSelectedCategory] = useState(selectedCategory);
+  // const [selectedSubcategory, setSelectedSubcategory] =
+  //   useState(selectedSubcategory);
   const [categories, setCategories] = useState();
   const [subcategories, setSubcategories] = useState();
 
@@ -32,20 +40,36 @@ function BudgetsSelect() {
     ]);
   };
 
+  const changeCategory = (event) => {
+    setCategory(event.target.value);
+  };
+
+  const changeSubcategory = (event) => {
+    setSubcategory(event.target.value);
+  };
+
   useEffect(() => {
     loadBudgets();
   });
 
   return (
     <>
-      <Select placeholder="Category">
+      <Select
+        onChange={changeCategory}
+        value={selectedCategory}
+        placeholder="Category"
+      >
         {categories
           ? categories.map((category) => (
               <option value={category}>{category}</option>
             ))
           : ""}
       </Select>
-      <Select placeholder="Subcategory">
+      <Select
+        onChange={changeSubcategory}
+        value={selectedSubcategory}
+        placeholder="Subcategory"
+      >
         {subcategories
           ? subcategories.map((subcategory) => (
               <option value={subcategory}>{subcategory}</option>

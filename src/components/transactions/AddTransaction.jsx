@@ -86,7 +86,12 @@ function AddTransaction() {
                 onChange={(event) => setDescription(event.target.value)}
                 placeholder="Description"
               />
-              <BudgetsSelect />
+              <BudgetsSelect
+                selectedCategory={category}
+                selectedSubcategory={subcategory}
+                setCategory={setCategory}
+                setSubcategory={setSubcategory}
+              />
               <InputGroup>
                 <InputLeftElement pointerEvents="none" color="gray.300">
                   $

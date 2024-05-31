@@ -40,7 +40,13 @@ function DeleteTransaction({ transactionDoc, onDelete }) {
           <ModalCloseButton />
           <ModalBody>This action cannot be undone.</ModalBody>
           <ModalFooter>
-            <Button colorScheme="red" onClick={deleteTransaction}>
+            <Button
+              colorScheme="red"
+              onClick={(event) => {
+                deleteTransaction(event);
+                onClose();
+              }}
+            >
               Delete
             </Button>
           </ModalFooter>

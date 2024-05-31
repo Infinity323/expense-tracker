@@ -1,6 +1,4 @@
 import {
-  Icon,
-  IconButton,
   Table,
   TableContainer,
   Tbody,
@@ -10,7 +8,6 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { useContext, useEffect, useState } from "react";
-import { FaRegTrashCan } from "react-icons/fa6";
 import { DbContext } from "../../DbContext";
 import EditBudget from "./EditBudget";
 import DeleteBudget from "./DeleteBudget";
