@@ -7,6 +7,7 @@ import {
   InputLeftElement,
   Modal,
   ModalBody,
+  ModalCloseButton,
   ModalContent,
   ModalFooter,
   ModalHeader,
@@ -51,6 +52,7 @@ function EditBudget({ budgetDoc }) {
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Edit Budget</ModalHeader>
+          <ModalCloseButton />
           <ModalBody>
             <Stack>
               <Input

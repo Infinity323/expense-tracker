@@ -5,6 +5,7 @@ import {
   InputLeftElement,
   Modal,
   ModalBody,
+  ModalCloseButton,
   ModalContent,
   ModalFooter,
   ModalHeader,
@@ -55,6 +56,7 @@ function AddBudget() {
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Add New Budget</ModalHeader>
+          <ModalCloseButton />
           <ModalBody>
             <Stack>
               <Input

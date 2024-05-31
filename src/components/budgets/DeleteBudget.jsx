@@ -4,6 +4,7 @@ import {
   IconButton,
   Modal,
   ModalBody,
+  ModalCloseButton,
   ModalContent,
   ModalFooter,
   ModalHeader,
@@ -36,6 +37,7 @@ function DeleteBudget({ budgetDoc, onDelete }) {
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Are you sure?</ModalHeader>
+          <ModalCloseButton />
           <ModalBody>This action cannot be undone.</ModalBody>
           <ModalFooter>
             <Button colorScheme="red" onClick={deleteBudget}>
