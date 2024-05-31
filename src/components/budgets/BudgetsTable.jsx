@@ -13,6 +13,7 @@ import { useContext, useEffect, useState } from "react";
 import { FaRegTrashCan } from "react-icons/fa6";
 import { DbContext } from "../../DbContext";
 import EditBudget from "./EditBudget";
+import DeleteBudget from "./DeleteBudget";
 
 function BudgetsTable() {
   const db = useContext(DbContext);
@@ -65,11 +66,7 @@ function BudgetsTable() {
                 <Td isNumeric>${budget.amount}</Td>
                 <Td padding="0" width="0">
                   <EditBudget budgetDoc={budget} />
-                  <IconButton
-                    variant="ghost"
-                    size="sm"
-                    icon={<Icon as={FaRegTrashCan} />}
-                  />
+                  <DeleteBudget budgetDoc={budget} onDelete={loadBudgets} />
                 </Td>
               </Tr>
             ))
