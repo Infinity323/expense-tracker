@@ -10,11 +10,7 @@ function BudgetsSelect({
 }) {
   const db = useContext(DbContext);
 
-  // const [selectedCategory, setSelectedCategory] = useState(selectedCategory);
-  // const [selectedSubcategory, setSelectedSubcategory] =
-  //   useState(selectedSubcategory);
-  const [categories, setCategories] = useState();
-  const [subcategories, setSubcategories] = useState();
+  const [budgets, setBudgets] = useState();
 
   const loadBudgets = async () => {
     await db.createIndex({
@@ -34,10 +30,12 @@ function BudgetsSelect({
       },
       sort: [{ category: "asc", subcategory: "asc" }],
     });
-    setCategories([...new Set(result.docs.map((budget) => budget.category))]);
-    setSubcategories([
-      ...new Set(result.docs.map((budget) => budget.subcategory)),
-    ]);
+    let budgetsMap = {};
+    result.docs.forEach((doc) => {
+      budgetsMap[doc.category] = budgetsMap[doc.category] || [];
+      budgetsMap[doc.category].push(doc.subcategory);
+    });
+    setBudgets(budgetsMap);
   };
 
   const changeCategory = (event) => {
@@ -59,8 +57,8 @@ function BudgetsSelect({
         value={selectedCategory}
         placeholder="Category"
       >
-        {categories
-          ? categories.map((category) => (
+        {budgets
+          ? Object.keys(budgets).map((category) => (
               <option value={category}>{category}</option>
             ))
           : ""}
@@ -69,9 +67,10 @@ function BudgetsSelect({
         onChange={changeSubcategory}
         value={selectedSubcategory}
         placeholder="Subcategory"
+        isDisabled={!selectedCategory}
       >
-        {subcategories
-          ? subcategories.map((subcategory) => (
+        {budgets && budgets[selectedCategory]
+          ? budgets[selectedCategory].map((subcategory) => (
               <option value={subcategory}>{subcategory}</option>
             ))
           : ""}
