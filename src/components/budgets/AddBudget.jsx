@@ -38,6 +38,9 @@ function AddBudget() {
       JSON.stringify(budgetDoc)
     );
     onClose();
+  };
+
+  const resetFields = () => {
     setCategory();
     setSubcategory();
     setAmount();
@@ -82,7 +85,10 @@ function AddBudget() {
           <ModalFooter>
             <Button
               colorScheme="teal"
-              onClick={addBudget}
+              onClick={(event) => {
+                addBudget(event);
+                resetFields();
+              }}
               isDisabled={!category || !subcategory || !amount}
             >
               Submit

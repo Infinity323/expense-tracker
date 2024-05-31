@@ -28,23 +28,15 @@ function EditBudget({ budgetDoc }) {
 
   const editBudget = async (event) => {
     event.preventDefault();
-    const newBudgetDoc = {
-      _id: budgetDoc._id,
-      _rev: budgetDoc._rev,
-      type: "budget",
-      category: category,
-      subcategory: subcategory,
-      amount: parseFloat(amount),
-    };
-    await db.put(newBudgetDoc);
+    budgetDoc.category = category;
+    budgetDoc.subcategory = subcategory;
+    budgetDoc.amount = amount;
+    await db.put(budgetDoc);
     console.log(
       "Successfully added new budget document: %s",
-      JSON.stringify(newBudgetDoc)
+      JSON.stringify(budgetDoc)
     );
     onClose();
-    setCategory();
-    setSubcategory();
-    setAmount();
   };
 
   return (
