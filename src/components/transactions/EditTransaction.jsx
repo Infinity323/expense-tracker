@@ -1,5 +1,7 @@
 import {
   Button,
+  Icon,
+  IconButton,
   Input,
   InputGroup,
   InputLeftElement,
@@ -14,51 +16,45 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useContext, useState } from "react";
-import { DbContext } from "../DbContext";
-import BudgetsSelect from "./budgets/BudgetsSelect";
+import { DbContext } from "../../DbContext";
+import BudgetsSelect from "../budgets/BudgetsSelect";
+import { FaPencil } from "react-icons/fa6";
 
-function AddTransaction() {
+function EditTransaction({ transactionDoc }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const db = useContext(DbContext);
 
-  const [date, setDate] = useState();
-  const [name, setName] = useState();
-  const [description, setDescription] = useState();
-  const [category, setCategory] = useState();
-  const [subcategory, setSubcategory] = useState();
-  const [amount, setAmount] = useState();
+  const [date, setDate] = useState(transactionDoc.date);
+  const [name, setName] = useState(transactionDoc.name);
+  const [description, setDescription] = useState(transactionDoc.description);
+  const [category, setCategory] = useState(transactionDoc.category);
+  const [subcategory, setSubcategory] = useState(transactionDoc.subcategory);
+  const [amount, setAmount] = useState(transactionDoc.amount);
 
-  const addTransaction = async (event) => {
+  const editTransaction = async (event) => {
     event.preventDefault();
-    const transactionDoc = {
-      _id: crypto.randomUUID(),
-      type: "transaction",
-      date: date,
-      name: name,
-      description: description,
-      category: category,
-      subcategory: subcategory,
-      amount: parseFloat(amount),
-    };
+    transactionDoc.date = date;
+    transactionDoc.name = name;
+    transactionDoc.date = date;
+    transactionDoc.category = category;
+    transactionDoc.subcategory = subcategory;
+    transactionDoc.amount = parseFloat(amount);
     await db.put(transactionDoc);
     console.log(
       "Successfully added new transaction document: %s",
       JSON.stringify(transactionDoc)
     );
     onClose();
-    setDate();
-    setName();
-    setDescription();
-    setCategory();
-    setSubcategory();
-    setAmount();
   };
 
   return (
     <>
-      <Button colorScheme="teal" onClick={onOpen}>
-        Add Transaction
-      </Button>
+      <IconButton
+        variant="ghost"
+        size="sm"
+        onClick={onOpen}
+        icon={<Icon as={FaPencil} />}
+      />
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
@@ -100,7 +96,7 @@ function AddTransaction() {
           <ModalFooter>
             <Button
               colorScheme="teal"
-              onClick={addTransaction}
+              onClick={editTransaction}
               isDisabled={
                 !date || !name || !category || !subcategory || !amount
               }
@@ -114,4 +110,4 @@ function AddTransaction() {
   );
 }
 
-export default AddTransaction;
+export default EditTransaction;

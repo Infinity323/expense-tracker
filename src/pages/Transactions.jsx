@@ -1,6 +1,6 @@
 import { Box } from "@chakra-ui/react";
-import AddTransaction from "../components/AddTransaction";
-import TransactionsTable from "../components/TransactionsTable";
+import AddTransaction from "../components/transactions/AddTransaction";
+import TransactionsTable from "../components/transactions/TransactionsTable";
 
 function Transactions() {
   return (

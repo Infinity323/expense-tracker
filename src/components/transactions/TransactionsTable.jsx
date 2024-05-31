@@ -8,7 +8,8 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { useContext, useEffect, useState } from "react";
-import { DbContext } from "../DbContext";
+import { DbContext } from "../../DbContext";
+import EditTransaction from "./EditTransaction";
 
 function TransactionsTable() {
   const db = useContext(DbContext);
@@ -44,6 +45,7 @@ function TransactionsTable() {
             <Th>Category</Th>
             <Th>Subcategory</Th>
             <Th isNumeric>Amount</Th>
+            <Th width="0">Actions</Th>
           </Tr>
         </Thead>
         <Tbody>
@@ -56,6 +58,9 @@ function TransactionsTable() {
                 <Td>{transaction.category}</Td>
                 <Td>{transaction.subcategory}</Td>
                 <Td isNumeric>${transaction.amount}</Td>
+                <Td padding="0">
+                  <EditTransaction transactionDoc={transaction} />
+                </Td>
               </Tr>
             ))
           ) : (
