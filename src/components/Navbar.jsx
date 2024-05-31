@@ -4,16 +4,22 @@ import {
   ButtonGroup,
   Flex,
   Heading,
+  Icon,
   Spacer,
 } from "@chakra-ui/react";
+import { FaChartLine } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 
 function Navbar() {
   return (
     <Flex minWidth="max-content" p="2" alignItems="center" gap="2">
-      <Box p="2">
+      <Box p="2" justifyContent="center">
         <Link to="/">
-          <Heading size="md">Expense Tracker</Heading>
+          <Icon as={FaChartLine} />
+          <Heading size="md" as="span">
+            {" "}
+            Expense Tracker
+          </Heading>
         </Link>
       </Box>
       <Spacer />
