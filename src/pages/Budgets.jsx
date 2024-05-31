@@ -1,6 +1,6 @@
 import { Box } from "@chakra-ui/react";
-import AddBudget from "../components/AddBudget";
-import BudgetsTable from "../components/BudgetsTable";
+import AddBudget from "../components/budgets/AddBudget";
+import BudgetsTable from "../components/budgets/BudgetsTable";
 
 function Budgets() {
   return (

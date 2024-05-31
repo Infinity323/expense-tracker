@@ -5,7 +5,6 @@ import {
   InputLeftElement,
   Modal,
   ModalBody,
-  ModalCloseButton,
   ModalContent,
   ModalFooter,
   ModalHeader,
@@ -14,41 +13,31 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useContext, useState } from "react";
-import { DbContext } from "../DbContext";
-import BudgetsSelect from "./budgets/BudgetsSelect";
+import { DbContext } from "../../DbContext";
 
-function AddTransaction() {
+function AddBudget() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const db = useContext(DbContext);
 
-  const [date, setDate] = useState();
-  const [name, setName] = useState();
-  const [description, setDescription] = useState();
   const [category, setCategory] = useState();
   const [subcategory, setSubcategory] = useState();
   const [amount, setAmount] = useState();
 
-  const addTransaction = async (event) => {
+  const addBudget = async (event) => {
     event.preventDefault();
-    const transactionDoc = {
+    const budgetDoc = {
       _id: crypto.randomUUID(),
-      type: "transaction",
-      date: date,
-      name: name,
-      description: description,
+      type: "budget",
       category: category,
       subcategory: subcategory,
       amount: parseFloat(amount),
     };
-    await db.put(transactionDoc);
+    await db.put(budgetDoc);
     console.log(
-      "Successfully added new transaction document: %s",
-      JSON.stringify(transactionDoc)
+      "Successfully added new budget document: %s",
+      JSON.stringify(budgetDoc)
     );
     onClose();
-    setDate();
-    setName();
-    setDescription();
     setCategory();
     setSubcategory();
     setAmount();
@@ -57,33 +46,26 @@ function AddTransaction() {
   return (
     <>
       <Button colorScheme="teal" onClick={onOpen}>
-        Add Transaction
+        Add Budget
       </Button>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Add New Transaction</ModalHeader>
-          <ModalCloseButton />
+          <ModalHeader>Add New Budget</ModalHeader>
           <ModalBody>
             <Stack>
               <Input
-                value={date}
-                onChange={(event) => setDate(event.target.value)}
-                placeholder="Date"
-                type="date"
+                value={category}
+                onChange={(event) => setCategory(event.target.value)}
+                placeholder="Category"
+                isInvalid={category === ""}
               />
               <Input
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                placeholder="Name"
-                isInvalid={name === ""}
+                value={subcategory}
+                onChange={(event) => setSubcategory(event.target.value)}
+                placeholder="Subcategory"
+                isInvalid={subcategory === ""}
               />
-              <Input
-                value={description}
-                onChange={(event) => setDescription(event.target.value)}
-                placeholder="Description"
-              />
-              <BudgetsSelect />
               <InputGroup>
                 <InputLeftElement pointerEvents="none" color="gray.300">
                   $
@@ -91,7 +73,7 @@ function AddTransaction() {
                 <Input
                   value={amount}
                   onChange={(event) => setAmount(event.target.value)}
-                  placeholder="Amount"
+                  placeholder="Monthly Amount"
                   isInvalid={amount === ""}
                 ></Input>
               </InputGroup>
@@ -100,10 +82,8 @@ function AddTransaction() {
           <ModalFooter>
             <Button
               colorScheme="teal"
-              onClick={addTransaction}
-              isDisabled={
-                !date || !name || !category || !subcategory || !amount
-              }
+              onClick={addBudget}
+              isDisabled={!category || !subcategory || !amount}
             >
               Submit
             </Button>
@@ -114,4 +94,4 @@ function AddTransaction() {
   );
 }
 
-export default AddTransaction;
+export default AddBudget;

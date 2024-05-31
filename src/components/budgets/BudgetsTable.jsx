@@ -1,4 +1,6 @@
 import {
+  Icon,
+  IconButton,
   Table,
   TableContainer,
   Tbody,
@@ -8,7 +10,9 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { useContext, useEffect, useState } from "react";
-import { DbContext } from "../DbContext";
+import { FaRegTrashCan } from "react-icons/fa6";
+import { DbContext } from "../../DbContext";
+import EditBudget from "./EditBudget";
 
 function BudgetsTable() {
   const db = useContext(DbContext);
@@ -48,6 +52,8 @@ function BudgetsTable() {
             <Th>Category</Th>
             <Th>Subcategory</Th>
             <Th isNumeric>Monthly Amount</Th>
+            {/* 0% to make Actions column as small as possible */}
+            <Th width="0">Actions</Th>
           </Tr>
         </Thead>
         <Tbody>
@@ -57,6 +63,14 @@ function BudgetsTable() {
                 <Td>{budget.category}</Td>
                 <Td>{budget.subcategory}</Td>
                 <Td isNumeric>${budget.amount}</Td>
+                <Td padding="0" width="0">
+                  <EditBudget budgetDoc={budget} />
+                  <IconButton
+                    variant="ghost"
+                    size="sm"
+                    icon={<Icon as={FaRegTrashCan} />}
+                  />
+                </Td>
               </Tr>
             ))
           ) : (

@@ -1,6 +1,6 @@
 import { Select } from "@chakra-ui/react";
 import { useContext, useEffect, useState } from "react";
-import { DbContext } from "../DbContext";
+import { DbContext } from "../../DbContext";
 
 function BudgetsSelect() {
   const db = useContext(DbContext);

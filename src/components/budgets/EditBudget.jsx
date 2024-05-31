@@ -1,5 +1,7 @@
 import {
   Button,
+  Icon,
+  IconButton,
   Input,
   InputGroup,
   InputLeftElement,
@@ -13,29 +15,31 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useContext, useState } from "react";
-import { DbContext } from "../DbContext";
+import { FaPencil } from "react-icons/fa6";
+import { DbContext } from "../../DbContext";
 
-function AddBudget() {
+function EditBudget({ budgetDoc }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const db = useContext(DbContext);
 
-  const [category, setCategory] = useState();
-  const [subcategory, setSubcategory] = useState();
-  const [amount, setAmount] = useState();
+  const [category, setCategory] = useState(budgetDoc.category);
+  const [subcategory, setSubcategory] = useState(budgetDoc.subcategory);
+  const [amount, setAmount] = useState(budgetDoc.amount);
 
-  const addBudget = async (event) => {
+  const editBudget = async (event) => {
     event.preventDefault();
-    const budgetDoc = {
-      _id: crypto.randomUUID(),
+    const newBudgetDoc = {
+      _id: budgetDoc._id,
+      _rev: budgetDoc._rev,
       type: "budget",
       category: category,
       subcategory: subcategory,
       amount: parseFloat(amount),
     };
-    await db.put(budgetDoc);
+    await db.put(newBudgetDoc);
     console.log(
       "Successfully added new budget document: %s",
-      JSON.stringify(budgetDoc)
+      JSON.stringify(newBudgetDoc)
     );
     onClose();
     setCategory();
@@ -45,13 +49,16 @@ function AddBudget() {
 
   return (
     <>
-      <Button colorScheme="teal" onClick={onOpen}>
-        Add Budget
-      </Button>
+      <IconButton
+        variant="ghost"
+        size="sm"
+        onClick={onOpen}
+        icon={<Icon as={FaPencil} />}
+      />
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Add New Budget</ModalHeader>
+          <ModalHeader>Edit Budget</ModalHeader>
           <ModalBody>
             <Stack>
               <Input
@@ -82,7 +89,7 @@ function AddBudget() {
           <ModalFooter>
             <Button
               colorScheme="teal"
-              onClick={addBudget}
+              onClick={editBudget}
               isDisabled={!category || !subcategory || !amount}
             >
               Submit
@@ -94,4 +101,4 @@ function AddBudget() {
   );
 }
 
-export default AddBudget;
+export default EditBudget;
