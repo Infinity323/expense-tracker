@@ -1,6 +1,12 @@
 {
     "configurations": [
         {
+            "name": "Launch Server",
+            "program": "${workspaceFolder}/server.js",
+            "request": "launch",
+            "type": "node"
+        },
+        {
             "name": "Launch Chrome",
             "request": "launch",
             "type": "chrome",

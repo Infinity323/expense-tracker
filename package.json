@@ -10,12 +10,17 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.7.2",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
     "framer-motion": "^11.2.6",
+    "plaid": "^24.0.0",
     "pouchdb": "^8.0.1",
     "pouchdb-find": "^8.0.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-icons": "^5.2.1",
+    "react-plaid-link": "^3.5.1",
     "react-router-dom": "^6.23.1",
     "react-scripts": "5.0.1"
   },
@@ -46,5 +51,6 @@
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@babel/plugin-transform-private-property-in-object": "^7.24.6"
-  }
+  },
+  "proxy": "http://localhost:8080"
 }
