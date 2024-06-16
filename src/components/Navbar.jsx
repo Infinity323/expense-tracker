@@ -24,6 +24,9 @@ function Navbar() {
       </Box>
       <Spacer />
       <ButtonGroup gap="2">
+        <Link to="/overview">
+          <Button colorScheme="teal">Overview</Button>
+        </Link>
         <Link to="/transactions">
           <Button colorScheme="teal">Transactions</Button>
         </Link>

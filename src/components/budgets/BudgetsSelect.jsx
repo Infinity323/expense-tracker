@@ -57,11 +57,10 @@ function BudgetsSelect({
         value={selectedCategory}
         placeholder="Category"
       >
-        {budgets
-          ? Object.keys(budgets).map((category) => (
-              <option value={category}>{category}</option>
-            ))
-          : ""}
+        {budgets &&
+          Object.keys(budgets).map((category) => (
+            <option value={category}>{category}</option>
+          ))}
       </Select>
       <Select
         onChange={changeSubcategory}
@@ -69,11 +68,11 @@ function BudgetsSelect({
         placeholder="Subcategory"
         isDisabled={!selectedCategory}
       >
-        {budgets && budgets[selectedCategory]
-          ? budgets[selectedCategory].map((subcategory) => (
-              <option value={subcategory}>{subcategory}</option>
-            ))
-          : ""}
+        {budgets &&
+          budgets[selectedCategory] &&
+          budgets[selectedCategory].map((subcategory) => (
+            <option value={subcategory}>{subcategory}</option>
+          ))}
       </Select>
     </>
   );
