@@ -27,3 +27,20 @@ export const getAccessToken = async (publicToken) => {
     return undefined;
   }
 };
+
+export const syncTransactions = async (itemId, accessToken) => {
+  console.log("Syncing transactions for item %s", itemId);
+  try {
+    const headers = {
+      access_token: accessToken,
+    };
+    const response = await axios.get(
+      "/api/transactions/sync/zydPwP97l1FkRBpyrqAdSKpaDaRnNNioqklnr",
+      { headers: headers }
+    );
+    console.log("Successfully synced transactions for item %s", itemId);
+    return response.data;
+  } catch (error) {
+    console.error("Error while syncing transactions for item %s", itemId);
+  }
+};

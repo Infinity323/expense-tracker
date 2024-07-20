@@ -78,6 +78,42 @@ app.post("/api/exchange_public_token", async (req, res, next) => {
   }
 });
 
+app.get("/api/transactions/sync/:item", async (req, res, next) => {
+  console.log(
+    "Received request to sync transactions for item [%s]",
+    req.params.item
+  );
+  try {
+    let cursor = null;
+    let added = [];
+    let modified = [];
+    let removed = [];
+    let hasMore = true;
+    while (hasMore) {
+      const request = {
+        access_token: req.headers.access_token,
+        cursor: cursor,
+      };
+      const response = await client.transactionsSync(request);
+      const data = response.data;
+
+      added = added.concat(data.added);
+      modified = modified.concat(data.modified);
+      removed = removed.concat(data.removed);
+
+      hasMore = data.has_more;
+      cursor = data.next_cursor;
+    }
+    console.log(
+      "Successfully synced transactions for item [%s]",
+      req.params.item
+    );
+    res.json(added);
+  } catch (error) {
+    console.error("Failed to sync transactions for item [%s]", req.params.item);
+  }
+});
+
 // // Fetches balance data using the Node client library for Plaid
 // app.get("/api/balance", async (req, res, next) => {
 //   const access_token = req.session.access_token;

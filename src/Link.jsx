@@ -21,7 +21,7 @@ function Link({ linkToken }) {
         },
       },
     });
-    if (existingLink && existingLink.length) {
+    if (existingLink.docs && existingLink.docs.length) {
       console.log(
         "Institution %s already linked",
         metadata.institution.institution_id
