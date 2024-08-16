@@ -1,123 +1,48 @@
 require("dotenv").config();
+
+const { mkdirp } = require("mkdirp");
+const PouchDB = require("pouchdb");
 const express = require("express");
 const bodyParser = require("body-parser");
 const session = require("express-session");
-const { Configuration, PlaidApi, PlaidEnvironments } = require("plaid");
-const app = express();
 
-app.use(
-  // FOR DEMO PURPOSES ONLY
-  // Use an actual secret key in production
-  session({ secret: "test", saveUninitialized: true, resave: true })
-);
+const plaidTokenRouter = require("./routes/token");
+const transactionRouter = require("./routes/transaction");
+const clientErrorHandler =
+  require("./middleware/error-handler").clientErrorHandler;
+const defaultErrorHandler =
+  require("./middleware/error-handler").defaultErrorHandler;
+
+mkdirp("/tmp/expense-tracker");
+mkdirp("/tmp/expense-tracker/db");
+
+const app = express();
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-// Configuration for the Plaid client
-const config = new Configuration({
-  basePath: PlaidEnvironments[process.env.PLAID_ENV],
-  baseOptions: {
-    headers: {
-      "PLAID-CLIENT-ID": process.env.PLAID_CLIENT_ID,
-      "PLAID-SECRET": process.env.PLAID_SECRET,
-    },
-  },
+// database
+app.use(
+  "/db",
+  require("express-pouchdb")(PouchDB, {
+    configPath: "./pouchdb-config.json",
+  })
+);
+
+// "request interceptor"
+app.use("/api/", (req, res, next) => {
+  console.log(`Received ${req.method} request for ${req.url}`);
+  next();
 });
 
-// Instantiate the Plaid client with the configuration
-const client = new PlaidApi(config);
+// routes
+app.use("/api/token", plaidTokenRouter);
+app.use("/api/transaction", transactionRouter);
 
-// Creates a Link token and return it
-app.post("/api/create_link_token/:userId", async (req, res, next) => {
-  let userId = req.params.userId;
-  console.log("Received request to create link token for user %s", userId);
-  try {
-    const tokenResponse = await client.linkTokenCreate({
-      user: { client_user_id: userId },
-      client_name: "Expense Tracker",
-      language: "en",
-      products: ["transactions"],
-      country_codes: ["US"],
-    });
-    console.log("Successfully created link token for user %s", userId);
-    res.json(tokenResponse.data);
-  } catch (error) {
-    console.error(
-      "Failed to create link token for user %s: %s",
-      userId,
-      err.response?.data
-    );
-  }
+// error handlers
+app.use(clientErrorHandler);
+app.use(defaultErrorHandler);
+
+app.listen(process.env.SERVER_PORT || 8080, () => {
+  console.log(`Server is running on port ${process.env.SERVER_PORT}`);
 });
-
-// Exchanges the public token from Plaid Link for an access token
-app.post("/api/exchange_public_token", async (req, res, next) => {
-  console.log(
-    "Received request to exchange public token [%s] for access token",
-    req.body.public_token
-  );
-  try {
-    const exchangeResponse = await client.itemPublicTokenExchange({
-      public_token: req.body.public_token,
-    });
-    console.log(
-      "Successfully exchanged public token [%s] for access token",
-      req.body.public_token
-    );
-    res.json(exchangeResponse.data);
-  } catch (error) {
-    console.error(
-      "Failed to exchange public token [%s] for access token",
-      req.body.public_token
-    );
-  }
-});
-
-app.get("/api/transactions/sync/:item", async (req, res, next) => {
-  console.log(
-    "Received request to sync transactions for item [%s]",
-    req.params.item
-  );
-  try {
-    let cursor = null;
-    let added = [];
-    let modified = [];
-    let removed = [];
-    let hasMore = true;
-    while (hasMore) {
-      const request = {
-        access_token: req.headers.access_token,
-        cursor: cursor,
-      };
-      const response = await client.transactionsSync(request);
-      const data = response.data;
-
-      added = added.concat(data.added);
-      modified = modified.concat(data.modified);
-      removed = removed.concat(data.removed);
-
-      hasMore = data.has_more;
-      cursor = data.next_cursor;
-    }
-    console.log(
-      "Successfully synced transactions for item [%s]",
-      req.params.item
-    );
-    res.json(added);
-  } catch (error) {
-    console.error("Failed to sync transactions for item [%s]", req.params.item);
-  }
-});
-
-// // Fetches balance data using the Node client library for Plaid
-// app.get("/api/balance", async (req, res, next) => {
-//   const access_token = req.session.access_token;
-//   const balanceResponse = await client.accountsBalanceGet({ access_token });
-//   res.json({
-//     Balance: balanceResponse.data,
-//   });
-// });
-
-console.log(`Starting Express server on port ${process.env.SERVER_PORT}`);
-app.listen(process.env.SERVER_PORT || 8080);
