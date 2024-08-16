@@ -1,8 +1,8 @@
-import { useContext, useEffect } from "react";
-import { usePlaidLink } from "react-plaid-link";
-import { getAccessToken } from "./PlaidService";
-import { DbContext } from "./DbContext";
 import { Button } from "@chakra-ui/react";
+import { useContext } from "react";
+import { usePlaidLink } from "react-plaid-link";
+import { DbContext } from "./DbContext";
+import { getAccessToken } from "./PlaidService";
 
 function Link({ linkToken }) {
   const db = useContext(DbContext);

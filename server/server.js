@@ -1,7 +1,3 @@
-/*
-server.js – Configures the Plaid client and uses Express to defines routes that call Plaid endpoints in the Sandbox environment.Utilizes the official Plaid node.js client library to make calls to the Plaid API.
-*/
-
 require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
