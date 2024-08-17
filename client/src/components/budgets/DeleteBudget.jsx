@@ -11,17 +11,15 @@ import {
   ModalOverlay,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useContext } from "react";
 import { FaRegTrashCan } from "react-icons/fa6";
-import { DbContext } from "../../DbContext";
+import { deleteBudget } from "../../services/BudgetService";
 
-function DeleteBudget({ budgetDoc, onDelete }) {
+function DeleteBudget({ budgetDoc: budget, onDelete }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const db = useContext(DbContext);
 
-  const deleteBudget = async (event) => {
+  const removeBudget = async (event) => {
     event.preventDefault();
-    await db.remove(budgetDoc);
+    await deleteBudget(budget._id, budget._rev);
     onDelete();
   };
 
@@ -40,7 +38,7 @@ function DeleteBudget({ budgetDoc, onDelete }) {
           <ModalCloseButton />
           <ModalBody>This action cannot be undone.</ModalBody>
           <ModalFooter>
-            <Button colorScheme="red" onClick={deleteBudget}>
+            <Button colorScheme="red" onClick={removeBudget}>
               Delete
             </Button>
           </ModalFooter>

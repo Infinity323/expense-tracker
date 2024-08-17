@@ -6,7 +6,8 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const session = require("express-session");
 
-const plaidTokenRouter = require("./routes/token");
+const tokenRouter = require("./routes/token");
+const budgetRouter = require("./routes/budget");
 const transactionRouter = require("./routes/transaction");
 const clientErrorHandler =
   require("./middleware/error-handler").clientErrorHandler;
@@ -36,7 +37,8 @@ app.use("/api/", (req, res, next) => {
 });
 
 // routes
-app.use("/api/token", plaidTokenRouter);
+app.use("/api/token", tokenRouter);
+app.use("/api/budget", budgetRouter);
 app.use("/api/transaction", transactionRouter);
 
 // error handlers

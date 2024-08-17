@@ -11,17 +11,15 @@ import {
   ModalOverlay,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useContext } from "react";
 import { FaRegTrashCan } from "react-icons/fa6";
-import { DbContext } from "../../DbContext";
+import { deleteTransaction } from "../../services/TransactionService";
 
-function DeleteTransaction({ transactionDoc, onDelete }) {
+function DeleteTransaction({ transactionDoc: transaction, onDelete }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const db = useContext(DbContext);
 
-  const deleteTransaction = async (event) => {
+  const removeTransaction = async (event) => {
     event.preventDefault();
-    await db.remove(transactionDoc);
+    await deleteTransaction(transaction._id, transaction._rev);
     onDelete();
   };
 
@@ -43,7 +41,7 @@ function DeleteTransaction({ transactionDoc, onDelete }) {
             <Button
               colorScheme="red"
               onClick={(event) => {
-                deleteTransaction(event);
+                removeTransaction(event);
                 onClose();
               }}
             >

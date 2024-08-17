@@ -13,12 +13,11 @@ import {
   Stack,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useContext, useState } from "react";
-import { DbContext } from "../../DbContext";
+import { useState } from "react";
+import { postBudget } from "../../services/BudgetService";
 
-function AddBudget() {
+function AddBudget({ setReload }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const db = useContext(DbContext);
 
   const [category, setCategory] = useState();
   const [subcategory, setSubcategory] = useState();
@@ -26,18 +25,7 @@ function AddBudget() {
 
   const addBudget = async (event) => {
     event.preventDefault();
-    const budgetDoc = {
-      _id: crypto.randomUUID(),
-      type: "budget",
-      category: category,
-      subcategory: subcategory,
-      amount: parseFloat(amount),
-    };
-    await db.put(budgetDoc);
-    console.log(
-      "Successfully added new budget document: %s",
-      JSON.stringify(budgetDoc)
-    );
+    await postBudget({ category, subcategory, amount });
     onClose();
   };
 
@@ -45,6 +33,7 @@ function AddBudget() {
     setCategory();
     setSubcategory();
     setAmount();
+    setReload(true);
   };
 
   return (

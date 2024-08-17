@@ -1,7 +1,7 @@
 import { Button } from "@chakra-ui/react";
-import { syncTransactions } from "../../PlaidService";
 import { useContext, useState } from "react";
 import { DbContext } from "../../DbContext";
+import { syncTransactions } from "../../services/TransactionService";
 
 function SyncTransactions() {
   const db = useContext(DbContext);

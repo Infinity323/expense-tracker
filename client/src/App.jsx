@@ -1,24 +1,21 @@
 import { ChakraProvider } from "@chakra-ui/react";
 import PouchDB from "pouchdb";
 import PouchdbFind from "pouchdb-find";
+import { useEffect, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { DbContext } from "./DbContext";
+import Link from "./Link";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
 import Budgets from "./pages/Budgets";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
-import Transactions from "./pages/Transactions";
 import Overview from "./pages/Overview";
-import { useEffect, useState } from "react";
-import { getLinkToken } from "./PlaidService";
-import Link from "./Link";
+import Transactions from "./pages/Transactions";
+import { getLinkToken } from "./services/PlaidService";
 
 PouchDB.plugin(PouchdbFind);
 
 function App() {
-  const db = new PouchDB("local");
-
   const [linkToken, setLinkToken] = useState();
 
   useEffect(() => {
@@ -31,20 +28,18 @@ function App() {
 
   return (
     <ChakraProvider>
-      <DbContext.Provider value={db}>
-        <BrowserRouter>
-          <Navbar />
-          <Routes>
-            <Route path="/" Component={Home} />
-            <Route path="/overview" Component={Overview} />
-            <Route path="/budgets" Component={Budgets} />
-            <Route path="/transactions" Component={Transactions} />
-            <Route path="/login" Component={Login} />
-          </Routes>
-          <Footer />
-        </BrowserRouter>
-        {linkToken && <Link linkToken={linkToken} />}
-      </DbContext.Provider>
+      <BrowserRouter>
+        <Navbar />
+        <Routes>
+          <Route path="/" Component={Home} />
+          <Route path="/overview" Component={Overview} />
+          <Route path="/budgets" Component={Budgets} />
+          <Route path="/transactions" Component={Transactions} />
+          <Route path="/login" Component={Login} />
+        </Routes>
+        <Footer />
+      </BrowserRouter>
+      {linkToken && <Link linkToken={linkToken} />}
     </ChakraProvider>
   );
 }

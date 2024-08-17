@@ -7,40 +7,28 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { useContext, useEffect, useState } from "react";
-import { DbContext } from "../../DbContext";
-import EditBudget from "./EditBudget";
+import { useEffect, useState } from "react";
+import { getBudgets } from "../../services/BudgetService";
 import DeleteBudget from "./DeleteBudget";
+import EditBudget from "./EditBudget";
 
-function BudgetsTable() {
-  const db = useContext(DbContext);
-
-  const [budgetDocs, setBudgetDocs] = useState();
+function BudgetsTable({ reload, setReload }) {
+  const [budgets, setBudgets] = useState([]);
 
   const loadBudgets = async () => {
-    await db.createIndex({
-      index: { fields: ["type"] },
-    });
-    await db.createIndex({
-      index: { fields: ["category"] },
-    });
-    await db.createIndex({
-      index: { fields: ["subcategory"] },
-    });
-    let result = await db.find({
-      selector: {
-        type: "budget",
-        category: { $exists: true },
-        subcategory: { $exists: true },
-      },
-      sort: [{ category: "asc", subcategory: "asc" }],
-    });
-    setBudgetDocs(result.docs);
+    setBudgets(await getBudgets());
   };
 
   useEffect(() => {
     loadBudgets();
-  });
+  }, []);
+
+  useEffect(() => {
+    if (reload) {
+      loadBudgets();
+      setReload(false);
+    }
+  }, [reload, setReload]);
 
   return (
     <TableContainer>
@@ -55,8 +43,8 @@ function BudgetsTable() {
           </Tr>
         </Thead>
         <Tbody>
-          {budgetDocs && budgetDocs.length ? (
-            budgetDocs.map((budget) => (
+          {budgets && budgets.length ? (
+            budgets.map((budget) => (
               <Tr>
                 <Td>{budget.category}</Td>
                 <Td>{budget.subcategory}</Td>

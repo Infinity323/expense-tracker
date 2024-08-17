@@ -5,28 +5,38 @@ const db = require("../middleware/database");
 
 router.get("/", async (req, res, next) => {
   try {
-    console.log();
-    console.log;
     await db.createIndex({
       index: { fields: ["type"] },
     });
     await db.createIndex({
       index: { fields: ["date"] },
     });
-    let transactions = await db.find({
+    let transactionsDocs = await db.find({
       selector: { type: "transaction", date: { $exists: true } },
       sort: [{ date: "desc" }],
     });
     console.log(
-      `Retrieved ${transactions.docs.length} transactions from the database`
+      `Retrieved ${transactionsDocs.docs.length} transactions from the database`
     );
-    res.json(transactions);
+    res.json(transactionsDocs.docs);
   } catch (err) {
     next(err);
   }
 });
 
-router.put("/:item", async (req, res, next) => {
+router.delete("/:id/:rev", async (req, res, next) => {
+  try {
+    await db.remove({ _id: req.params.id, _rev: req.params.rev });
+    console.log(
+      `Successfully deleted transaction document with ID ${req.params.id} and rev ${req.params.rev}`
+    );
+    res.status(200).json();
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.put("/sync/:item", async (req, res, next) => {
   try {
     let cursor = null;
     let added = [];

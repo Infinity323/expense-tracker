@@ -7,33 +7,21 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { useContext, useEffect, useState } from "react";
-import { DbContext } from "../../DbContext";
-import EditTransaction from "./EditTransaction";
+import { useEffect, useState } from "react";
+import { getTransactions } from "../../services/TransactionService";
 import DeleteTransaction from "./DeleteTransaction";
+import EditTransaction from "./EditTransaction";
 
 function TransactionsTable() {
-  const db = useContext(DbContext);
-
-  const [transactionDocs, setTransactionDocs] = useState();
+  const [transactions, setTransactions] = useState([]);
 
   const loadTransactions = async () => {
-    await db.createIndex({
-      index: { fields: ["type"] },
-    });
-    await db.createIndex({
-      index: { fields: ["date"] },
-    });
-    let result = await db.find({
-      selector: { type: "transaction", date: { $exists: true } },
-      sort: [{ date: "desc" }],
-    });
-    setTransactionDocs(result.docs);
+    setTransactions(await getTransactions());
   };
 
   useEffect(() => {
     loadTransactions();
-  });
+  }, []);
 
   return (
     <TableContainer>
@@ -50,8 +38,8 @@ function TransactionsTable() {
           </Tr>
         </Thead>
         <Tbody>
-          {transactionDocs && transactionDocs.length ? (
-            transactionDocs.map((transaction) => (
+          {transactions && transactions.length ? (
+            transactions.map((transaction) => (
               <Tr>
                 <Td>{transaction.date}</Td>
                 <Td>{transaction.name}</Td>
