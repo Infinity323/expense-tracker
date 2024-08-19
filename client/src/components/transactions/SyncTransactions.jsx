@@ -3,8 +3,8 @@ import { syncTransactions } from "../../services/TransactionService";
 
 function SyncTransactions() {
   const sync = async () => {
-    let accessTokens = sessionStorage.getItem("accessTokens");
-    if (accessTokens) {
+    let accessTokens = JSON.parse(sessionStorage.getItem("accessTokens"));
+    if (accessTokens.size > 0) {
       accessTokens.forEach((accessToken, itemId) => {
         syncTransactions(itemId, accessToken);
       });

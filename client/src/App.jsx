@@ -19,7 +19,7 @@ PouchDB.plugin(PouchdbFind);
 function App() {
   const loadAccessTokens = async () => {
     let accessTokens = await getAccessTokens();
-    sessionStorage.setItem("accessTokens", accessTokens);
+    sessionStorage.setItem("accessTokens", JSON.stringify(accessTokens));
   };
 
   useEffect(() => {

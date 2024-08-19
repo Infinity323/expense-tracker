@@ -1,24 +1,21 @@
 const express = require("express");
 const router = express.Router();
 const plaidClient = require("../clients/plaid-client");
-const db = require("../middleware/database");
+const db = require("../db/database");
+const {
+  findAllTransactions,
+  createTransaction,
+  updateTransaction,
+  deleteTransaction,
+} = require("../db/queries/transaction");
 
 router.get("/", async (req, res, next) => {
   try {
-    await db.createIndex({
-      index: { fields: ["type"] },
-    });
-    await db.createIndex({
-      index: { fields: ["date"] },
-    });
-    let transactionsDocs = await db.find({
-      selector: { type: "transaction", date: { $exists: true } },
-      sort: [{ date: "desc" }],
-    });
+    const transactionDocs = await findAllTransactions();
     console.log(
-      `Retrieved ${transactionsDocs.docs.length} transactions from the database`
+      `Retrieved ${transactionDocs.length} transactions from the database`
     );
-    res.json(transactionsDocs.docs);
+    res.json(transactionDocs);
   } catch (err) {
     next(err);
   }
@@ -26,21 +23,9 @@ router.get("/", async (req, res, next) => {
 
 router.post("/", async (req, res, next) => {
   try {
-    let transactionDoc = {
-      _id: crypto.randomUUID(),
-      type: "transaction",
-      date: req.body.date,
-      name: req.body.name,
-      description: req.body.description,
-      category: req.body.category,
-      subcategory: req.body.subcategory,
-      amount: parseFloat(req.body.amount),
-    };
-    await db.put(transactionDoc);
+    const response = await createTransaction(req.body);
     console.log(
-      `Successfully added new transaction document: ${JSON.stringify(
-        transactionDoc
-      )}`
+      `Successfully added new transaction document ID [${response.id}]`
     );
     res.status(201).json(transactionsDoc);
   } catch (err) {
@@ -50,22 +35,9 @@ router.post("/", async (req, res, next) => {
 
 router.put("/", async (req, res, next) => {
   try {
-    let transactionDoc = {
-      _id: req.body._id,
-      _rev: req.body._rev,
-      type: "transaction",
-      date: req.body.date,
-      name: req.body.name,
-      description: req.body.description,
-      category: req.body.category,
-      subcategory: req.body.subcategory,
-      amount: parseFloat(req.body.amount),
-    };
-    await db.put(transactionDoc);
+    const response = await updateTransaction(req.body);
     console.log(
-      `Successfully updated transaction document: ${JSON.stringify(
-        transactionDoc
-      )}`
+      `Successfully updated transaction document ID [${response.id}]`
     );
     res.status(204).send();
   } catch (err) {
@@ -75,11 +47,11 @@ router.put("/", async (req, res, next) => {
 
 router.delete("/:id/:rev", async (req, res, next) => {
   try {
-    await db.remove({ _id: req.params.id, _rev: req.params.rev });
+    await deleteTransaction(req.params);
     console.log(
       `Successfully deleted transaction document with ID ${req.params.id} and rev ${req.params.rev}`
     );
-    res.status(200).json();
+    res.status(204).send();
   } catch (err) {
     next(err);
   }
@@ -87,6 +59,7 @@ router.delete("/:id/:rev", async (req, res, next) => {
 
 router.put("/sync/:item", async (req, res, next) => {
   try {
+    // TODO: modify database
     let cursor = null;
     let added = [];
     let modified = [];

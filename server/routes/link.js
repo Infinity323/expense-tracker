@@ -1,7 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const plaidClient = require("../clients/plaid-client");
-const db = require("../middleware/database");
+const {
+  findAllAccessTokens,
+  createAccessToken,
+} = require("../db/queries/access-token");
+const { createLinkMetadata } = require("../db/queries/link-metadata");
 
 // Creates a Link token and return it
 router.post("/link-token/:userId", async (req, res, next) => {
@@ -25,21 +29,14 @@ router.post("/link-token/:userId", async (req, res, next) => {
 // Get all access tokens
 router.get("/access-token", async (req, res, next) => {
   try {
-    await db.createIndex({
-      index: { fields: ["type", "metadata.institution.institution_id"] },
-    });
-    let accessTokenDocs = await db.find({
-      selector: {
-        type: "accessToken",
-      },
-    });
+    const accessTokenDocs = await findAllAccessTokens();
     console.log(
-      `Retrieved ${accessTokenDocs.docs.length} access tokens from the database`
+      `Retrieved ${accessTokenDocs.length} access tokens from the database`
     );
-    let accessTokenMap = new Map(
-      accessTokenDocs.docs.map((doc) => [doc.itemId, doc.accessToken])
-    );
-    res.json(accessTokenMap);
+    let accessTokens = accessTokenDocs.map((doc) => {
+      return { itemId: doc.itemId, accessToken: doc.accessToken };
+    });
+    res.json(accessTokens);
   } catch (err) {
     next(err);
   }
@@ -48,23 +45,24 @@ router.get("/access-token", async (req, res, next) => {
 // Exchanges the public token from Plaid Link for an access token
 router.post("/access-token", async (req, res, next) => {
   try {
-    const exchangeResponse = await plaidClient.itemPublicTokenExchange({
+    let exchangeResponse = await plaidClient.itemPublicTokenExchange({
       public_token: req.body.public_token,
     });
+    exchangeResponse = exchangeResponse.data;
     console.log(
-      `Successfully exchanged public token ${req.body.public_token} for access token`
+      `Successfully exchanged public token [${req.body.public_token}] for access token`
     );
-    const accessTokenDoc = {
-      _id: crypto.randomUUID(),
-      type: "accessToken",
-      itemId: exchangeResponse.item_id,
-      accessToken: exchangeResponse.access_token,
-    };
-    await db.put(accessTokenDoc);
+    await createAccessToken(
+      exchangeResponse.item_id,
+      exchangeResponse.access_token
+    );
     console.log(
       `Saved access token for item [${exchangeResponse.item_id}] to database`
     );
-    res.json({ [exchangeResponse.item_id]: exchangeResponse.access_token });
+    res.status(201).json({
+      itemId: exchangeResponse.item_id,
+      accessToken: exchangeResponse.access_token,
+    });
   } catch (err) {
     next(err);
   }
@@ -74,14 +72,9 @@ router.post("/access-token", async (req, res, next) => {
 router.post("/", async (req, res, next) => {
   try {
     // TODO: check if link exists and throw error if duplicate
-    const linkMetadataDoc = {
-      _id: crypto.randomUUID(),
-      type: "linkMetadata",
-      metadata: req.body.metadata,
-    };
-    await db.put(linkMetadataDoc);
+    await createLinkMetadata(req.body);
     console.log(
-      `Saved new institution [${metadata.institution.institution_id}] link metadata to database`
+      `Saved new institution [${req.body.institution.institution_id}] link metadata to database`
     );
     res.status(201).send(linkMetadataDoc);
   } catch (err) {

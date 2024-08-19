@@ -27,9 +27,13 @@ export const postAccessToken = async (publicToken) => {
   } catch (err) {}
 };
 
-export const saveAccessTokenToSession = (accessTokenDoc) => {
-  let accessTokens = sessionStorage.getItem("accessTokens");
-  accessTokens[accessTokenDoc.itemId] = accessTokenDoc.accessToken;
+export const saveAccessTokenToSession = (accessTokenResponse) => {
+  let accessTokens = JSON.parse(sessionStorage.getItem("accessTokens"));
+  accessTokens.push({
+    itemId: accessTokenResponse.itemId,
+    accessToken: accessTokenResponse.accessToken,
+  });
+  sessionStorage.setItem("accessTokens", JSON.stringify(accessTokens));
 };
 
 export const postLink = async (metadata) => {

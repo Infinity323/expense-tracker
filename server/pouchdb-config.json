@@ -3,6 +3,6 @@
     "uuid": "b24306a6-933c-4461-8d51-ecf7b417d36f"
   },
   "log": {
-    "file": "/tmp/expense-tracker-db-log.txt"
+    "file": "/tmp/expense-tracker/db/log.txt"
   }
 }
