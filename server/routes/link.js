@@ -52,10 +52,7 @@ router.post("/access-token", async (req, res, next) => {
     console.log(
       `Successfully exchanged public token [${req.body.public_token}] for access token`
     );
-    await createAccessToken(
-      exchangeResponse.item_id,
-      exchangeResponse.access_token
-    );
+    await createAccessToken(exchangeResponse);
     console.log(
       `Saved access token for item [${exchangeResponse.item_id}] to database`
     );
@@ -76,7 +73,7 @@ router.post("/", async (req, res, next) => {
     console.log(
       `Saved new institution [${req.body.institution.institution_id}] link metadata to database`
     );
-    res.status(201).send(linkMetadataDoc);
+    res.status(201).send();
   } catch (err) {
     next(err);
   }
