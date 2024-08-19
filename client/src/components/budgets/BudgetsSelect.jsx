@@ -36,7 +36,9 @@ function BudgetsSelect({
       >
         {budgets &&
           Object.keys(budgets).map((category) => (
-            <option value={category}>{category}</option>
+            <option key={category} value={category}>
+              {category}
+            </option>
           ))}
       </Select>
       <Select
@@ -48,7 +50,9 @@ function BudgetsSelect({
         {budgets &&
           budgets[selectedCategory] &&
           budgets[selectedCategory].map((subcategory) => (
-            <option value={subcategory}>{subcategory}</option>
+            <option key={subcategory} value={subcategory}>
+              {subcategory}
+            </option>
           ))}
       </Select>
     </>
