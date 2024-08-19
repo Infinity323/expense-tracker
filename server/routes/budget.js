@@ -32,18 +32,20 @@ router.get("/", async (req, res, next) => {
 });
 
 const seedBudgets = async () => {
+  let rows = [];
   fs.createReadStream("db/budget-seed-data.csv")
     .pipe(parse({ from_line: 2 }))
-    .on("data", (row) => {
-      createBudget({
-        primary: row[0],
-        detailed: row[1],
-        description: row[2],
-        category: row[3],
-        subcategory: row[4],
-        amount: 0,
-      });
+    .on("data", (row) => rows.push(row));
+  for (const row of rows) {
+    await createBudget({
+      primary: row[0],
+      detailed: row[1],
+      description: row[2],
+      category: row[3],
+      subcategory: row[4],
+      amount: 0,
     });
+  }
   let budgetDocs = await findAllBudgets();
   console.log(`Seeded database with ${budgetDocs.length} budgets`);
   return budgetDocs;

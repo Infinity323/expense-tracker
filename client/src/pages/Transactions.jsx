@@ -17,7 +17,7 @@ function Transactions() {
       <br />
       <Stack direction="row" spacing={4}>
         <AddTransaction setReload={setReload} />
-        <SyncTransactions />
+        <SyncTransactions setReload={setReload} />
       </Stack>
     </Box>
   );
