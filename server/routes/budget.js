@@ -1,4 +1,6 @@
 const express = require("express");
+const fs = require("fs");
+const { parse } = require("csv-parse");
 const router = express.Router();
 const {
   findAllBudgets,
@@ -9,7 +11,10 @@ const {
 
 router.get("/", async (req, res, next) => {
   try {
-    const budgetDocs = await findAllBudgets();
+    let budgetDocs = await findAllBudgets();
+    if (!budgetDocs.length) {
+      budgetDocs = await seedBudgets();
+    }
     console.log(`Retrieved ${budgetDocs.length} budgets from the database`);
     if (req.query.sorted) {
       let budgetsMap = {};
@@ -25,6 +30,24 @@ router.get("/", async (req, res, next) => {
     next(err);
   }
 });
+
+const seedBudgets = async () => {
+  fs.createReadStream("db/budget-seed-data.csv")
+    .pipe(parse({ from_line: 2 }))
+    .on("data", (row) => {
+      createBudget({
+        primary: row[0],
+        detailed: row[1],
+        description: row[2],
+        category: row[3],
+        subcategory: row[4],
+        amount: 0,
+      });
+    });
+  let budgetDocs = await findAllBudgets();
+  console.log(`Seeded database with ${budgetDocs.length} budgets`);
+  return budgetDocs;
+};
 
 router.post("/", async (req, res, next) => {
   try {

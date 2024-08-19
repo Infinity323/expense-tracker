@@ -20,9 +20,32 @@ const findAllBudgets = async () => {
   return budgetDocs.docs;
 };
 
-const createBudget = async ({ category, subcategory, amount }) => {
+const findAllPlaidBudgets = async () => {
+  await db.createIndex({
+    index: { fields: ["detailed"] },
+  });
+  const plaidBudgetDocs = await db.find({
+    selector: {
+      type: BUDGET,
+      detailed: { $exists: true },
+    },
+  });
+  return plaidBudgetDocs.docs;
+};
+
+const createBudget = async ({
+  primary,
+  detailed,
+  description,
+  category,
+  subcategory,
+  amount,
+}) => {
   return await db.post({
     type: BUDGET,
+    primary: primary,
+    detailed: detailed,
+    description: description,
     category: category,
     subcategory: subcategory,
     amount: parseFloat(amount),
@@ -44,4 +67,10 @@ const deleteBudget = async ({ id, rev }) => {
   return await db.remove({ _id: id, _rev: rev });
 };
 
-module.exports = { findAllBudgets, createBudget, updateBudget, deleteBudget };
+module.exports = {
+  findAllBudgets,
+  findAllPlaidBudgets,
+  createBudget,
+  updateBudget,
+  deleteBudget,
+};

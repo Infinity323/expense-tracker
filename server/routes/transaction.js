@@ -11,6 +11,7 @@ const {
   updateItemTransactionCursor,
   findItemTransactionCursor,
 } = require("../db/queries/item");
+const { findAllPlaidBudgets } = require("../db/queries/budget");
 
 router.get("/", async (req, res, next) => {
   try {
@@ -83,12 +84,49 @@ router.put("/sync/:itemId", async (req, res, next) => {
       cursor = data.next_cursor;
     }
 
+    const plaidBudgetDocs = await findAllPlaidBudgets();
+    const plaidBudgetMap = plaidBudgetDocs.reduce((map, doc) => {
+      map[doc.detailed] = {
+        category: doc.category,
+        subcategory: doc.subcategory,
+      };
+      return map;
+    });
+
     added.forEach((transaction) => {
-      createTransaction(transaction);
+      createTransaction({
+        _id: transaction.transaction_id,
+        date: transaction.date,
+        name: transaction.name,
+        category:
+          plaidBudgetMap[transaction.personal_finance_category.detailed]
+            .category,
+        subcategory:
+          plaidBudgetMap[transaction.personal_finance_category.detailed]
+            .subcategory,
+        amount: transaction.amount,
+        account_id: transaction.account_id,
+        merchant_name: transaction.merchant_name,
+        pending: transaction.pending,
+      });
     });
     console.log(`Added ${added.length} transactions for item ${itemId}`);
     modified.forEach((transaction) => {
-      updateTransaction(transaction);
+      updateTransaction({
+        _id: transaction.transaction_id,
+        date: transaction.date,
+        name: transaction.name,
+        category:
+          plaidBudgetMap[transaction.personal_finance_category.detailed]
+            .category,
+        subcategory:
+          plaidBudgetMap[transaction.personal_finance_category.detailed]
+            .subcategory,
+        amount: transaction.amount,
+        account_id: transaction.account_id,
+        merchant_name: transaction.merchant_name,
+        pending: transaction.pending,
+      });
     });
     console.log(`Updated ${modified.length} transactions for item ${itemId}`);
 
