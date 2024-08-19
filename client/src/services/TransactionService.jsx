@@ -28,7 +28,7 @@ export const syncTransactions = async (itemId, accessToken) => {
     const headers = {
       access_token: accessToken,
     };
-    const response = await axios.get(`${TRANSACTION_API}/sync/${itemId}`, {
+    const response = await axios.put(`${TRANSACTION_API}/sync/${itemId}`, {
       headers: headers,
     });
     return response.data;

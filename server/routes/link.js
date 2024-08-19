@@ -1,10 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const plaidClient = require("../clients/plaid-client");
-const {
-  findAllAccessTokens,
-  createAccessToken,
-} = require("../db/queries/access-token");
+const { findAllAccessTokens, createItem } = require("../db/queries/item");
 const { createLinkMetadata } = require("../db/queries/link-metadata");
 
 // Creates a Link token and return it
@@ -29,12 +26,10 @@ router.post("/link-token/:userId", async (req, res, next) => {
 // Get all access tokens
 router.get("/access-token", async (req, res, next) => {
   try {
-    const accessTokenDocs = await findAllAccessTokens();
-    console.log(
-      `Retrieved ${accessTokenDocs.length} access tokens from the database`
-    );
-    let accessTokens = accessTokenDocs.map((doc) => {
-      return { itemId: doc.itemId, accessToken: doc.accessToken };
+    const itemDocs = await findAllAccessTokens();
+    console.log(`Retrieved ${itemDocs.length} access tokens from the database`);
+    let accessTokens = itemDocs.map((doc) => {
+      return { itemId: doc.item_id, accessToken: doc.access_token };
     });
     res.json(accessTokens);
   } catch (err) {
@@ -52,10 +47,15 @@ router.post("/access-token", async (req, res, next) => {
     console.log(
       `Successfully exchanged public token [${req.body.public_token}] for access token`
     );
-    await createAccessToken(exchangeResponse);
-    console.log(
-      `Saved access token for item [${exchangeResponse.item_id}] to database`
+    let accountsResponse = await plaidClient.accountsGet({
+      access_token: exchangeResponse.access_token,
+    });
+    await createItem(
+      exchangeResponse.item_id,
+      exchangeResponse.access_token,
+      accountsResponse.data.accounts
     );
+    console.log(`Saved new item [${exchangeResponse.item_id}] to database`);
     res.status(201).json({
       itemId: exchangeResponse.item_id,
       accessToken: exchangeResponse.access_token,

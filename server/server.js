@@ -9,6 +9,8 @@ const session = require("express-session");
 const linkRouter = require("./routes/link");
 const budgetRouter = require("./routes/budget");
 const transactionRouter = require("./routes/transaction");
+const accountRouter = require("./routes/account");
+
 const clientErrorHandler =
   require("./middleware/error-handler").clientErrorHandler;
 const defaultErrorHandler =
@@ -61,6 +63,7 @@ app.use("/swagger.json", (req, res) => {
 app.use("/api/link", linkRouter);
 app.use("/api/budget", budgetRouter);
 app.use("/api/transaction", transactionRouter);
+app.use("/api/account", accountRouter);
 
 // error handlers
 app.use(clientErrorHandler);

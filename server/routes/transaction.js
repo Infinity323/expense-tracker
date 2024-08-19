@@ -1,13 +1,16 @@
 const express = require("express");
 const router = express.Router();
 const plaidClient = require("../clients/plaid-client");
-const db = require("../db/database");
 const {
   findAllTransactions,
   createTransaction,
   updateTransaction,
   deleteTransaction,
 } = require("../db/queries/transaction");
+const {
+  updateItemTransactionCursor,
+  findItemTransactionCursor,
+} = require("../db/queries/item");
 
 router.get("/", async (req, res, next) => {
   try {
@@ -57,20 +60,19 @@ router.delete("/:id/:rev", async (req, res, next) => {
   }
 });
 
-router.put("/sync/:item", async (req, res, next) => {
+router.put("/sync/:itemId", async (req, res, next) => {
   try {
-    // TODO: modify database
-    let cursor = null;
+    let itemId = req.params.itemId;
+    let cursor = await findItemTransactionCursor(itemId);
     let added = [];
     let modified = [];
     let removed = [];
     let hasMore = true;
     while (hasMore) {
-      const request = {
-        access_token: req.headers.access_token,
+      const response = await plaidClient.transactionsSync({
+        access_token: req.body.headers.access_token,
         cursor: cursor,
-      };
-      const response = await plaidClient.transactionsSync(request);
+      });
       const data = response.data;
 
       added = added.concat(data.added);
@@ -80,9 +82,18 @@ router.put("/sync/:item", async (req, res, next) => {
       hasMore = data.has_more;
       cursor = data.next_cursor;
     }
-    console.log(
-      `Successfully synced transactions for item [${req.params.item}]`
-    );
+
+    added.forEach((transaction) => {
+      createTransaction(transaction);
+    });
+    console.log(`Added ${added.length} transactions for item ${itemId}`);
+    modified.forEach((transaction) => {
+      updateTransaction(transaction);
+    });
+    console.log(`Updated ${modified.length} transactions for item ${itemId}`);
+
+    await updateItemTransactionCursor({ itemId, cursor });
+    console.log(`Successfully synced transactions for item [${itemId}]`);
     res.json(added);
   } catch (err) {
     next(err);
