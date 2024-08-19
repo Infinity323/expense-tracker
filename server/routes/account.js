@@ -7,7 +7,9 @@ router.get("/", async (req, res, next) => {
     let accountDocs = await findAllAccounts();
     let accounts = [];
     accountDocs.forEach((doc) => {
+      let createdTimestamp = doc?.created_timestamp;
       doc?.accounts?.forEach((account) => {
+        account["created_timestamp"] = createdTimestamp;
         accounts.push(account);
       });
     });

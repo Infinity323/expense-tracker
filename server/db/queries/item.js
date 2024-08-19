@@ -19,6 +19,7 @@ const createItem = async (item_id, access_token, accounts) => {
     item_id: item_id,
     access_token: access_token,
     accounts: accounts,
+    created_timestamp: new Date(),
   });
 };
 
@@ -38,7 +39,7 @@ const findAllAccounts = async () => {
     selector: {
       type: ITEM,
     },
-    fields: ["accounts"],
+    fields: ["accounts", "created_timestamp"],
   });
   return itemDocs.docs;
 };
