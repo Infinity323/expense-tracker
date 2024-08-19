@@ -1,6 +1,4 @@
 import { ChakraProvider } from "@chakra-ui/react";
-import PouchDB from "pouchdb";
-import PouchdbFind from "pouchdb-find";
 import { useEffect } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Footer from "./components/Footer";
@@ -13,8 +11,6 @@ import Overview from "./pages/Overview";
 import Swagger from "./pages/Swagger";
 import Transactions from "./pages/Transactions";
 import { getAccessTokens } from "./services/LinkService";
-
-PouchDB.plugin(PouchdbFind);
 
 function App() {
   const loadAccessTokens = async () => {

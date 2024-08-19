@@ -24,7 +24,7 @@ function AccountsAccordion() {
   return (
     <Accordion allowToggle>
       {accounts.map((account) => (
-        <AccordionItem>
+        <AccordionItem key={account.account_id}>
           <h2>
             <AccordionButton>
               <Box as="span" flex="1" textAlign="left">

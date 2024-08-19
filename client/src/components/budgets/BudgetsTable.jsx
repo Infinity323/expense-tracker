@@ -45,7 +45,7 @@ function BudgetsTable({ reload, setReload }) {
         <Tbody>
           {budgets && budgets.length ? (
             budgets.map((budget) => (
-              <Tr>
+              <Tr key={budget._id}>
                 <Td>{budget.category}</Td>
                 <Td>{budget.subcategory}</Td>
                 <Td isNumeric>${budget.amount}</Td>
