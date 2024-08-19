@@ -13,13 +13,12 @@ import {
   Stack,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useContext, useState } from "react";
-import { DbContext } from "../../DbContext";
+import { useState } from "react";
+import { postTransaction } from "../../services/TransactionService";
 import BudgetsSelect from "../budgets/BudgetsSelect";
 
-function AddTransaction() {
+function AddTransaction({ setReload }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const db = useContext(DbContext);
 
   const [date, setDate] = useState();
   const [name, setName] = useState();
@@ -30,21 +29,14 @@ function AddTransaction() {
 
   const addTransaction = async (event) => {
     event.preventDefault();
-    const transactionDoc = {
-      _id: crypto.randomUUID(),
-      type: "transaction",
-      date: date,
-      name: name,
-      description: description,
-      category: category,
-      subcategory: subcategory,
-      amount: parseFloat(amount),
-    };
-    await db.put(transactionDoc);
-    console.log(
-      "Successfully added new transaction document: %s",
-      JSON.stringify(transactionDoc)
-    );
+    await postTransaction({
+      date,
+      name,
+      description,
+      category,
+      subcategory,
+      amount,
+    });
     onClose();
   };
 
@@ -55,6 +47,7 @@ function AddTransaction() {
     setCategory();
     setSubcategory();
     setAmount();
+    setReload(true);
   };
 
   return (

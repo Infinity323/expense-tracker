@@ -24,7 +24,16 @@ router.get("/", async (req, res, next) => {
     console.log(
       `Retrieved ${budgetDocs.docs.length} budgets from the database`
     );
-    res.json(budgetDocs.docs);
+    if (req.query.sorted) {
+      let budgetsMap = {};
+      budgetDocs.docs.forEach((doc) => {
+        budgetsMap[doc.category] = budgetsMap[doc.category] || [];
+        budgetsMap[doc.category].push(doc.subcategory);
+      });
+      res.json(budgetsMap);
+    } else {
+      res.json(budgetDocs.docs);
+    }
   } catch (err) {
     next(err);
   }
@@ -44,6 +53,26 @@ router.post("/", async (req, res, next) => {
       `Successfully added new budget document: ${JSON.stringify(budgetDoc)}`
     );
     res.status(201).json(budgetDoc);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.put("/", async (req, res, next) => {
+  try {
+    let budgetDoc = {
+      _id: req.body._id,
+      _rev: req.body._rev,
+      type: "budget",
+      category: req.body.category,
+      subcategory: req.body.subcategory,
+      amount: parseFloat(req.body.amount),
+    };
+    await db.put(budgetDoc);
+    console.log(
+      `Successfully updated budget document: ${JSON.stringify(budgetDoc)}`
+    );
+    res.status(204).send();
   } catch (err) {
     next(err);
   }

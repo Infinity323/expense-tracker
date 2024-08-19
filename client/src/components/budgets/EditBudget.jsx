@@ -15,13 +15,12 @@ import {
   Stack,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { FaPencil } from "react-icons/fa6";
-import { DbContext } from "../../DbContext";
+import { putBudget } from "../../services/BudgetService";
 
 function EditBudget({ budgetDoc }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const db = useContext(DbContext);
 
   const [category, setCategory] = useState(budgetDoc.category);
   const [subcategory, setSubcategory] = useState(budgetDoc.subcategory);
@@ -29,14 +28,9 @@ function EditBudget({ budgetDoc }) {
 
   const editBudget = async (event) => {
     event.preventDefault();
-    budgetDoc.category = category;
-    budgetDoc.subcategory = subcategory;
-    budgetDoc.amount = amount;
-    await db.put(budgetDoc);
-    console.log(
-      "Successfully added new budget document: %s",
-      JSON.stringify(budgetDoc)
-    );
+    let _id = budgetDoc._id;
+    let _rev = budgetDoc._rev;
+    await putBudget({ _id, _rev, category, subcategory, amount });
     onClose();
   };
 

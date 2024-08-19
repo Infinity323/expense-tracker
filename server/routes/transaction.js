@@ -24,6 +24,55 @@ router.get("/", async (req, res, next) => {
   }
 });
 
+router.post("/", async (req, res, next) => {
+  try {
+    let transactionDoc = {
+      _id: crypto.randomUUID(),
+      type: "transaction",
+      date: req.body.date,
+      name: req.body.name,
+      description: req.body.description,
+      category: req.body.category,
+      subcategory: req.body.subcategory,
+      amount: parseFloat(req.body.amount),
+    };
+    await db.put(transactionDoc);
+    console.log(
+      `Successfully added new transaction document: ${JSON.stringify(
+        transactionDoc
+      )}`
+    );
+    res.status(201).json(transactionsDoc);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.put("/", async (req, res, next) => {
+  try {
+    let transactionDoc = {
+      _id: req.body._id,
+      _rev: req.body._rev,
+      type: "transaction",
+      date: req.body.date,
+      name: req.body.name,
+      description: req.body.description,
+      category: req.body.category,
+      subcategory: req.body.subcategory,
+      amount: parseFloat(req.body.amount),
+    };
+    await db.put(transactionDoc);
+    console.log(
+      `Successfully updated transaction document: ${JSON.stringify(
+        transactionDoc
+      )}`
+    );
+    res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.delete("/:id/:rev", async (req, res, next) => {
   try {
     await db.remove({ _id: req.params.id, _rev: req.params.rev });

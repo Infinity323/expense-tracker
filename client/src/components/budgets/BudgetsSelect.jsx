@@ -1,6 +1,6 @@
 import { Select } from "@chakra-ui/react";
-import { useContext, useEffect, useState } from "react";
-import { DbContext } from "../../DbContext";
+import { useEffect, useState } from "react";
+import { getBudgets } from "../../services/BudgetService";
 
 function BudgetsSelect({
   selectedCategory,
@@ -8,34 +8,11 @@ function BudgetsSelect({
   setCategory,
   setSubcategory,
 }) {
-  const db = useContext(DbContext);
-
   const [budgets, setBudgets] = useState();
 
   const loadBudgets = async () => {
-    await db.createIndex({
-      index: { fields: ["type"] },
-    });
-    await db.createIndex({
-      index: { fields: ["category"] },
-    });
-    await db.createIndex({
-      index: { fields: ["subcategory"] },
-    });
-    let result = await db.find({
-      selector: {
-        type: "budget",
-        category: { $exists: true },
-        subcategory: { $exists: true },
-      },
-      sort: [{ category: "asc", subcategory: "asc" }],
-    });
-    let budgetsMap = {};
-    result.docs.forEach((doc) => {
-      budgetsMap[doc.category] = budgetsMap[doc.category] || [];
-      budgetsMap[doc.category].push(doc.subcategory);
-    });
-    setBudgets(budgetsMap);
+    let budgets = await getBudgets(true);
+    setBudgets(budgets);
   };
 
   const changeCategory = (event) => {
@@ -48,7 +25,7 @@ function BudgetsSelect({
 
   useEffect(() => {
     loadBudgets();
-  });
+  }, []);
 
   return (
     <>

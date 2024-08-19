@@ -6,6 +6,7 @@
     "express-session": "^1.18.0",
     "mkdirp": "^3.0.1",
     "plaid": "^26.0.0",
-    "pouchdb": "^9.0.0"
+    "pouchdb": "^9.0.0",
+    "swagger-jsdoc": "^6.2.8"
   }
 }

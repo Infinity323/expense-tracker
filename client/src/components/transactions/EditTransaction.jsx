@@ -15,14 +15,13 @@ import {
   Stack,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useContext, useState } from "react";
-import { DbContext } from "../../DbContext";
-import BudgetsSelect from "../budgets/BudgetsSelect";
+import { useState } from "react";
 import { FaPencil } from "react-icons/fa6";
+import { putTransaction } from "../../services/TransactionService";
+import BudgetsSelect from "../budgets/BudgetsSelect";
 
 function EditTransaction({ transactionDoc }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const db = useContext(DbContext);
 
   const [date, setDate] = useState(transactionDoc.date);
   const [name, setName] = useState(transactionDoc.name);
@@ -33,17 +32,18 @@ function EditTransaction({ transactionDoc }) {
 
   const editTransaction = async (event) => {
     event.preventDefault();
-    transactionDoc.date = date;
-    transactionDoc.name = name;
-    transactionDoc.date = date;
-    transactionDoc.category = category;
-    transactionDoc.subcategory = subcategory;
-    transactionDoc.amount = parseFloat(amount);
-    await db.put(transactionDoc);
-    console.log(
-      "Successfully added new transaction document: %s",
-      JSON.stringify(transactionDoc)
-    );
+    let _id = transactionDoc._id;
+    let _rev = transactionDoc._rev;
+    await putTransaction({
+      _id,
+      _rev,
+      date,
+      name,
+      description,
+      category,
+      subcategory,
+      amount,
+    });
     onClose();
   };
 

@@ -12,7 +12,7 @@ import { getTransactions } from "../../services/TransactionService";
 import DeleteTransaction from "./DeleteTransaction";
 import EditTransaction from "./EditTransaction";
 
-function TransactionsTable() {
+function TransactionsTable({ reload, setReload }) {
   const [transactions, setTransactions] = useState([]);
 
   const loadTransactions = async () => {
@@ -22,6 +22,13 @@ function TransactionsTable() {
   useEffect(() => {
     loadTransactions();
   }, []);
+
+  useEffect(() => {
+    if (reload) {
+      loadTransactions();
+      setReload(false);
+    }
+  }, [reload, setReload]);
 
   return (
     <TableContainer>

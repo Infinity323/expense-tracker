@@ -33,6 +33,9 @@ function Navbar() {
         <Link to="/budgets">
           <Button colorScheme="teal">Budgets</Button>
         </Link>
+        <Link to="/accounts">
+          <Button colorScheme="teal">Accounts</Button>
+        </Link>
         <Link to="/login">
           <Button colorScheme="teal">Log In</Button>
         </Link>
