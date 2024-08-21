@@ -10,7 +10,10 @@ const linkRouter = require("./routes/link");
 const budgetRouter = require("./routes/budget");
 const transactionRouter = require("./routes/transaction");
 const accountRouter = require("./routes/account");
+const trendsRouter = require("./routes/trends");
 
+const validationErrorHandler =
+  require("./middleware/error-handler").validationErrorHandler;
 const clientErrorHandler =
   require("./middleware/error-handler").clientErrorHandler;
 const defaultErrorHandler =
@@ -64,8 +67,10 @@ app.use("/api/link", linkRouter);
 app.use("/api/budget", budgetRouter);
 app.use("/api/transaction", transactionRouter);
 app.use("/api/account", accountRouter);
+app.use("/api/trends", trendsRouter);
 
 // error handlers
+app.use(validationErrorHandler);
 app.use(clientErrorHandler);
 app.use(defaultErrorHandler);
 
