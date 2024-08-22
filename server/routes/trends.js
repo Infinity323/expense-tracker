@@ -1,10 +1,12 @@
 const express = require("express");
-const { findAllTransactions } = require("../db/queries/transaction");
+const { findAllExpenses } = require("../db/queries/transaction");
+const e = require("express");
 const router = express.Router();
 
 const SUPPORTED_TIME_DIVISIONS = ["monthly", "quarterly", "annually"];
+const SUPPORTED_GROUP_BY = ["category", "subcategory"];
 
-router.get("/spending/by-time", async (req, res, next) => {
+router.get("/spending/over-time", async (req, res, next) => {
   try {
     let division = req.query.division; // monthly, quarterly, annually
     if (!division) {
@@ -18,34 +20,47 @@ router.get("/spending/by-time", async (req, res, next) => {
       throw err;
     }
     let groupBy = req.query.groupBy; // category, subcategory
-    let result = {};
-    let transactionDocs = await findAllTransactions();
+    let resultMap = {};
+    let transactionDocs = await findAllExpenses();
     transactionDocs.forEach((transaction) => {
       let transactionDate = new Date(transaction.date);
       let timeKey = getTimeKey(division, transactionDate);
       if (groupBy == "subcategory") {
-        result[timeKey] = result[timeKey] || {};
-        result[timeKey][transaction.category] =
-          result[timeKey][transaction.category] || {};
-        result[timeKey][transaction.category][transaction.subcategory] =
-          result[timeKey][transaction.category][transaction.subcategory] || 0;
-        result[timeKey][transaction.category][transaction.subcategory] = round(
-          result[timeKey][transaction.category][transaction.subcategory] +
-            transaction.amount
-        );
+        resultMap[timeKey] = resultMap[timeKey] || {};
+        resultMap[timeKey][transaction.category] =
+          resultMap[timeKey][transaction.category] || {};
+        resultMap[timeKey][transaction.category][transaction.subcategory] =
+          resultMap[timeKey][transaction.category][transaction.subcategory] ||
+          0;
+        resultMap[timeKey][transaction.category][transaction.subcategory] =
+          round(
+            resultMap[timeKey][transaction.category][transaction.subcategory] +
+              transaction.amount
+          );
       } else if (groupBy == "category") {
-        result[timeKey] = result[timeKey] || {};
-        result[timeKey][transaction.category] =
-          result[timeKey][transaction.category] || 0;
-        result[timeKey][transaction.category] = round(
-          result[timeKey][transaction.category] + transaction.amount
+        resultMap[timeKey] = resultMap[timeKey] || {};
+        resultMap[timeKey][transaction.category] =
+          resultMap[timeKey][transaction.category] || 0;
+        resultMap[timeKey][transaction.category] = round(
+          resultMap[timeKey][transaction.category] + transaction.amount
         );
       } else {
-        result[timeKey] = result[timeKey] || 0;
-        result[timeKey] = round(result[timeKey] + transaction.amount);
+        resultMap[timeKey] = resultMap[timeKey] || 0;
+        resultMap[timeKey] = round(resultMap[timeKey] + transaction.amount);
       }
     });
-    res.json(result);
+    // TODO: clean this up
+    let resultArray = [];
+    new Map(Object.entries(resultMap)).forEach((totals, date) => {
+      let dateResult = {
+        date: date,
+      };
+      new Map(Object.entries(totals)).forEach((total, category) => {
+        dateResult[category] = total;
+      });
+      resultArray.push(dateResult);
+    });
+    res.json(resultArray);
   } catch (err) {
     next(err);
   }
@@ -65,7 +80,95 @@ const getTimeKey = (division, date) => {
   }
 };
 
-router.get("/spending/by-category", (req, res, next) => {});
+router.get("/spending/by-category", async (req, res, next) => {
+  try {
+    let groupBy = req.query.groupBy; // category, subcategory
+    if (!groupBy) {
+      const err = new Error("Group by is mandatory");
+      err.status = 400;
+      throw err;
+    }
+    if (!SUPPORTED_GROUP_BY.includes(groupBy)) {
+      const err = new Error("Group by not supported");
+      err.status = 400;
+      throw err;
+    }
+    let division = req.query.division; // monthly, quarterly, annually
+    let resultMap = {};
+    let transactionDocs = await findAllExpenses();
+    transactionDocs.forEach((transaction) => {
+      let transactionDate = new Date(transaction.date);
+      let timeKey = getTimeKey(division, transactionDate);
+      if (groupBy == "subcategory") {
+        resultMap[transaction.category] = resultMap[transaction.category] || {};
+        resultMap[transaction.category][transaction.subcategory] =
+          resultMap[transaction.category][transaction.subcategory] || {};
+        resultMap[transaction.category][transaction.subcategory][timeKey] =
+          resultMap[transaction.category][transaction.subcategory][timeKey] ||
+          0;
+        resultMap[transaction.category][transaction.subcategory][timeKey] =
+          round(
+            resultMap[transaction.category][transaction.subcategory][timeKey] +
+              transaction.amount
+          );
+      } else if (groupBy == "category") {
+        resultMap[transaction.category] = resultMap[transaction.category] || {};
+        resultMap[transaction.category][timeKey] =
+          resultMap[transaction.category][timeKey] || 0;
+        resultMap[transaction.category][timeKey] = round(
+          resultMap[transaction.category][timeKey] + transaction.amount
+        );
+      } else {
+        resultMap[timeKey] = resultMap[timeKey] || 0;
+        resultMap[timeKey] = round(resultMap[timeKey] + transaction.amount);
+      }
+    });
+    let resultArray = processByCategoryResults(resultMap, groupBy);
+    res.json(resultArray);
+  } catch (err) {
+    next(err);
+  }
+});
+
+const processByCategoryResults = (resultMap, groupBy) => {
+  if (groupBy == "subcategory") {
+    return Array.from(
+      new Map(Object.entries(resultMap)),
+      ([category, totals]) => ({
+        category,
+        totals: Array.from(
+          new Map(Object.entries(totals)),
+          ([subcategory, subtotals]) => ({
+            subcategory,
+            subtotals: Array.from(
+              new Map(Object.entries(subtotals)),
+              ([date, amount]) => ({
+                date,
+                amount,
+              })
+            ),
+          })
+        ),
+      })
+    );
+  } else if (groupBy == "category") {
+    return Array.from(
+      new Map(Object.entries(resultMap)),
+      ([category, totals]) => ({
+        category,
+        totals: Array.from(
+          new Map(Object.entries(totals)),
+          ([date, amount]) => ({
+            date,
+            amount,
+          })
+        ),
+      })
+    );
+  } else {
+    return [];
+  }
+};
 
 const round = (amount) => {
   return parseFloat(amount.toFixed(2));

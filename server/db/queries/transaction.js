@@ -2,13 +2,17 @@ const db = require("../database");
 
 const TRANSACTION = "transaction";
 
-const findAllTransactions = async () => {
+const findAllExpenses = async () => {
   await db.createIndex({
-    index: { fields: ["date"] },
+    index: { fields: ["date", "category"] },
   });
   const transactionDocs = await db.find({
-    selector: { type: TRANSACTION, date: { $exists: true } },
-    sort: [{ date: "desc" }],
+    selector: {
+      type: TRANSACTION,
+      date: { $exists: true },
+      category: { $ne: "Income" },
+    },
+    sort: [{ date: "asc" }],
   });
   return transactionDocs.docs;
 };
@@ -68,7 +72,7 @@ const deleteTransaction = async ({ id, rev }) => {
 };
 
 module.exports = {
-  findAllTransactions,
+  findAllExpenses,
   createTransaction,
   updateTransaction,
   deleteTransaction,
