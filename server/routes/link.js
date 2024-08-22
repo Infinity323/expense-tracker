@@ -28,9 +28,10 @@ router.get("/access-token", async (req, res, next) => {
   try {
     const itemDocs = await findAllAccessTokens();
     console.log(`Retrieved ${itemDocs.length} access tokens from the database`);
-    let accessTokens = itemDocs.map((doc) => {
-      return { itemId: doc.item_id, accessToken: doc.access_token };
-    });
+    let accessTokens = itemDocs.map((doc) => ({
+      itemId: doc.item_id,
+      accessToken: doc.access_token,
+    }));
     res.json(accessTokens);
   } catch (err) {
     next(err);

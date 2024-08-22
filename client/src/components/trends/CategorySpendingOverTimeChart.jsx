@@ -12,7 +12,7 @@ import {
 import { getBudgets } from "../../services/BudgetService";
 import { getSpendingOverTime } from "../../services/TrendsService";
 
-function SpendingOverTimeChart({ setIsLoading }) {
+function CategorySpendingOverTimeChart({ setIsLoading }) {
   const [categories, setCategories] = useState([]);
   const [data, setData] = useState([]);
 
@@ -104,4 +104,4 @@ const dateToString = (value) => {
   })} ${date.getFullYear()}`;
 };
 
-export default SpendingOverTimeChart;
+export default CategorySpendingOverTimeChart;

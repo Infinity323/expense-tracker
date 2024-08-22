@@ -2,10 +2,11 @@ const express = require("express");
 const router = express.Router();
 const plaidClient = require("../clients/plaid-client");
 const {
-  findAllTransactions,
   createTransaction,
   updateTransaction,
   deleteTransaction,
+  findAllExpenses,
+  findAllTransactions,
 } = require("../db/queries/transaction");
 const {
   updateItemTransactionCursor,
@@ -85,16 +86,19 @@ router.put("/sync/:itemId", async (req, res, next) => {
     }
 
     const plaidBudgetDocs = await findAllPlaidBudgets();
-    const plaidBudgetMap = plaidBudgetDocs.reduce((map, doc) => {
-      map[doc.detailed] = {
-        category: doc.category,
-        subcategory: doc.subcategory,
-      };
-      return map;
-    });
+    const plaidBudgetMap = plaidBudgetDocs.reduce(
+      (map, doc) => (
+        (map[doc.detailed] = {
+          category: doc.category,
+          subcategory: doc.subcategory,
+        }),
+        map
+      ),
+      {}
+    );
 
-    added.forEach((transaction) => {
-      createTransaction({
+    for (const transaction of added) {
+      await createTransaction({
         _id: transaction.transaction_id,
         date: transaction.date,
         name: transaction.name,
@@ -109,10 +113,10 @@ router.put("/sync/:itemId", async (req, res, next) => {
         merchant_name: transaction.merchant_name,
         pending: transaction.pending,
       });
-    });
+    }
     console.log(`Added ${added.length} transactions for item ${itemId}`);
-    modified.forEach((transaction) => {
-      updateTransaction({
+    for (const transaction of modified) {
+      await updateTransaction({
         _id: transaction.transaction_id,
         date: transaction.date,
         name: transaction.name,
@@ -127,7 +131,7 @@ router.put("/sync/:itemId", async (req, res, next) => {
         merchant_name: transaction.merchant_name,
         pending: transaction.pending,
       });
-    });
+    }
     console.log(`Updated ${modified.length} transactions for item ${itemId}`);
 
     await updateItemTransactionCursor({ itemId, cursor });

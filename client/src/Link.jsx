@@ -6,11 +6,12 @@ import {
   saveAccessTokenToSession,
 } from "./services/LinkService";
 
-function Link({ linkToken }) {
+function Link({ linkToken, setReload }) {
   const onSuccess = async (publicToken, metadata) => {
     await postLink(metadata);
     let accessTokenResponse = await postAccessToken(publicToken);
     await saveAccessTokenToSession(accessTokenResponse);
+    setReload();
   };
 
   const { open, ready } = usePlaidLink({

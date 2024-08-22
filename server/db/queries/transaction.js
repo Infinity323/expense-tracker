@@ -17,6 +17,20 @@ const findAllExpenses = async () => {
   return transactionDocs.docs;
 };
 
+const findAllTransactions = async () => {
+  await db.createIndex({
+    index: { fields: ["date", "category"] },
+  });
+  const transactionDocs = await db.find({
+    selector: {
+      type: TRANSACTION,
+      date: { $exists: true },
+    },
+    sort: [{ date: "desc" }],
+  });
+  return transactionDocs.docs;
+};
+
 const createTransaction = async ({
   _id,
   date,
@@ -73,6 +87,7 @@ const deleteTransaction = async ({ id, rev }) => {
 
 module.exports = {
   findAllExpenses,
+  findAllTransactions,
   createTransaction,
   updateTransaction,
   deleteTransaction,
