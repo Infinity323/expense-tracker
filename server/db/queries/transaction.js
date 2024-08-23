@@ -31,6 +31,22 @@ const findAllTransactions = async () => {
   return transactionDocs.docs;
 };
 
+const findCurrentMonthTransactions = async () => {
+  let currentMonth = new Date(Date.now());
+  currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth());
+  await db.createIndex({
+    index: { fields: ["date", "category"] },
+  });
+  const transactionDocs = await db.find({
+    selector: {
+      type: TRANSACTION,
+      date: { $gte: currentMonth },
+    },
+    sort: [{ date: "desc" }],
+  });
+  return transactionDocs.docs;
+};
+
 const createTransaction = async ({
   _id,
   date,
@@ -88,6 +104,7 @@ const deleteTransaction = async ({ id, rev }) => {
 module.exports = {
   findAllExpenses,
   findAllTransactions,
+  findCurrentMonthTransactions,
   createTransaction,
   updateTransaction,
   deleteTransaction,

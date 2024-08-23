@@ -8,6 +8,7 @@ const {
   updateBudget,
   deleteBudget,
 } = require("../db/queries/budget");
+const { findCurrentMonthTransactions } = require("../db/queries/transaction");
 
 router.get("/", async (req, res, next) => {
   try {
@@ -82,5 +83,38 @@ router.delete("/:id/:rev", async (req, res, next) => {
     next(err);
   }
 });
+
+router.get("/comparison", async (req, res, next) => {
+  try {
+    let budgetDocs = await findAllBudgets();
+    let transactionDocs = await findCurrentMonthTransactions();
+    let actualMap = {};
+    transactionDocs.forEach((transaction) => {
+      actualMap[transaction.subcategory] =
+        actualMap[transaction.subcategory] || 0;
+      actualMap[transaction.subcategory] += transaction.amount;
+    });
+    let result = [];
+    budgetDocs.forEach((budget) => {
+      if (budget.amount == 0) {
+        return;
+      }
+      let actualAmount = round(actualMap[budget.subcategory] || 0);
+      result.push({
+        name: budget.subcategory,
+        expectedAmount: budget.amount,
+        actualAmount: actualAmount,
+        difference: budget.amount - actualAmount,
+      });
+    });
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+});
+
+const round = (amount) => {
+  return parseFloat(amount.toFixed(2));
+};
 
 module.exports = router;
