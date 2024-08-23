@@ -20,6 +20,7 @@ import { FaPencil } from "react-icons/fa6";
 import { putBudget } from "../../services/BudgetService";
 
 function EditBudget({ budgetDoc }) {
+  // TODO: implement reloading
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [category, setCategory] = useState(budgetDoc.category);

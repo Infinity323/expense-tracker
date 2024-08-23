@@ -13,6 +13,13 @@ export const getBudgets = async (sorted) => {
   } catch (err) {}
 };
 
+export const getBudgetComparison = async (sorted) => {
+  try {
+    const response = await axios.get(`${BUDGET_API}/comparison`);
+    return response.data;
+  } catch (err) {}
+};
+
 export const postBudget = async (budget) => {
   try {
     const response = await axios.post(BUDGET_API, budget);

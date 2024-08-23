@@ -4,7 +4,7 @@ import {
   postAccessToken,
   postLink,
   saveAccessTokenToSession,
-} from "./services/LinkService";
+} from "../../services/LinkService";
 
 function Link({ linkToken, setReload }) {
   const onSuccess = async (publicToken, metadata) => {

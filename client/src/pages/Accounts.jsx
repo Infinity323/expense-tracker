@@ -1,8 +1,8 @@
 import { Box, Heading, useDisclosure } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 import AccountsAccordion from "../components/accounts/AccountsAccordion";
+import Link from "../components/accounts/Link";
 import LoadingModal from "../components/shared/LoadingModal";
-import Link from "../Link";
 import { getLinkToken } from "../services/LinkService";
 
 function Accounts() {
