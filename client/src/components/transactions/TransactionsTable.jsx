@@ -6,9 +6,8 @@ import {
   Th,
   Thead,
   Tr,
-  useDisclosure,
 } from "@chakra-ui/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { getTransactions } from "../../services/TransactionService";
 import LoadingModal from "../shared/LoadingModal";
 import DeleteTransaction from "./DeleteTransaction";
@@ -16,14 +15,12 @@ import EditTransaction from "./EditTransaction";
 
 function TransactionsTable({ reload, setReload }) {
   const [transactions, setTransactions] = useState([]);
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const onOpenRef = useRef(onOpen);
-  const onCloseRef = useRef(onClose);
+  const [isLoading, setIsLoading] = useState();
 
   const loadTransactions = async () => {
-    onOpenRef.current();
+    setIsLoading(true);
     setTransactions(await getTransactions());
-    onCloseRef.current();
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -79,7 +76,7 @@ function TransactionsTable({ reload, setReload }) {
           </Tbody>
         </Table>
       </TableContainer>
-      <LoadingModal isOpen={isOpen} onClose={onClose} />
+      <LoadingModal isLoading={isLoading} />
     </>
   );
 }

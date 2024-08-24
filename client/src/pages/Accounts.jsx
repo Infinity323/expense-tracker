@@ -1,5 +1,5 @@
-import { Box, Heading, useDisclosure } from "@chakra-ui/react";
-import { useEffect, useRef, useState } from "react";
+import { Box, Heading } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 import AccountsAccordion from "../components/accounts/AccountsAccordion";
 import Link from "../components/accounts/Link";
 import LoadingModal from "../components/shared/LoadingModal";
@@ -7,16 +7,14 @@ import { getLinkToken } from "../services/LinkService";
 
 function Accounts() {
   const [linkToken, setLinkToken] = useState();
+  const [isLoading, setIsLoading] = useState();
   const [reload, setReload] = useState();
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const onOpenRef = useRef(onOpen);
-  const onCloseRef = useRef(onClose);
 
   const establishLink = async () => {
-    onOpenRef.current();
+    setIsLoading(true);
     const newLinkToken = await getLinkToken();
     setLinkToken(newLinkToken);
-    onCloseRef.current();
+    setIsLoading(false);
     setReload(false);
   };
 
@@ -26,9 +24,9 @@ function Accounts() {
 
   useEffect(() => {
     if (reload === true) {
-      onOpenRef.current();
+      setIsLoading(true);
     } else if (reload === false) {
-      onCloseRef.current();
+      setIsLoading(false);
     }
   }, [reload]);
 
@@ -43,7 +41,7 @@ function Accounts() {
         <br />
         {linkToken && <Link linkToken={linkToken} setReload={setReload} />}
       </Box>
-      <LoadingModal isOpen={isOpen} onClose={onClose} />
+      <LoadingModal isLoading={isLoading} />
     </>
   );
 }

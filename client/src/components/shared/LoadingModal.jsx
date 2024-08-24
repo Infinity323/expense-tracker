@@ -7,9 +7,23 @@ import {
   ModalHeader,
   ModalOverlay,
   Spinner,
+  useDisclosure,
 } from "@chakra-ui/react";
+import { useEffect, useRef } from "react";
 
-function LoadingModal({ isOpen, onClose }) {
+function LoadingModal({ isLoading }) {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const onOpenRef = useRef(onOpen);
+  const onCloseRef = useRef(onClose);
+
+  useEffect(() => {
+    if (isLoading) {
+      onOpenRef.current();
+    } else {
+      onCloseRef.current();
+    }
+  }, [isLoading]);
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />

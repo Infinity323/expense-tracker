@@ -6,9 +6,8 @@ import {
   Th,
   Thead,
   Tr,
-  useDisclosure,
 } from "@chakra-ui/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { getBudgets } from "../../services/BudgetService";
 import LoadingModal from "../shared/LoadingModal";
 import DeleteBudget from "./DeleteBudget";
@@ -16,14 +15,12 @@ import EditBudget from "./EditBudget";
 
 function BudgetsTable({ reload, setReload }) {
   const [budgets, setBudgets] = useState([]);
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const onOpenRef = useRef(onOpen);
-  const onCloseRef = useRef(onClose);
+  const [isLoading, setIsLoading] = useState();
 
   const loadBudgets = async () => {
-    onOpenRef.current();
+    setIsLoading(true);
     setBudgets(await getBudgets());
-    onCloseRef.current();
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -71,7 +68,7 @@ function BudgetsTable({ reload, setReload }) {
           </Tbody>
         </Table>
       </TableContainer>
-      <LoadingModal isOpen={isOpen} onClose={onClose} />
+      <LoadingModal isLoading={isLoading} />
     </>
   );
 }
