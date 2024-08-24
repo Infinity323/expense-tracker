@@ -90,17 +90,22 @@ router.get("/comparison", async (req, res, next) => {
     let transactionDocs = await findCurrentMonthTransactions();
     let actualMap = {};
     transactionDocs.forEach((transaction) => {
-      actualMap[transaction.subcategory] =
-        actualMap[transaction.subcategory] || 0;
-      actualMap[transaction.subcategory] += transaction.amount;
+      let key = `${transaction.category} - ${transaction.subcategory}`;
+      actualMap[key] = actualMap[key] || 0;
+      actualMap[key] += transaction.amount;
     });
-    let result = [];
+    let result = { income: [], expenses: [] };
     budgetDocs.forEach((budget) => {
       if (budget.amount == 0) {
         return;
       }
-      let actualAmount = round(actualMap[budget.subcategory] || 0);
-      result.push({
+      let actualAmount = round(
+        actualMap[`${budget.category} - ${budget.subcategory}`] || 0
+      );
+      if (budget.category == "Income") {
+        actualAmount *= -1;
+      }
+      result[budget.category == "Income" ? "income" : "expenses"].push({
         name: budget.subcategory,
         expectedAmount: budget.amount,
         actualAmount: actualAmount,

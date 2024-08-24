@@ -1,22 +1,7 @@
-import { Box, Heading, useDisclosure } from "@chakra-ui/react";
-import { useEffect, useRef, useState } from "react";
-import LoadingModal from "../components/shared/LoadingModal";
+import { Box, Heading } from "@chakra-ui/react";
 import CategorySpendingOverTimeChart from "../components/trends/CategorySpendingOverTimeChart";
 
 function Insights() {
-  const [isLoading, setIsLoading] = useState(true);
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const onOpenRef = useRef(onOpen);
-  const onCloseRef = useRef(onClose);
-
-  useEffect(() => {
-    if (isLoading) {
-      onOpenRef.current();
-    } else {
-      onCloseRef.current();
-    }
-  }, [isLoading]);
-
   return (
     <>
       <Box padding="5rem">
@@ -26,9 +11,8 @@ function Insights() {
         <Heading as="h3" size="md">
           Monthly Spending By Category
         </Heading>
-        <CategorySpendingOverTimeChart setIsLoading={setIsLoading} />
+        <CategorySpendingOverTimeChart />
       </Box>
-      <LoadingModal isOpen={isOpen} onClose={onClose} />
     </>
   );
 }

@@ -23,5 +23,5 @@ export const useApiData = ({ apiCall }) => {
     }
   }, []);
 
-  return { data, isLoading, error };
+  return [data, isLoading, error];
 };

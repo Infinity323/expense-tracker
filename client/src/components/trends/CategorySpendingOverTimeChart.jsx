@@ -1,4 +1,4 @@
-import { Box, Text } from "@chakra-ui/react";
+import { Box, Skeleton, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import {
   CartesianGrid,
@@ -9,60 +9,60 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useApiData } from "../../hooks/UseApiData";
 import { getBudgets } from "../../services/BudgetService";
 import { getSpendingOverTime } from "../../services/TrendsService";
 
-function CategorySpendingOverTimeChart({ setIsLoading }) {
+function CategorySpendingOverTimeChart() {
   const [categories, setCategories] = useState([]);
-  const [data, setData] = useState([]);
 
-  const getData = async () => {
-    let categoryResults = await getBudgets(true);
-    let categories = [];
-    new Map(Object.entries(categoryResults)).forEach((_, category) => {
-      categories.push(category);
-    });
-    setCategories(categories);
-
-    let spendingResults = await getSpendingOverTime({
-      groupBy: "category",
-      division: "monthly",
-    });
-    setData(spendingResults);
-
-    setIsLoading(false);
-  };
+  const [categoryData, categoryIsLoading, categoryError] = useApiData({
+    apiCall: getBudgets(true),
+  });
+  const [spendingData, spendingIsLoading, spendingError] = useApiData({
+    apiCall: getSpendingOverTime({ groupBy: "category", division: "monthly" }),
+  });
 
   useEffect(() => {
-    getData();
-  }, []);
+    if (categoryData) {
+      let categories = [];
+      new Map(Object.entries(categoryData)).forEach((_, category) => {
+        categories.push(category);
+      });
+      setCategories(categories);
+    }
+  }, [categoryData]);
 
   return (
     <ResponsiveContainer width="100%" height={500}>
-      <LineChart
-        data={data}
-        margin={{ top: 50, left: 50, right: 50, bottom: 50 }}
-      >
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis
-          dataKey="date"
-          type="number"
-          domain={["auto", "auto"]}
-          tick={<DateTick />}
-        />
-        <YAxis
-          domain={["auto", "auto"]}
-          tickFormatter={(value, _) => `$${value}`}
-        />
-        {data &&
-          categories &&
-          categories.map((category) => (
-            <>
-              <Tooltip content={<CustomTooltip />} />
-              <Line dataKey={category} />
-            </>
-          ))}
-      </LineChart>
+      {categoryIsLoading || spendingIsLoading ? (
+        <Skeleton />
+      ) : (
+        <LineChart
+          data={spendingData}
+          margin={{ top: 50, left: 50, right: 50, bottom: 50 }}
+        >
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis
+            dataKey="date"
+            type="number"
+            domain={["auto", "auto"]}
+            tick={<DateTick />}
+          />
+          <YAxis
+            domain={["auto", "auto"]}
+            tickFormatter={(value, _) => `$${value}`}
+          />
+          {spendingData &&
+            categories &&
+            categories.map((category) => (
+              <>
+                <Tooltip content={<CustomTooltip />} />
+                <Line dataKey={category} />
+              </>
+            ))}
+        </LineChart>
+      )}
     </ResponsiveContainer>
   );
 }
