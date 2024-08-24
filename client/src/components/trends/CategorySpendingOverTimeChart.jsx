@@ -2,6 +2,7 @@ import { Box, Skeleton, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import {
   CartesianGrid,
+  Legend,
   Line,
   LineChart,
   ResponsiveContainer,
@@ -12,6 +13,25 @@ import {
 import { useApiData } from "../../hooks/UseApiData";
 import { getBudgets } from "../../services/BudgetService";
 import { getSpendingOverTime } from "../../services/TrendsService";
+import { dateToString } from "../shared/LineChartShared";
+
+const COLOR_MAP = {
+  "Bank Fees": "#EAC435",
+  Entertainment: "#345995",
+  "Food and Drink": "#E40066",
+  "General Merchandise": "#03CEA4",
+  "General Services": "#FB4D3D",
+  "Government and Non-Profit": "#044389",
+  "Home Improvement": "#536271",
+  "Loan Payments": "#FFAD05",
+  Medical: "#7CAFC4",
+  "Personal Care": "#5995ED",
+  "Rent and Utilities": "#617073",
+  "Transfer In": "#7A93AC",
+  "Transfer Out": "#92BCEA",
+  Transportation: "#AFB3F7",
+  Travel: "#84828F",
+};
 
 function CategorySpendingOverTimeChart() {
   const [categories, setCategories] = useState([]);
@@ -27,6 +47,10 @@ function CategorySpendingOverTimeChart() {
     if (categoryData) {
       let categories = [];
       new Map(Object.entries(categoryData)).forEach((_, category) => {
+        // don't display income
+        if (category === "Income") {
+          return;
+        }
         categories.push(category);
       });
       setCategories(categories);
@@ -47,18 +71,24 @@ function CategorySpendingOverTimeChart() {
             dataKey="date"
             type="number"
             domain={["auto", "auto"]}
-            tick={<DateTick />}
+            tickFormatter={dateToString}
           />
           <YAxis
             domain={["auto", "auto"]}
             tickFormatter={(value, _) => `$${value}`}
           />
+          <Legend />
+          <Tooltip content={<CustomTooltip />} />
           {spendingData &&
             categories &&
             categories.map((category) => (
               <>
-                <Tooltip content={<CustomTooltip />} />
-                <Line dataKey={category} />
+                <Line
+                  dataKey={category}
+                  dot={false}
+                  stroke={COLOR_MAP[category]}
+                  strokeWidth={2}
+                />
               </>
             ))}
         </LineChart>
@@ -67,41 +97,21 @@ function CategorySpendingOverTimeChart() {
   );
 }
 
-function DateTick({ x, y, stroke, payload }) {
-  return (
-    <g transform={`translate(${x},${y})`}>
-      <text
-        x={0}
-        y={0}
-        dy={16}
-        textAnchor="end"
-        fill="#666"
-        transform="rotate(-35)"
-      >
-        {dateToString(payload.value)}
-      </text>
-    </g>
-  );
-}
-
 function CustomTooltip({ active, payload, label }) {
   if (active && payload && payload.length) {
     return (
       <Box bg="white" rounded="md" boxShadow="md" padding="1rem">
-        <Text as="b">{payload[0].name}</Text>
-        <Text>
-          {dateToString(Number(label))}: ${payload[0].value}
-        </Text>
+        <Text as="b">{dateToString(Number(label))}</Text>
+        {payload
+          .sort((a, b) => b.value - a.value)
+          .map((data) => (
+            <Text>
+              {data.name}: ${data.value}
+            </Text>
+          ))}
       </Box>
     );
   }
 }
-
-const dateToString = (value) => {
-  let date = new Date(value);
-  return `${date.toLocaleString("default", {
-    month: "long",
-  })} ${date.getFullYear()}`;
-};
 
 export default CategorySpendingOverTimeChart;

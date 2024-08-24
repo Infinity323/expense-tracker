@@ -1,5 +1,9 @@
 const express = require("express");
-const { findAllExpenses } = require("../db/queries/transaction");
+const {
+  findAllExpenses,
+  findCurrentMonthTransactions,
+  findAllIncome,
+} = require("../db/queries/transaction");
 const e = require("express");
 const router = express.Router();
 
@@ -169,6 +173,42 @@ const processByCategoryResults = (resultMap, groupBy) => {
     return [];
   }
 };
+
+router.get("/income-vs-expenses", async (req, res, next) => {
+  try {
+    // TODO: expand to not just monthly
+    let income = await findAllIncome();
+    let expenses = await findAllExpenses();
+    let comparisonMap = {};
+    income.forEach((transaction) => {
+      let key = getTimeKey("monthly", new Date(transaction.date));
+      comparisonMap[key] = comparisonMap[key] || {};
+      comparisonMap[key]["income"] = comparisonMap[key]["income"] || 0;
+      comparisonMap[key]["income"] -= transaction.amount;
+      comparisonMap[key]["income"] = round(comparisonMap[key]["income"]);
+    });
+    expenses.forEach((transaction) => {
+      let key = getTimeKey("monthly", new Date(transaction.date));
+      comparisonMap[key] = comparisonMap[key] || {};
+      comparisonMap[key]["expenses"] = comparisonMap[key]["expenses"] || 0;
+      comparisonMap[key]["expenses"] += transaction.amount;
+      comparisonMap[key]["expenses"] = round(comparisonMap[key]["expenses"]);
+    });
+    let results = [];
+    new Map(Object.entries(comparisonMap)).forEach((totals, date) => {
+      let dateResult = {
+        date: date,
+        Income: totals.income,
+        Expenses: totals.expenses,
+      };
+      results.push(dateResult);
+    });
+    results.sort((a, b) => a.date - b.date);
+    res.json(results);
+  } catch (err) {
+    next(err);
+  }
+});
 
 const round = (amount) => {
   return parseFloat(amount.toFixed(2));

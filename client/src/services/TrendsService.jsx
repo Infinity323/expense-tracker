@@ -21,3 +21,8 @@ export const getSpendingByCategory = async ({ division, groupBy }) => {
   });
   return response.data;
 };
+
+export const getIncomeVsExpenses = async () => {
+  const response = await axios.get(`${TRENDS_API}/income-vs-expenses`);
+  return response.data;
+};

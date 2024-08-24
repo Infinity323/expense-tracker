@@ -7,6 +7,7 @@ function Overview() {
       <Heading as="h2" size="xl">
         This month at a glance
       </Heading>
+      <br />
       <CurrentMonthBudgetComparison />
     </Box>
   );
