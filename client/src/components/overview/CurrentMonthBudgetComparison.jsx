@@ -1,17 +1,11 @@
 import { Box, Heading, Progress, Text } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useApiData } from "../../hooks/UseApiData";
 import { getBudgetComparison } from "../../services/BudgetService";
 
 function CurrentMonthBudgetComparison() {
-  const [data, setData] = useState([]);
-
-  const loadComparisons = async () => {
-    setData(await getBudgetComparison());
-  };
-
-  useEffect(() => {
-    loadComparisons();
-  }, []);
+  const { data, loading, error } = useApiData({
+    apiCall: getBudgetComparison(),
+  });
 
   const getStatusColor = (difference) => {
     return difference > 0 ? "green" : "red";
@@ -45,7 +39,7 @@ function CurrentMonthBudgetComparison() {
             </Text>
             <Text as="span" color={getStatusColor(comparison.difference)}>
               {`($${Math.abs(comparison.difference)} ${
-                comparison.difference > 0 ? "under" : "over"
+                comparison.difference > 0 ? "underbudget" : "overbudget"
               })`}
             </Text>
           </Box>

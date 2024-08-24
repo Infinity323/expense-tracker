@@ -3,28 +3,22 @@ import axios from "axios";
 const LINK_API = "/api/link";
 
 export const getLinkToken = async () => {
-  try {
-    let userId = "test";
-    const response = await axios.post(`${LINK_API}/link-token/${userId}`);
-    return response.data.link_token;
-  } catch (err) {}
+  let userId = "test";
+  const response = await axios.post(`${LINK_API}/link-token/${userId}`);
+  return response.data.link_token;
 };
 
 export const getAccessTokens = async () => {
-  try {
-    const response = await axios.get(`${LINK_API}/access-token`);
-    return response.data;
-  } catch (err) {}
+  const response = await axios.get(`${LINK_API}/access-token`);
+  return response.data;
 };
 
 export const postAccessToken = async (publicToken) => {
-  try {
-    const data = {
-      public_token: publicToken,
-    };
-    const response = await axios.post(`${LINK_API}/access-token`, data);
-    return response.data;
-  } catch (err) {}
+  const data = {
+    public_token: publicToken,
+  };
+  const response = await axios.post(`${LINK_API}/access-token`, data);
+  return response.data;
 };
 
 export const saveAccessTokenToSession = (accessTokenResponse) => {
@@ -37,8 +31,6 @@ export const saveAccessTokenToSession = (accessTokenResponse) => {
 };
 
 export const postLink = async (metadata) => {
-  try {
-    const response = await axios.post(LINK_API, metadata);
-    return response.data;
-  } catch (err) {}
+  const response = await axios.post(LINK_API, metadata);
+  return response.data;
 };
