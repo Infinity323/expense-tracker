@@ -1,6 +1,7 @@
 import {
   Button,
   Center,
+  Icon,
   Modal,
   ModalBody,
   ModalContent,
@@ -10,27 +11,47 @@ import {
   Spinner,
   useDisclosure,
 } from "@chakra-ui/react";
+import { useEffect } from "react";
+import { FaCircleExclamation } from "react-icons/fa6";
 import { syncTransactions } from "../../services/TransactionService";
 
 function SyncTransactions({ setReload }) {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: refreshIsOpen,
+    onOpen: refreshOnOpen,
+    onClose: refreshOnClose,
+  } = useDisclosure();
+  const {
+    isOpen: errorIsOpen,
+    onOpen: errorOnOpen,
+    onClose: errorOnClose,
+  } = useDisclosure();
 
   const sync = async () => {
-    onOpen();
+    refreshOnOpen();
     let accessTokens = JSON.parse(sessionStorage.getItem("accessTokens"));
     for (const entry of accessTokens) {
-      await syncTransactions(entry.itemId, entry.accessToken);
+      try {
+        await syncTransactions(entry.itemId, entry.accessToken);
+      } catch (err) {
+        errorOnOpen();
+      }
     }
-    onClose();
-    setReload(true);
+    refreshOnClose();
   };
+
+  useEffect(() => {
+    if (!errorIsOpen) {
+      setReload(true);
+    }
+  }, [errorIsOpen]);
 
   return (
     <>
       <Button colorScheme="teal" onClick={sync}>
         Refresh
       </Button>
-      <Modal isOpen={isOpen} onClose={onClose} isCentered>
+      <Modal isOpen={refreshIsOpen} onClose={refreshOnClose} isCentered>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>
@@ -39,6 +60,20 @@ function SyncTransactions({ setReload }) {
           <ModalBody>
             <Center>
               <Spinner color="teal" size="xl" />
+            </Center>
+          </ModalBody>
+          <ModalFooter />
+        </ModalContent>
+      </Modal>
+      <Modal isOpen={errorIsOpen} onClose={errorOnClose} isCentered>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>
+            <Center>One or more of your accounts require attention</Center>
+          </ModalHeader>
+          <ModalBody>
+            <Center>
+              <Icon as={FaCircleExclamation} boxSize={16} color="red" />
             </Center>
           </ModalBody>
           <ModalFooter />

@@ -8,8 +8,10 @@ router.get("/", async (req, res, next) => {
     let accounts = [];
     accountDocs.forEach((doc) => {
       let createdTimestamp = doc?.created_timestamp;
+      let needsAttention = doc?.needs_attention;
       doc?.accounts?.forEach((account) => {
         account["created_timestamp"] = createdTimestamp;
+        account["needs_attention"] = needsAttention;
         accounts.push(account);
       });
     });

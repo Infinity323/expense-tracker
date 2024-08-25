@@ -39,9 +39,15 @@ const findAllAccounts = async () => {
     selector: {
       type: ITEM,
     },
-    fields: ["accounts", "created_timestamp"],
+    fields: ["accounts", "created_timestamp", "needs_attention"],
   });
   return itemDocs.docs;
+};
+
+const updateItemNeedsAttention = async (itemId, needsAttention) => {
+  let itemDoc = await db.get(itemId);
+  itemDoc["needs_attention"] = needsAttention;
+  return await db.put(itemDoc);
 };
 
 module.exports = {
@@ -50,4 +56,5 @@ module.exports = {
   findItemTransactionCursor,
   updateItemTransactionCursor,
   findAllAccounts,
+  updateItemNeedsAttention,
 };

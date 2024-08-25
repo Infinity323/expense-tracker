@@ -11,8 +11,10 @@ const {
 const {
   updateItemTransactionCursor,
   findItemTransactionCursor,
+  updateItemNeedsAttention,
 } = require("../db/queries/item");
 const { findAllPlaidBudgets } = require("../db/queries/budget");
+const db = require("../db/database");
 
 router.get("/", async (req, res, next) => {
   try {
@@ -63,8 +65,8 @@ router.delete("/:id/:rev", async (req, res, next) => {
 });
 
 router.put("/sync/:itemId", async (req, res, next) => {
+  let itemId = req.params.itemId;
   try {
-    let itemId = req.params.itemId;
     let cursor = await findItemTransactionCursor(itemId);
     let added = [];
     let modified = [];
@@ -138,6 +140,15 @@ router.put("/sync/:itemId", async (req, res, next) => {
     console.log(`Successfully synced transactions for item [${itemId}]`);
     res.json(added);
   } catch (err) {
+    if (err.response.data) {
+      // plaid API error
+      console.error(
+        `Error while syncing transactions for item [${itemId}]; ${JSON.stringify(
+          err.response.data
+        )}`
+      );
+      await updateItemNeedsAttention(itemId, true);
+    }
     next(err);
   }
 });

@@ -5,8 +5,13 @@ import {
   AccordionItem,
   AccordionPanel,
   Box,
+  Heading,
+  HStack,
+  Icon,
+  Text,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
+import { FaCircleExclamation } from "react-icons/fa6";
 import { getAccounts } from "../../services/AccountsService";
 
 function AccountsAccordion({ reload, setReload }) {
@@ -31,19 +36,36 @@ function AccountsAccordion({ reload, setReload }) {
     <Accordion allowToggle>
       {accounts.map((account) => (
         <AccordionItem key={account.account_id}>
-          <h2>
+          <Heading as="h3" size="md">
             <AccordionButton>
               <Box as="span" flex="1" textAlign="left">
-                <b>{`${account.name} - ${account.mask}`}</b>
+                <HStack>
+                  <Text
+                    as="span"
+                    fontWeight="bold"
+                  >{`${account.name} - ${account.mask}`}</Text>
+                  {account.needs_attention && (
+                    <>
+                      <Icon
+                        as={FaCircleExclamation}
+                        verticalAlign="center"
+                        color="red"
+                      />
+                      <Text as="span" color="red">
+                        Needs attention!
+                      </Text>
+                    </>
+                  )}
+                </HStack>
               </Box>
               <AccordionIcon />
             </AccordionButton>
-          </h2>
+          </Heading>
           <AccordionPanel pb={4}>
             {account.official_name}
             <br />
             <br />
-            Added on {new Date(account.created_timestamp).toDateString()}
+            Linked on {new Date(account.created_timestamp).toLocaleDateString()}
           </AccordionPanel>
         </AccordionItem>
       ))}
