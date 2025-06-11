@@ -1,28 +1,30 @@
-import axios from "axios";
+import { IncomeVsExpenses } from "@backend/types/incomeVsExpenses";
+import { SpendingOverTime } from "@backend/types/spendingOverTime";
+import { get } from "./httpService";
 
 const TRENDS_API = "/api/trends";
 
-export const getSpendingOverTime = async ({ division, groupBy }) => {
-  const response = await axios.get(`${TRENDS_API}/spending/over-time`, {
+export const getSpendingOverTime = async ({ queryKey }: any) => {
+  const [, { division, groupBy }] = queryKey;
+  return await get<SpendingOverTime[]>({
+    uri: `${TRENDS_API}/spending/over-time`,
     params: {
-      division: division,
-      groupBy: groupBy,
+      division,
+      groupBy,
     },
   });
-  return response.data;
 };
 
-export const getSpendingByCategory = async ({ division, groupBy }) => {
-  const response = await axios.get(`${TRENDS_API}/spending/by-category`, {
+export const getSpendingByCategory = async ({ queryKey }: any) => {
+  const [, { division, groupBy }] = queryKey;
+  return await get({
+    uri: `${TRENDS_API}/spending/by-category`,
     params: {
-      division: division,
-      groupBy: groupBy,
+      division,
+      groupBy,
     },
   });
-  return response.data;
 };
 
-export const getIncomeVsExpenses = async () => {
-  const response = await axios.get(`${TRENDS_API}/income-vs-expenses`);
-  return response.data;
-};
+export const getIncomeVsExpenses = async () =>
+  await get<IncomeVsExpenses[]>({ uri: `${TRENDS_API}/income-vs-expenses` });

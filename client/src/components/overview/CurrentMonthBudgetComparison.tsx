@@ -1,10 +1,11 @@
 import { Box, Heading, Progress, Skeleton, Text } from "@chakra-ui/react";
-import { useApiData } from "../../hooks/useApiData";
+import { useQuery } from "react-query";
 import { getBudgetComparison } from "../../services/budgetService";
 
 function CurrentMonthBudgetComparison() {
-  const [data, loading, error] = useApiData({
-    apiCall: getBudgetComparison(),
+  const { data, isLoading } = useQuery({
+    queryKey: ["budgetComparison"],
+    queryFn: getBudgetComparison,
   });
 
   const getStatusColor = (difference) => {
@@ -20,7 +21,7 @@ function CurrentMonthBudgetComparison() {
       <Heading as="h3" size="lg">
         Income
       </Heading>
-      {loading ? (
+      {isLoading ? (
         <Box width="50%" padding="1rem">
           <Skeleton height={20} />
         </Box>
@@ -52,7 +53,7 @@ function CurrentMonthBudgetComparison() {
       <Heading as="h3" size="lg">
         Spending
       </Heading>
-      {loading ? (
+      {isLoading ? (
         <Box width="50%" padding="1rem">
           <Skeleton height={20} />
         </Box>

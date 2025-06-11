@@ -1,4 +1,5 @@
 import { Box, Skeleton, Text } from "@chakra-ui/react";
+import { useQuery } from "react-query";
 import {
   Area,
   AreaChart,
@@ -9,13 +10,13 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { useApiData } from "../../hooks/useApiData";
-import { getIncomeVsExpenses } from "../../services/trendsService";
-import { dateToString } from "../../utils/DateUtil";
+import { getIncomeVsExpenses } from "../../../services/trendsService";
+import { dateToString } from "../../../utils/DateUtil";
 
 function IncomeVsSpendingOverTime() {
-  const [data, isLoading, error] = useApiData({
-    apiCall: getIncomeVsExpenses(),
+  const { data, isLoading } = useQuery({
+    queryKey: ["incomeVsExpenses"],
+    queryFn: getIncomeVsExpenses,
   });
 
   return (

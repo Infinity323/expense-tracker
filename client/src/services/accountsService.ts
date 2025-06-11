@@ -1,8 +1,5 @@
-import axios from "axios";
+import { get } from "./httpService";
 
 const ACCOUNT_API = "/api/account";
 
-export const getAccounts = async () => {
-  const response = await axios.get(ACCOUNT_API);
-  return response.data;
-};
+export const getAccounts = async () => await get<any>({ uri: ACCOUNT_API });

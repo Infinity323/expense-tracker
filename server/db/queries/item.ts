@@ -1,5 +1,5 @@
-import { ItemDoc } from "../../types/item-doc";
 import db from "../database";
+import { ItemDoc } from "../types/itemDoc";
 
 const ITEM = "item";
 

@@ -1,6 +1,6 @@
 import { Box, Heading } from "@chakra-ui/react";
-import CategorySpendingOverTimeChart from "../components/trends/CategorySpendingOverTimeChart";
-import IncomeVsSpendingOverTime from "../components/trends/IncomeVsSpendingOverTime";
+import CategorySpendingOverTimeChart from "../components/trends/category-spending/CategorySpendingOverTimeChart";
+import IncomeVsSpendingOverTime from "../components/trends/income-vs-spending/IncomeVsSpendingOverTime";
 
 function Insights() {
   return (

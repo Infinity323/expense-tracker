@@ -9,7 +9,9 @@ import {
   ModalHeader,
   ModalOverlay,
   Spinner,
+  Text,
   useDisclosure,
+  VStack,
 } from "@chakra-ui/react";
 import { useEffect } from "react";
 import { FaCircleExclamation } from "react-icons/fa6";
@@ -68,13 +70,16 @@ function SyncTransactions({ setReload }) {
       <Modal isOpen={errorIsOpen} onClose={errorOnClose} isCentered>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>
-            <Center>One or more of your accounts require attention</Center>
-          </ModalHeader>
+          <ModalHeader />
           <ModalBody>
-            <Center>
-              <Icon as={FaCircleExclamation} boxSize={16} color="red" />
-            </Center>
+            <VStack>
+              <Center>
+                <Icon as={FaCircleExclamation} boxSize={16} color="red" />
+              </Center>
+              <Text fontWeight="semibold">
+                One or more of your accounts require attention.
+              </Text>
+            </VStack>
           </ModalBody>
           <ModalFooter />
         </ModalContent>

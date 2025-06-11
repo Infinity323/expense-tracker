@@ -7,32 +7,29 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useQuery } from "react-query";
 import { getBudgets } from "../../services/budgetService";
 import LoadingModal from "../shared/LoadingModal";
 import DeleteBudget from "./DeleteBudget";
 import EditBudget from "./EditBudget";
 
 function BudgetsTable({ reload, setReload }) {
-  const [budgets, setBudgets] = useState<any[]>();
-  const [isLoading, setIsLoading] = useState<boolean>();
-
-  const loadBudgets = async () => {
-    setIsLoading(true);
-    setBudgets(await getBudgets());
-    setIsLoading(false);
-  };
-
-  useEffect(() => {
-    loadBudgets();
-  }, []);
+  const {
+    data: budgets,
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ["budgets"],
+    queryFn: getBudgets,
+  });
 
   useEffect(() => {
     if (reload) {
-      loadBudgets();
+      refetch();
       setReload(false);
     }
-  }, [reload, setReload]);
+  }, [reload, setReload, refetch]);
 
   return (
     <>
@@ -56,7 +53,7 @@ function BudgetsTable({ reload, setReload }) {
                   <Td isNumeric>${budget.amount}</Td>
                   <Td padding="0" width="0">
                     <EditBudget budgetDoc={budget} />
-                    <DeleteBudget budgetDoc={budget} onDelete={loadBudgets} />
+                    <DeleteBudget budgetDoc={budget} onDelete={refetch} />
                   </Td>
                 </Tr>
               ))
@@ -68,7 +65,7 @@ function BudgetsTable({ reload, setReload }) {
           </Tbody>
         </Table>
       </TableContainer>
-      <LoadingModal isLoading={isLoading} />
+      <LoadingModal isLoading={reload || isLoading} />
     </>
   );
 }

@@ -1,6 +1,6 @@
 import { Select } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import { getBudgets } from "../../services/budgetService";
+import { useQuery } from "react-query";
+import { getSortedBudgets } from "../../services/budgetService";
 
 function BudgetsSelect({
   selectedCategory,
@@ -8,12 +8,10 @@ function BudgetsSelect({
   setCategory,
   setSubcategory,
 }) {
-  const [budgets, setBudgets] = useState([]);
-
-  const loadBudgets = async () => {
-    let budgets = await getBudgets(true);
-    setBudgets(budgets);
-  };
+  const { data: budgets } = useQuery({
+    queryKey: ["sortedBudgets"],
+    queryFn: getSortedBudgets,
+  });
 
   const changeCategory = (event) => {
     setCategory(event.target.value);
@@ -22,10 +20,6 @@ function BudgetsSelect({
   const changeSubcategory = (event) => {
     setSubcategory(event.target.value);
   };
-
-  useEffect(() => {
-    loadBudgets();
-  }, []);
 
   return (
     <>

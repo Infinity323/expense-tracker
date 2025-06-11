@@ -7,32 +7,29 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useQuery } from "react-query";
 import { getTransactions } from "../../services/transactionService";
 import LoadingModal from "../shared/LoadingModal";
 import DeleteTransaction from "./DeleteTransaction";
 import EditTransaction from "./EditTransaction";
 
 function TransactionsTable({ reload, setReload }) {
-  const [transactions, setTransactions] = useState([]);
-  const [isLoading, setIsLoading] = useState<boolean>();
-
-  const loadTransactions = async () => {
-    setIsLoading(true);
-    setTransactions(await getTransactions());
-    setIsLoading(false);
-  };
-
-  useEffect(() => {
-    loadTransactions();
-  }, []);
+  const {
+    data: transactions,
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ["transactions"],
+    queryFn: getTransactions,
+  });
 
   useEffect(() => {
     if (reload) {
-      loadTransactions();
+      refetch();
       setReload(false);
     }
-  }, [reload, setReload]);
+  }, [reload, setReload, refetch]);
 
   return (
     <>
@@ -63,7 +60,7 @@ function TransactionsTable({ reload, setReload }) {
                     <EditTransaction transactionDoc={transaction} />
                     <DeleteTransaction
                       transactionDoc={transaction}
-                      onDelete={loadTransactions}
+                      onDelete={refetch}
                     />
                   </Td>
                 </Tr>

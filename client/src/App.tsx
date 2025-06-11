@@ -1,8 +1,10 @@
 import { ChakraProvider } from "@chakra-ui/react";
 import { useEffect } from "react";
+import { QueryClient, QueryClientProvider } from "react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
+import { useTheme } from "./hooks/useTheme";
 import Accounts from "./pages/Accounts";
 import Budgets from "./pages/Budgets";
 import Home from "./pages/Home";
@@ -12,7 +14,12 @@ import Overview from "./pages/Overview";
 import Swagger from "./pages/Swagger";
 import Transactions from "./pages/Transactions";
 import { getAccessTokens } from "./services/linkService";
-import { useTheme } from "./hooks/useTheme";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { retry: false },
+  },
+});
 
 function App() {
   const loadAccessTokens = async () => {
@@ -26,20 +33,22 @@ function App() {
 
   return (
     <ChakraProvider theme={useTheme()}>
-      <BrowserRouter>
-        <Navbar />
-        <Routes>
-          <Route path="/" Component={Home} />
-          <Route path="/overview" Component={Overview} />
-          <Route path="/insights" Component={Insights} />
-          <Route path="/budgets" Component={Budgets} />
-          <Route path="/transactions" Component={Transactions} />
-          <Route path="/accounts" Component={Accounts} />
-          <Route path="/login" Component={Login} />
-          <Route path="/api" Component={Swagger} />
-        </Routes>
-        <Footer />
-      </BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <Navbar />
+          <Routes>
+            <Route path="/" Component={Home} />
+            <Route path="/overview" Component={Overview} />
+            <Route path="/insights" Component={Insights} />
+            <Route path="/budgets" Component={Budgets} />
+            <Route path="/transactions" Component={Transactions} />
+            <Route path="/accounts" Component={Accounts} />
+            <Route path="/login" Component={Login} />
+            <Route path="/api" Component={Swagger} />
+          </Routes>
+          <Footer />
+        </BrowserRouter>
+      </QueryClientProvider>
     </ChakraProvider>
   );
 }

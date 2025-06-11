@@ -1,5 +1,5 @@
 import { Box, Skeleton, Text } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useQuery } from "react-query";
 import {
   Area,
   AreaChart,
@@ -10,10 +10,9 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { useApiData } from "../../hooks/useApiData";
-import { getBudgets } from "../../services/budgetService";
-import { getSpendingOverTime } from "../../services/trendsService";
-import { dateToString } from "../../utils/DateUtil";
+import { getSortedBudgets } from "../../../services/budgetService";
+import { getSpendingOverTime } from "../../../services/trendsService";
+import { dateToString } from "../../../utils/DateUtil";
 
 const COLOR_MAP = {
   "Bank Fees": "#EAC435",
@@ -34,28 +33,21 @@ const COLOR_MAP = {
 };
 
 function CategorySpendingOverTimeChart() {
-  const [categories, setCategories] = useState([]);
-
-  const [categoryData, categoryIsLoading, categoryError] = useApiData({
-    apiCall: getBudgets(true),
+  const { data: categoryData, isLoading: categoryIsLoading } = useQuery({
+    queryKey: ["sortedBudgets"],
+    queryFn: getSortedBudgets,
   });
-  const [spendingData, spendingIsLoading, spendingError] = useApiData({
-    apiCall: getSpendingOverTime({ groupBy: "category", division: "monthly" }),
+  const { data: spendingData, isLoading: spendingIsLoading } = useQuery({
+    queryKey: [
+      "spendingOverTime",
+      { groupBy: "category", division: "monthly" },
+    ],
+    queryFn: getSpendingOverTime,
   });
 
-  useEffect(() => {
-    if (categoryData) {
-      let categories = [];
-      new Map(Object.entries(categoryData)).forEach((_, category) => {
-        // don't display income
-        if (category === "Income") {
-          return;
-        }
-        categories.push(category);
-      });
-      setCategories(categories);
-    }
-  }, [categoryData]);
+  const categories = categoryData
+    ? Object.entries(categoryData).map((entry) => entry[0])
+    : undefined;
 
   return (
     <ResponsiveContainer width="100%" height={500}>

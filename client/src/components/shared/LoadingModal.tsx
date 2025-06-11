@@ -11,20 +11,18 @@ import {
   useDisclosure,
   VStack,
 } from "@chakra-ui/react";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 
 function LoadingModal({ isLoading }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const onOpenRef = useRef(onOpen);
-  const onCloseRef = useRef(onClose);
 
   useEffect(() => {
     if (isLoading) {
-      onOpenRef.current();
+      onOpen();
     } else {
-      onCloseRef.current();
+      onClose();
     }
-  }, [isLoading]);
+  }, [isLoading, onOpen, onClose]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
@@ -35,7 +33,7 @@ function LoadingModal({ isLoading }) {
           <Center>
             <VStack>
               <Spinner color="teal" size="lg" />
-              <Text fontWeight="medium">Loading...</Text>
+              <Text fontWeight="semibold">Loading...</Text>
             </VStack>
           </Center>
         </ModalBody>
