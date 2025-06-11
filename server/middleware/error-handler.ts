@@ -32,8 +32,4 @@ const defaultErrorHandler = (err, req, res, next) => {
   res.status(500).json({ error: "Internal Server Error" });
 };
 
-module.exports = {
-  validationErrorHandler,
-  clientErrorHandler,
-  defaultErrorHandler,
-};
+export { clientErrorHandler, defaultErrorHandler, validationErrorHandler };

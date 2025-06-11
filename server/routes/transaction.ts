@@ -1,22 +1,21 @@
-const express = require("express");
-const router = express.Router();
-const plaidClient = require("../clients/plaid-client");
-const {
-  createTransaction,
-  updateTransaction,
-  deleteTransaction,
-  findAllExpenses,
-  findAllTransactions,
-} = require("../db/queries/transaction");
-const {
-  updateItemTransactionCursor,
+import express from "express";
+import plaidClient from "../clients/plaid-client";
+import { findAllPlaidBudgets } from "../db/queries/budget";
+import {
   findItemTransactionCursor,
   updateItemNeedsAttention,
-} = require("../db/queries/item");
-const { findAllPlaidBudgets } = require("../db/queries/budget");
-const db = require("../db/database");
+  updateItemTransactionCursor,
+} from "../db/queries/item";
+import {
+  createTransaction,
+  deleteTransaction,
+  findAllTransactions,
+  updateTransaction,
+} from "../db/queries/transaction";
 
-router.get("/", async (req, res, next) => {
+const transactionRouter = express.Router();
+
+transactionRouter.get("/", async (req, res, next) => {
   try {
     const transactionDocs = await findAllTransactions();
     console.log(
@@ -28,19 +27,19 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-router.post("/", async (req, res, next) => {
+transactionRouter.post("/", async (req, res, next) => {
   try {
     const response = await createTransaction(req.body);
     console.log(
       `Successfully added new transaction document ID [${response.id}]`
     );
-    res.status(201).json(transactionsDoc);
+    res.status(201).json(response);
   } catch (err) {
     next(err);
   }
 });
 
-router.put("/", async (req, res, next) => {
+transactionRouter.put("/", async (req, res, next) => {
   try {
     const response = await updateTransaction(req.body);
     console.log(
@@ -52,7 +51,7 @@ router.put("/", async (req, res, next) => {
   }
 });
 
-router.delete("/:id/:rev", async (req, res, next) => {
+transactionRouter.delete("/:id/:rev", async (req, res, next) => {
   try {
     await deleteTransaction(req.params);
     console.log(
@@ -64,7 +63,7 @@ router.delete("/:id/:rev", async (req, res, next) => {
   }
 });
 
-router.put("/sync/:itemId", async (req, res, next) => {
+transactionRouter.put("/sync/:itemId", async (req, res, next) => {
   let itemId = req.params.itemId;
   try {
     let cursor = await findItemTransactionCursor(itemId);
@@ -153,4 +152,4 @@ router.put("/sync/:itemId", async (req, res, next) => {
   }
 });
 
-module.exports = router;
+export default transactionRouter;

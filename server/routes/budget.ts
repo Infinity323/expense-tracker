@@ -1,16 +1,17 @@
-const express = require("express");
-const fs = require("fs");
-const { parse } = require("csv-parse");
-const router = express.Router();
-const {
-  findAllBudgets,
+import { parse } from "csv-parse";
+import express from "express";
+import * as fs from "fs";
+import {
   createBudget,
-  updateBudget,
   deleteBudget,
-} = require("../db/queries/budget");
-const { findCurrentMonthTransactions } = require("../db/queries/transaction");
+  findAllBudgets,
+  updateBudget,
+} from "../db/queries/budget";
+import { findCurrentMonthTransactions } from "../db/queries/transaction";
 
-router.get("/", async (req, res, next) => {
+const budgetRouter = express.Router();
+
+budgetRouter.get("/", async (req, res, next) => {
   try {
     let budgetDocs = await findAllBudgets();
     if (!budgetDocs.length) {
@@ -52,17 +53,17 @@ const seedBudgets = async () => {
   return budgetDocs;
 };
 
-router.post("/", async (req, res, next) => {
+budgetRouter.post("/", async (req, res, next) => {
   try {
     const response = await createBudget(req.body);
     console.log(`Successfully added new budget document ID [${response.id}]`);
-    res.status(201).json(budgetDoc);
+    res.status(201).json(response);
   } catch (err) {
     next(err);
   }
 });
 
-router.put("/", async (req, res, next) => {
+budgetRouter.put("/", async (req, res, next) => {
   try {
     const response = await updateBudget(req.body);
     console.log(`Successfully updated budget document ID [${response.id}]`);
@@ -72,7 +73,7 @@ router.put("/", async (req, res, next) => {
   }
 });
 
-router.delete("/:id/:rev", async (req, res, next) => {
+budgetRouter.delete("/:id/:rev", async (req, res, next) => {
   try {
     await deleteBudget(req.params);
     console.log(
@@ -84,7 +85,7 @@ router.delete("/:id/:rev", async (req, res, next) => {
   }
 });
 
-router.get("/comparison", async (req, res, next) => {
+budgetRouter.get("/comparison", async (req, res, next) => {
   try {
     let budgetDocs = await findAllBudgets();
     let transactionDocs = await findCurrentMonthTransactions();
@@ -122,4 +123,4 @@ const round = (amount) => {
   return parseFloat(amount.toFixed(2));
 };
 
-module.exports = router;
+export default budgetRouter;

@@ -7,7 +7,9 @@ import {
   ModalHeader,
   ModalOverlay,
   Spinner,
+  Text,
   useDisclosure,
+  VStack,
 } from "@chakra-ui/react";
 import { useEffect, useRef } from "react";
 
@@ -28,12 +30,13 @@ function LoadingModal({ isLoading }) {
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>
-          <Center>Loading...</Center>
-        </ModalHeader>
+        <ModalHeader />
         <ModalBody>
           <Center>
-            <Spinner color="teal" size="xl" />
+            <VStack>
+              <Spinner color="teal" size="lg" />
+              <Text fontWeight="medium">Loading...</Text>
+            </VStack>
           </Center>
         </ModalBody>
         <ModalFooter />

@@ -1,26 +1,25 @@
-const express = require("express");
-const {
+import express from "express";
+import {
   findAllExpenses,
-  findCurrentMonthTransactions,
-  findAllIncome,
-} = require("../db/queries/transaction");
-const e = require("express");
-const router = express.Router();
+  findAllIncome
+} from "../db/queries/transaction";
+
+const trendsRouter = express.Router();
 
 const SUPPORTED_TIME_DIVISIONS = ["monthly", "quarterly", "annually"];
 const SUPPORTED_GROUP_BY = ["category", "subcategory"];
 
-router.get("/spending/over-time", async (req, res, next) => {
+trendsRouter.get("/spending/over-time", async (req, res, next) => {
   try {
     let division = req.query.division; // monthly, quarterly, annually
     if (!division) {
       const err = new Error("Time division is mandatory");
-      err.status = 400;
+      // err.status = 400;
       throw err;
     }
     if (!SUPPORTED_TIME_DIVISIONS.includes(division)) {
       const err = new Error("Time division not supported");
-      err.status = 400;
+      // err.status = 400;
       throw err;
     }
     let groupBy = req.query.groupBy; // category, subcategory
@@ -72,29 +71,29 @@ router.get("/spending/over-time", async (req, res, next) => {
 
 const getTimeKey = (division, date) => {
   if (division == "monthly") {
-    return Date.parse(new Date(date.getFullYear(), date.getMonth()));
+    return new Date(date.getFullYear(), date.getMonth()).getTime();
   } else if (division == "quarterly") {
     let quarter = Math.floor((date.getMonth() + 3) / 3);
     let monthIndex = quarter * 3 - 3;
-    return Date.parse(new Date(date.getFullYear(), monthIndex));
+    return new Date(date.getFullYear(), monthIndex).getTime();
   } else if (division == "yearly") {
-    return Date.parse(new Date(date.getFullYear(), 0));
+    return new Date(date.getFullYear(), 0).getTime();
   } else {
     return 0;
   }
 };
 
-router.get("/spending/by-category", async (req, res, next) => {
+trendsRouter.get("/spending/by-category", async (req, res, next) => {
   try {
     let groupBy = req.query.groupBy; // category, subcategory
     if (!groupBy) {
       const err = new Error("Group by is mandatory");
-      err.status = 400;
+      // err.status = 400;
       throw err;
     }
     if (!SUPPORTED_GROUP_BY.includes(groupBy)) {
       const err = new Error("Group by not supported");
-      err.status = 400;
+      // err.status = 400;
       throw err;
     }
     let division = req.query.division; // monthly, quarterly, annually
@@ -174,7 +173,7 @@ const processByCategoryResults = (resultMap, groupBy) => {
   }
 };
 
-router.get("/income-vs-expenses", async (req, res, next) => {
+trendsRouter.get("/income-vs-expenses", async (req, res, next) => {
   try {
     // TODO: expand to not just monthly
     let income = await findAllIncome();
@@ -195,7 +194,7 @@ router.get("/income-vs-expenses", async (req, res, next) => {
       comparisonMap[key]["expenses"] = round(comparisonMap[key]["expenses"]);
     });
     let results = [];
-    new Map(Object.entries(comparisonMap)).forEach((totals, date) => {
+    new Map(Object.entries(comparisonMap)).forEach((totals: any, date) => {
       let dateResult = {
         date: date,
         Income: totals.income,
@@ -214,4 +213,4 @@ const round = (amount) => {
   return parseFloat(amount.toFixed(2));
 };
 
-module.exports = router;
+export default trendsRouter;

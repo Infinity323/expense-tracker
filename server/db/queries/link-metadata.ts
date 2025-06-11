@@ -1,4 +1,4 @@
-const db = require("../database");
+import db from "../database";
 
 const LINK_METADATA = "linkMetadata";
 
@@ -9,4 +9,4 @@ const createLinkMetadata = async (metadata) => {
   });
 };
 
-module.exports = { createLinkMetadata };
+export { createLinkMetadata };

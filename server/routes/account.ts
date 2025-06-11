@@ -1,8 +1,9 @@
-const express = require("express");
-const router = express.Router();
-const { findAllAccounts } = require("../db/queries/item");
+import express from "express";
+import { findAllAccounts } from "../db/queries/item";
 
-router.get("/", async (req, res, next) => {
+const accountRouter = express.Router();
+
+accountRouter.get("/", async (req, res, next) => {
   try {
     let accountDocs = await findAllAccounts();
     let accounts = [];
@@ -22,4 +23,4 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-module.exports = router;
+export default accountRouter;

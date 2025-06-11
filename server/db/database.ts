@@ -1,5 +1,7 @@
-const PouchDB = require("pouchdb");
-PouchDB.plugin(require("pouchdb-find"));
+import PouchDB from "pouchdb";
+import PouchFind from "pouchdb-find";
+
+PouchDB.plugin(PouchFind);
 
 const db = new PouchDB("/tmp/expense-tracker/db");
 
@@ -10,4 +12,4 @@ const createTypeIndex = async () => {
 };
 createTypeIndex();
 
-module.exports = db;
+export default db;

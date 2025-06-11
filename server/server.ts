@@ -1,24 +1,26 @@
-require("dotenv").config();
+import * as dotenv from "dotenv";
 
-const { mkdirp } = require("mkdirp");
-const PouchDB = require("pouchdb");
-const express = require("express");
-const bodyParser = require("body-parser");
-const session = require("express-session");
+import bodyParser from "body-parser";
+import express from "express";
+import { mkdirp } from "mkdirp";
+import PouchDB from "pouchdb";
 
-const linkRouter = require("./routes/link");
-const budgetRouter = require("./routes/budget");
-const transactionRouter = require("./routes/transaction");
-const accountRouter = require("./routes/account");
-const trendsRouter = require("./routes/trends");
+import swaggerSpec from "./middleware/swagger";
+import accountRouter from "./routes/account";
+import budgetRouter from "./routes/budget";
+import linkRouter from "./routes/link";
+import transactionRouter from "./routes/transaction";
+import trendsRouter from "./routes/trends";
 
-const validationErrorHandler =
-  require("./middleware/error-handler").validationErrorHandler;
-const clientErrorHandler =
-  require("./middleware/error-handler").clientErrorHandler;
-const defaultErrorHandler =
-  require("./middleware/error-handler").defaultErrorHandler;
-const swaggerSpec = require("./middleware/swagger");
+import {
+  clientErrorHandler,
+  defaultErrorHandler,
+  validationErrorHandler,
+} from "./middleware/error-handler";
+
+import expressPouchDb from "express-pouchdb";
+
+dotenv.config();
 
 mkdirp("/tmp/expense-tracker");
 mkdirp("/tmp/expense-tracker/db");
@@ -31,7 +33,7 @@ app.use(bodyParser.json());
 // database
 app.use(
   "/db",
-  require("express-pouchdb")(PouchDB, {
+  expressPouchDb(PouchDB, {
     configPath: "./pouchdb-config.json",
   })
 );

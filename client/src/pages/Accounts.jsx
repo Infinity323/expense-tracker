@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import AccountsAccordion from "../components/accounts/AccountsAccordion";
 import Link from "../components/accounts/Link";
 import LoadingModal from "../components/shared/LoadingModal";
-import { getLinkToken } from "../services/LinkService";
+import { getLinkToken } from "../services/linkService";
 
 function Accounts() {
   const [linkToken, setLinkToken] = useState();

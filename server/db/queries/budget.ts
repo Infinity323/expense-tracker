@@ -1,4 +1,4 @@
-const db = require("../database");
+import db from "../database";
 
 const BUDGET = "budget";
 
@@ -67,10 +67,10 @@ const deleteBudget = async ({ id, rev }) => {
   return await db.remove({ _id: id, _rev: rev });
 };
 
-module.exports = {
+export {
+  createBudget,
+  deleteBudget,
   findAllBudgets,
   findAllPlaidBudgets,
-  createBudget,
   updateBudget,
-  deleteBudget,
 };

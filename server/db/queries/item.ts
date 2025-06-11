@@ -1,4 +1,5 @@
-const db = require("../database");
+import { ItemDoc } from "../../types/item-doc";
+import db from "../database";
 
 const ITEM = "item";
 
@@ -13,7 +14,7 @@ const findAllAccessTokens = async () => {
 };
 
 const createItem = async (item_id, access_token, accounts) => {
-  return await db.put({
+  return await db.put<ItemDoc>({
     _id: item_id,
     type: ITEM,
     item_id: item_id,
@@ -24,7 +25,7 @@ const createItem = async (item_id, access_token, accounts) => {
 };
 
 const findItemTransactionCursor = async (itemId) => {
-  const itemDoc = await db.get(itemId);
+  const itemDoc = await db.get<{ cursor: string }>(itemId);
   return itemDoc.cursor;
 };
 
@@ -50,11 +51,11 @@ const updateItemNeedsAttention = async (itemId, needsAttention) => {
   return await db.put(itemDoc);
 };
 
-module.exports = {
-  findAllAccessTokens,
+export {
   createItem,
-  findItemTransactionCursor,
-  updateItemTransactionCursor,
+  findAllAccessTokens,
   findAllAccounts,
+  findItemTransactionCursor,
   updateItemNeedsAttention,
+  updateItemTransactionCursor,
 };
