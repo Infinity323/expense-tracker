@@ -20,7 +20,7 @@ function Link({ linkToken, setReload }) {
   });
 
   return (
-    <Button onClick={open} disabled={!ready}>
+    <Button onClick={() => open()} disabled={!ready}>
       Link account
     </Button>
   );

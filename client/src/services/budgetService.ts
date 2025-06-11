@@ -2,7 +2,7 @@ import axios from "axios";
 
 const BUDGET_API = "/api/budget";
 
-export const getBudgets = async (sorted) => {
+export const getBudgets = async (sorted?: boolean) => {
   const response = await axios.get(BUDGET_API, {
     params: {
       sorted: sorted,

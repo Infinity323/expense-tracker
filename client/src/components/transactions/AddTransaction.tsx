@@ -1,7 +1,5 @@
 import {
   Button,
-  Icon,
-  IconButton,
   Input,
   InputGroup,
   InputLeftElement,
@@ -16,27 +14,22 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { FaPencil } from "react-icons/fa6";
-import { putTransaction } from "../../services/TransactionService";
+import { postTransaction } from "../../services/transactionService";
 import BudgetsSelect from "../budgets/BudgetsSelect";
 
-function EditTransaction({ transactionDoc }) {
+function AddTransaction({ setReload }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const [date, setDate] = useState(transactionDoc.date);
-  const [name, setName] = useState(transactionDoc.name);
-  const [description, setDescription] = useState(transactionDoc.description);
-  const [category, setCategory] = useState(transactionDoc.category);
-  const [subcategory, setSubcategory] = useState(transactionDoc.subcategory);
-  const [amount, setAmount] = useState(transactionDoc.amount);
+  const [date, setDate] = useState<string>();
+  const [name, setName] = useState<string>();
+  const [description, setDescription] = useState<string>();
+  const [category, setCategory] = useState<string>();
+  const [subcategory, setSubcategory] = useState<string>();
+  const [amount, setAmount] = useState<string>();
 
-  const editTransaction = async (event) => {
+  const addTransaction = async (event) => {
     event.preventDefault();
-    let _id = transactionDoc._id;
-    let _rev = transactionDoc._rev;
-    await putTransaction({
-      _id,
-      _rev,
+    await postTransaction({
       date,
       name,
       description,
@@ -47,14 +40,21 @@ function EditTransaction({ transactionDoc }) {
     onClose();
   };
 
+  const resetFields = () => {
+    setDate(undefined);
+    setName(undefined);
+    setDescription(undefined);
+    setCategory(undefined);
+    setSubcategory(undefined);
+    setAmount(undefined);
+    setReload(true);
+  };
+
   return (
     <>
-      <IconButton
-        variant="ghost"
-        size="sm"
-        onClick={onOpen}
-        icon={<Icon as={FaPencil} />}
-      />
+      <Button colorScheme="teal" onClick={onOpen}>
+        Add Transaction
+      </Button>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
@@ -101,7 +101,10 @@ function EditTransaction({ transactionDoc }) {
           <ModalFooter>
             <Button
               colorScheme="teal"
-              onClick={editTransaction}
+              onClick={(event) => {
+                addTransaction(event);
+                resetFields();
+              }}
               isDisabled={
                 !date || !name || !category || !subcategory || !amount
               }
@@ -115,4 +118,4 @@ function EditTransaction({ transactionDoc }) {
   );
 }
 
-export default EditTransaction;
+export default AddTransaction;

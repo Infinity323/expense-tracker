@@ -8,14 +8,14 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { getTransactions } from "../../services/TransactionService";
+import { getTransactions } from "../../services/transactionService";
 import LoadingModal from "../shared/LoadingModal";
 import DeleteTransaction from "./DeleteTransaction";
 import EditTransaction from "./EditTransaction";
 
 function TransactionsTable({ reload, setReload }) {
   const [transactions, setTransactions] = useState([]);
-  const [isLoading, setIsLoading] = useState();
+  const [isLoading, setIsLoading] = useState<boolean>();
 
   const loadTransactions = async () => {
     setIsLoading(true);
@@ -70,7 +70,7 @@ function TransactionsTable({ reload, setReload }) {
               ))
             ) : (
               <Tr>
-                <Td colSpan="100%">No transactions found.</Td>
+                <Td colSpan={100}>No transactions found.</Td>
               </Tr>
             )}
           </Tbody>

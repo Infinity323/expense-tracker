@@ -17,7 +17,7 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { FaPencil } from "react-icons/fa6";
-import { putBudget } from "../../services/BudgetService";
+import { putBudget } from "../../services/budgetService";
 
 function EditBudget({ budgetDoc }) {
   // TODO: implement reloading
@@ -42,6 +42,7 @@ function EditBudget({ budgetDoc }) {
         size="sm"
         onClick={onOpen}
         icon={<Icon as={FaPencil} />}
+        aria-label=""
       />
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />

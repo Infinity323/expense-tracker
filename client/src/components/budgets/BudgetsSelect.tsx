@@ -1,6 +1,6 @@
 import { Select } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { getBudgets } from "../../services/BudgetService";
+import { getBudgets } from "../../services/budgetService";
 
 function BudgetsSelect({
   selectedCategory,
@@ -8,7 +8,7 @@ function BudgetsSelect({
   setCategory,
   setSubcategory,
 }) {
-  const [budgets, setBudgets] = useState();
+  const [budgets, setBudgets] = useState([]);
 
   const loadBudgets = async () => {
     let budgets = await getBudgets(true);
@@ -47,13 +47,11 @@ function BudgetsSelect({
         placeholder="Subcategory"
         isDisabled={!selectedCategory}
       >
-        {budgets &&
-          budgets[selectedCategory] &&
-          budgets[selectedCategory].map((subcategory) => (
-            <option key={subcategory} value={subcategory}>
-              {subcategory}
-            </option>
-          ))}
+        {budgets?.[selectedCategory]?.map((subcategory) => (
+          <option key={subcategory} value={subcategory}>
+            {subcategory}
+          </option>
+        ))}
       </Select>
     </>
   );

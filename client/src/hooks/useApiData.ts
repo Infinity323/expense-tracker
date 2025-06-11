@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 
+// TODO: replace with useQuery
 export const useApiData = ({ apiCall }) => {
-  const [data, setData] = useState();
-  const [isLoading, setIsLoading] = useState();
+  const [data, setData] = useState<any>();
+  const [isLoading, setIsLoading] = useState<boolean>();
   const [error, setError] = useState();
 
   useEffect(() => {

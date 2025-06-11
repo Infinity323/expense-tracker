@@ -7,8 +7,8 @@ import { getLinkToken } from "../services/linkService";
 
 function Accounts() {
   const [linkToken, setLinkToken] = useState();
-  const [isLoading, setIsLoading] = useState();
-  const [reload, setReload] = useState();
+  const [isLoading, setIsLoading] = useState<boolean>();
+  const [reload, setReload] = useState<boolean>();
 
   const establishLink = async () => {
     setIsLoading(true);

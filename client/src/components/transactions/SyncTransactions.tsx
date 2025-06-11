@@ -13,7 +13,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect } from "react";
 import { FaCircleExclamation } from "react-icons/fa6";
-import { syncTransactions } from "../../services/TransactionService";
+import { syncTransactions } from "../../services/transactionService";
 
 function SyncTransactions({ setReload }) {
   const {

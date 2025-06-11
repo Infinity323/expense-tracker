@@ -12,14 +12,14 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { FaRegTrashCan } from "react-icons/fa6";
-import { deleteBudget } from "../../services/BudgetService";
+import { deleteTransaction } from "../../services/transactionService";
 
-function DeleteBudget({ budgetDoc: budget, onDelete }) {
+function DeleteTransaction({ transactionDoc: transaction, onDelete }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const removeBudget = async (event) => {
+  const removeTransaction = async (event) => {
     event.preventDefault();
-    await deleteBudget(budget._id, budget._rev);
+    await deleteTransaction(transaction._id, transaction._rev);
     onDelete();
   };
 
@@ -30,6 +30,7 @@ function DeleteBudget({ budgetDoc: budget, onDelete }) {
         size="sm"
         onClick={onOpen}
         icon={<Icon as={FaRegTrashCan} />}
+        aria-label=""
       />
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
@@ -38,7 +39,13 @@ function DeleteBudget({ budgetDoc: budget, onDelete }) {
           <ModalCloseButton />
           <ModalBody>This action cannot be undone.</ModalBody>
           <ModalFooter>
-            <Button colorScheme="red" onClick={removeBudget}>
+            <Button
+              colorScheme="red"
+              onClick={(event) => {
+                removeTransaction(event);
+                onClose();
+              }}
+            >
               Delete
             </Button>
           </ModalFooter>
@@ -48,4 +55,4 @@ function DeleteBudget({ budgetDoc: budget, onDelete }) {
   );
 }
 
-export default DeleteBudget;
+export default DeleteTransaction;

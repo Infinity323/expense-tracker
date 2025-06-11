@@ -12,6 +12,7 @@ import Overview from "./pages/Overview";
 import Swagger from "./pages/Swagger";
 import Transactions from "./pages/Transactions";
 import { getAccessTokens } from "./services/linkService";
+import { useTheme } from "./hooks/useTheme";
 
 function App() {
   const loadAccessTokens = async () => {
@@ -24,7 +25,7 @@ function App() {
   }, []);
 
   return (
-    <ChakraProvider>
+    <ChakraProvider theme={useTheme()}>
       <BrowserRouter>
         <Navbar />
         <Routes>

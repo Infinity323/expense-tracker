@@ -1,6 +1,6 @@
 import { Box, Heading, Progress, Skeleton, Text } from "@chakra-ui/react";
-import { useApiData } from "../../hooks/UseApiData";
-import { getBudgetComparison } from "../../services/BudgetService";
+import { useApiData } from "../../hooks/useApiData";
+import { getBudgetComparison } from "../../services/budgetService";
 
 function CurrentMonthBudgetComparison() {
   const [data, loading, error] = useApiData({
@@ -25,9 +25,7 @@ function CurrentMonthBudgetComparison() {
           <Skeleton height={20} />
         </Box>
       ) : (
-        data &&
-        data.income &&
-        data.income.map((comparison) => (
+        data?.income?.map((comparison) => (
           <Box padding="1rem" key={comparison.name} width="50%">
             <Heading as="h4" fontSize="md">
               {comparison.name}: ${comparison.expectedAmount}

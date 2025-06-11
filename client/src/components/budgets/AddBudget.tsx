@@ -14,14 +14,14 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { postBudget } from "../../services/BudgetService";
+import { postBudget } from "../../services/budgetService";
 
 function AddBudget({ setReload }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const [category, setCategory] = useState();
-  const [subcategory, setSubcategory] = useState();
-  const [amount, setAmount] = useState();
+  const [category, setCategory] = useState<string>();
+  const [subcategory, setSubcategory] = useState<string>();
+  const [amount, setAmount] = useState<string>();
 
   const addBudget = async (event) => {
     event.preventDefault();
@@ -30,9 +30,9 @@ function AddBudget({ setReload }) {
   };
 
   const resetFields = () => {
-    setCategory();
-    setSubcategory();
-    setAmount();
+    setCategory(undefined);
+    setSubcategory(undefined);
+    setAmount(undefined);
     setReload(true);
   };
 

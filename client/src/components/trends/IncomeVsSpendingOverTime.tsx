@@ -9,9 +9,9 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { useApiData } from "../../hooks/UseApiData";
-import { getIncomeVsExpenses } from "../../services/TrendsService";
-import { dateToString } from "../shared/LineChartShared";
+import { useApiData } from "../../hooks/useApiData";
+import { getIncomeVsExpenses } from "../../services/trendsService";
+import { dateToString } from "../../utils/DateUtil";
 
 function IncomeVsSpendingOverTime() {
   const [data, isLoading, error] = useApiData({
@@ -68,7 +68,7 @@ function IncomeVsSpendingOverTime() {
   );
 }
 
-function CustomTooltip({ active, payload, label }) {
+function CustomTooltip({ active, payload, label }: any) {
   if (active && payload && payload.length) {
     return (
       <Box bg="white" rounded="md" boxShadow="md" padding="1rem">

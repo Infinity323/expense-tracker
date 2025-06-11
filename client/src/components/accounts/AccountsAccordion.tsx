@@ -12,7 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { FaCircleExclamation } from "react-icons/fa6";
-import { getAccounts } from "../../services/AccountsService";
+import { getAccounts } from "../../services/accountsService";
 
 function AccountsAccordion({ reload, setReload }) {
   const [accounts, setAccounts] = useState([]);

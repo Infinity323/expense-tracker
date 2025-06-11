@@ -8,14 +8,14 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { getBudgets } from "../../services/BudgetService";
+import { getBudgets } from "../../services/budgetService";
 import LoadingModal from "../shared/LoadingModal";
 import DeleteBudget from "./DeleteBudget";
 import EditBudget from "./EditBudget";
 
 function BudgetsTable({ reload, setReload }) {
-  const [budgets, setBudgets] = useState([]);
-  const [isLoading, setIsLoading] = useState();
+  const [budgets, setBudgets] = useState<any[]>();
+  const [isLoading, setIsLoading] = useState<boolean>();
 
   const loadBudgets = async () => {
     setIsLoading(true);
@@ -62,7 +62,7 @@ function BudgetsTable({ reload, setReload }) {
               ))
             ) : (
               <Tr>
-                <Td colSpan="100%">No budgets found.</Td>
+                <Td colSpan={100}>No budgets found.</Td>
               </Tr>
             )}
           </Tbody>

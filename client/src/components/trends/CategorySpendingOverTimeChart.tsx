@@ -10,10 +10,10 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { useApiData } from "../../hooks/UseApiData";
-import { getBudgets } from "../../services/BudgetService";
-import { getSpendingOverTime } from "../../services/TrendsService";
-import { dateToString } from "../shared/LineChartShared";
+import { useApiData } from "../../hooks/useApiData";
+import { getBudgets } from "../../services/budgetService";
+import { getSpendingOverTime } from "../../services/trendsService";
+import { dateToString } from "../../utils/DateUtil";
 
 const COLOR_MAP = {
   "Bank Fees": "#EAC435",
@@ -120,7 +120,7 @@ function CategorySpendingOverTimeChart() {
   );
 }
 
-function CustomTooltip({ active, payload, label }) {
+function CustomTooltip({ active, payload, label }: any) {
   if (active && payload && payload.length) {
     return (
       <Box bg="white" rounded="md" boxShadow="md" padding="1rem">
