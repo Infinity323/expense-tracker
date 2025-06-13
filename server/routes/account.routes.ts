@@ -1,5 +1,5 @@
 import express from "express";
-import { findAllAccounts } from "../db/queries/item";
+import { findAllAccounts } from "../db/repositories/item.repository";
 import { AccountResponse } from "../types/accountResponse";
 
 const accountRouter = express.Router();

@@ -1,19 +1,19 @@
 import express from "express";
 import { RemovedTransaction, Transaction } from "plaid";
-import plaidClient from "../clients/plaid-client";
-import { findAllPlaidBudgets } from "../db/queries/budget";
+import plaidClient from "../clients/plaidClient";
+import { findAllPlaidBudgets } from "../db/repositories/budget.repository";
 import {
   findItemTransactionCursor,
   updateItemNeedsAttention,
   updateItemTransactionCursor,
-} from "../db/queries/item";
+} from "../db/repositories/item.repository";
 import {
   createTransaction,
   deleteAllTransactions,
   deleteTransaction,
   findAllTransactions,
   updateTransaction,
-} from "../db/queries/transaction";
+} from "../db/repositories/transaction";
 
 const transactionRouter = express.Router();
 

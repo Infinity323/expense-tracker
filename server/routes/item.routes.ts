@@ -1,6 +1,10 @@
 import express, { Request } from "express";
 import { PlaidLinkOnSuccessMetadata } from "react-plaid-link";
-import { deleteItem, findAllItems, updateItem } from "../db/queries/item";
+import {
+  deleteItem,
+  findAllItems,
+  updateItem,
+} from "../db/repositories/item.repository";
 
 const itemRouter = express.Router();
 

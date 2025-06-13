@@ -1,8 +1,11 @@
 import express, { NextFunction, Request, Response } from "express";
 import { CountryCode, Products } from "plaid";
-import plaidClient from "../clients/plaid-client";
-import { createItem, findAllAccessTokens } from "../db/queries/item";
-import { createLinkMetadata } from "../db/queries/link-metadata";
+import plaidClient from "../clients/plaidClient";
+import {
+  createItem,
+  findAllAccessTokens,
+} from "../db/repositories/item.repository";
+import { createLinkMetadata } from "../db/repositories/linkMetadata.repository";
 import { LinkTokenRequest } from "../types/linkTokenRequest";
 
 const linkRouter = express.Router();

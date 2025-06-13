@@ -6,8 +6,8 @@ import {
   deleteBudget,
   findAllBudgets,
   updateBudget,
-} from "../db/queries/budget";
-import { findCurrentMonthTransactions } from "../db/queries/transaction";
+} from "../db/repositories/budget.repository";
+import { findCurrentMonthTransactions } from "../db/repositories/transaction";
 
 const budgetRouter = express.Router();
 

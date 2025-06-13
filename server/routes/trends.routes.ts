@@ -1,8 +1,5 @@
 import express from "express";
-import {
-  findAllExpenses,
-  findAllIncome
-} from "../db/queries/transaction";
+import { findAllExpenses, findAllIncome } from "../db/repositories/transaction";
 
 const trendsRouter = express.Router();
 
