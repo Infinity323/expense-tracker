@@ -52,8 +52,10 @@ function BudgetsTable({ reload, setReload }) {
                   <Td>{budget.subcategory}</Td>
                   <Td isNumeric>${budget.amount}</Td>
                   <Td padding="0" width="0">
-                    <EditBudget budgetDoc={budget} />
-                    <DeleteBudget budgetDoc={budget} onDelete={refetch} />
+                    <EditBudget budgetDoc={budget} refetch={refetch} />
+                    {!budget.isMaster && (
+                      <DeleteBudget budgetDoc={budget} onDelete={refetch} />
+                    )}
                   </Td>
                 </Tr>
               ))

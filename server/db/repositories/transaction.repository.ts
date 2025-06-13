@@ -76,7 +76,7 @@ export const createTransaction = async ({
   merchant_entity_id,
   pending,
 }) => {
-  return await db.put({
+  return await db.put<TransactionDoc>({
     _id: _id ? _id : crypto.randomUUID(),
     type: TRANSACTION,
     date: date,
@@ -102,16 +102,16 @@ export const updateTransaction = async ({
   amount,
   pending,
 }) => {
-  let transactionDoc = db.get<TransactionDoc>(_id);
-  transactionDoc["date"] = date;
-  transactionDoc["name"] = name;
+  let transactionDoc = await db.get<TransactionDoc>(_id);
+  transactionDoc.date = date;
+  transactionDoc.name = name;
   if (description) {
-    transactionDoc["description"] = description;
+    transactionDoc.description = description;
   }
-  transactionDoc["pending"] = pending;
-  transactionDoc["category"] = category;
-  transactionDoc["subcategory"] = subcategory;
-  transactionDoc["amount"] = parseFloat(amount);
+  transactionDoc.pending = pending;
+  transactionDoc.category = category;
+  transactionDoc.subcategory = subcategory;
+  transactionDoc.amount = parseFloat(amount);
   return await db.put(transactionDoc);
 };
 

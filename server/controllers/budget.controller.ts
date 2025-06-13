@@ -1,7 +1,8 @@
 import { parse } from "csv-parse";
-import * as fs from "fs";
+import fs from "fs";
 import {
   create,
+  deleteAll,
   deleteById,
   findAll,
   update,
@@ -32,11 +33,10 @@ export const getAllBudgets = async (req, res, next) => {
 };
 
 const seedBudgets = async () => {
-  let rows = [];
-  fs.createReadStream("db/budget-seed-data.csv")
-    .pipe(parse({ from_line: 2 }))
-    .on("data", (row) => rows.push(row));
-  for (const row of rows) {
+  const parser = fs
+    .createReadStream("db/budget-seed-data.csv")
+    .pipe(parse({ from_line: 2 }));
+  for await (const row of parser) {
     await create({
       primary: row[0],
       detailed: row[1],
@@ -44,6 +44,7 @@ const seedBudgets = async () => {
       category: row[3],
       subcategory: row[4],
       amount: 0,
+      isMaster: true,
     });
   }
   let budgetDocs = await findAll();
@@ -112,6 +113,16 @@ export const getBudgetComparison = async (req, res, next) => {
       });
     });
     res.json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const deleteAllBudgets = async (req, res, next) => {
+  try {
+    const budgetDocs = await deleteAll();
+    console.log(`Deleted ${budgetDocs.length} budgets`);
+    res.status(204).send();
   } catch (err) {
     next(err);
   }

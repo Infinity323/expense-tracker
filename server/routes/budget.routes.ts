@@ -1,6 +1,7 @@
 import express from "express";
 import {
   addBudget,
+  deleteAllBudgets,
   deleteBudget,
   getAllBudgets,
   getBudgetComparison,
@@ -9,7 +10,12 @@ import {
 
 const budgetRouter = express.Router();
 
-budgetRouter.route("/").get(getAllBudgets).post(addBudget).put(putBudget);
+budgetRouter
+  .route("/")
+  .get(getAllBudgets)
+  .post(addBudget)
+  .put(putBudget)
+  .delete(deleteAllBudgets);
 
 budgetRouter.delete("/:id", deleteBudget);
 

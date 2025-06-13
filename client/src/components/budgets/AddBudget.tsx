@@ -27,6 +27,7 @@ function AddBudget({ setReload }) {
     event.preventDefault();
     await postBudget({ category, subcategory, amount });
     onClose();
+    setReload(true);
   };
 
   const resetFields = () => {

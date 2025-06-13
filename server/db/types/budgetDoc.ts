@@ -7,4 +7,5 @@ export interface BudgetDoc extends Doc<"budget"> {
   category: string;
   subcategory: string;
   amount: number;
+  isMaster: boolean;
 }

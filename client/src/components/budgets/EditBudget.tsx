@@ -19,7 +19,7 @@ import { useState } from "react";
 import { FaPencil } from "react-icons/fa6";
 import { putBudget } from "../../services/budgetService";
 
-function EditBudget({ budgetDoc }) {
+function EditBudget({ budgetDoc, refetch }) {
   // TODO: implement reloading
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -29,10 +29,10 @@ function EditBudget({ budgetDoc }) {
 
   const editBudget = async (event) => {
     event.preventDefault();
-    let _id = budgetDoc._id;
-    let _rev = budgetDoc._rev;
-    await putBudget({ _id, _rev, category, subcategory, amount });
+    const _id = budgetDoc._id;
+    await putBudget({ _id, category, subcategory, amount });
     onClose();
+    refetch();
   };
 
   return (

@@ -106,8 +106,9 @@ export const syncTransactions = async (req, res, next) => {
       ),
       {}
     );
-
+    let i = 0;
     for (const transaction of added) {
+      console.log(i++);
       await createTransaction({
         _id: transaction.transaction_id,
         date: transaction.date,
