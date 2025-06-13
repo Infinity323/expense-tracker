@@ -3,7 +3,7 @@ import { ItemDoc } from "../types/itemDoc";
 
 const ITEM = "item";
 
-const findAllAccessTokens = async () => {
+export const findAllAccessTokens = async () => {
   const itemDocs = await db.find({
     selector: {
       type: ITEM,
@@ -13,7 +13,7 @@ const findAllAccessTokens = async () => {
   return itemDocs.docs;
 };
 
-const createItem = async (item_id, access_token, accounts) => {
+export const createItem = async (item_id, access_token, accounts) => {
   return await db.put<ItemDoc>({
     _id: item_id,
     type: ITEM,
@@ -24,7 +24,8 @@ const createItem = async (item_id, access_token, accounts) => {
   });
 };
 
-export const findAllItems = async () => {
+export const findAll = async () => {
+  // TODO: return institution info
   const itemDocs = await db.find({
     selector: {
       type: ITEM,
@@ -33,7 +34,7 @@ export const findAllItems = async () => {
   return itemDocs.docs;
 };
 
-export const updateItem = async (item_id, accounts) => {
+export const updateAccounts = async (item_id, accounts) => {
   const itemDoc = await db.get<ItemDoc>(item_id);
   return await db.put<ItemDoc>({
     ...itemDoc,
@@ -42,43 +43,24 @@ export const updateItem = async (item_id, accounts) => {
   });
 };
 
-export const deleteItem = async (id) => {
+export const deleteById = async (id) => {
   const itemDoc = await db.get<ItemDoc>(id);
   return await db.remove({ _id: id, _rev: itemDoc._rev });
 };
 
-const findItemTransactionCursor = async (itemId) => {
+export const findItemTransactionCursor = async (itemId) => {
   const itemDoc = await db.get<{ cursor: string }>(itemId);
   return itemDoc.cursor;
 };
 
-const updateItemTransactionCursor = async ({ itemId, cursor }) => {
+export const updateItemTransactionCursor = async ({ itemId, cursor }) => {
   let itemDoc = await db.get(itemId);
   itemDoc["cursor"] = cursor;
   return await db.put(itemDoc);
 };
 
-const findAllAccounts = async () => {
-  const itemDocs = await db.find({
-    selector: {
-      type: ITEM,
-    },
-    fields: ["accounts", "created_timestamp", "needs_attention", "item_id"],
-  });
-  return itemDocs.docs;
-};
-
-const updateItemNeedsAttention = async (itemId, needsAttention) => {
+export const updateItemNeedsAttention = async (itemId, needsAttention) => {
   let itemDoc = await db.get(itemId);
   itemDoc["needs_attention"] = needsAttention;
   return await db.put(itemDoc);
-};
-
-export {
-  createItem,
-  findAllAccessTokens,
-  findAllAccounts,
-  findItemTransactionCursor,
-  updateItemNeedsAttention,
-  updateItemTransactionCursor,
 };

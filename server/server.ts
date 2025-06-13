@@ -6,20 +6,20 @@ import { mkdirp } from "mkdirp";
 import PouchDB from "pouchdb";
 
 import swaggerSpec from "./middleware/swagger";
-import accountRouter from "./routes/account";
-import budgetRouter from "./routes/budget";
-import linkRouter from "./routes/link";
-import transactionRouter from "./routes/transaction";
-import trendsRouter from "./routes/trends";
+import accountRouter from "./routes/account.routes";
+import budgetRouter from "./routes/budget.routes";
+import linkRouter from "./routes/link.routes";
+import transactionRouter from "./routes/transaction.routes";
+import trendsRouter from "./routes/trends.routes";
 
 import {
   clientErrorHandler,
   defaultErrorHandler,
   validationErrorHandler,
-} from "./middleware/error-handler";
+} from "./middleware/errorHandler";
 
 import expressPouchDb from "express-pouchdb";
-import itemRouter from "./routes/item";
+import itemRouter from "./routes/item.routes";
 
 dotenv.config();
 

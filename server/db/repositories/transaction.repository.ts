@@ -2,7 +2,7 @@ import db from "../database";
 
 const TRANSACTION = "transaction";
 
-const findAllExpenses = async () => {
+export const findAllExpenses = async () => {
   await db.createIndex({
     index: { fields: ["date", "category"] },
   });
@@ -17,7 +17,7 @@ const findAllExpenses = async () => {
   return transactionDocs.docs;
 };
 
-const findAllIncome = async () => {
+export const findAllIncome = async () => {
   await db.createIndex({
     index: { fields: ["date", "category"] },
   });
@@ -32,7 +32,7 @@ const findAllIncome = async () => {
   return transactionDocs.docs;
 };
 
-const findAllTransactions = async () => {
+export const findAllTransactions = async () => {
   await db.createIndex({
     index: { fields: ["date", "category"] },
   });
@@ -46,7 +46,7 @@ const findAllTransactions = async () => {
   return transactionDocs.docs;
 };
 
-const findCurrentMonthTransactions = async () => {
+export const findCurrentMonthTransactions = async () => {
   let currentMonth = new Date(Date.now());
   currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth());
   await db.createIndex({
@@ -62,7 +62,7 @@ const findCurrentMonthTransactions = async () => {
   return transactionDocs.docs;
 };
 
-const createTransaction = async ({
+export const createTransaction = async ({
   _id,
   date,
   name,
@@ -91,7 +91,7 @@ const createTransaction = async ({
   });
 };
 
-const updateTransaction = async ({
+export const updateTransaction = async ({
   _id,
   date,
   name,
@@ -114,11 +114,15 @@ const updateTransaction = async ({
   return await db.put(transactionDoc);
 };
 
-const deleteTransaction = async ({ id, rev }) => {
-  return await db.remove({ _id: id, _rev: rev });
+export const deleteById = async (id) => {
+  const transactionDoc = await db.get(id);
+  return await db.remove({
+    _id: transactionDoc._id,
+    _rev: transactionDoc._rev,
+  });
 };
 
-export const deleteAllTransactions = async () => {
+export const deleteAll = async () => {
   const transactionDocs = await db.find({
     selector: {
       type: TRANSACTION,
@@ -128,14 +132,4 @@ export const deleteAllTransactions = async () => {
     async (doc) => await db.remove({ _id: doc._id, _rev: doc._rev })
   );
   return transactionDocs.docs;
-};
-
-export {
-  createTransaction,
-  deleteTransaction,
-  findAllExpenses,
-  findAllIncome,
-  findAllTransactions,
-  findCurrentMonthTransactions,
-  updateTransaction,
 };

@@ -63,13 +63,14 @@ const updateBudget = async ({ _id, _rev, category, subcategory, amount }) => {
   });
 };
 
-const deleteBudget = async ({ id, rev }) => {
-  return await db.remove({ _id: id, _rev: rev });
+const deleteById = async (id) => {
+  const budgetDoc = await db.get(id);
+  return await db.remove({ _id: budgetDoc._id, _rev: budgetDoc._rev });
 };
 
 export {
   createBudget,
-  deleteBudget,
+  deleteById,
   findAllBudgets,
   findAllPlaidBudgets,
   updateBudget,

@@ -27,7 +27,7 @@ export const syncTransactions = async (itemId, accessToken) => {
   return response.data;
 };
 
-export const deleteTransaction = async (id, rev) => {
-  const response = await axios.delete(`${TRANSACTION_API}/${id}/${rev}`);
+export const deleteTransaction = async (id) => {
+  const response = await axios.delete(`${TRANSACTION_API}/${id}`);
   return response.data;
 };
