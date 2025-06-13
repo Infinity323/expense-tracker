@@ -1,34 +1,14 @@
 import { Box, Heading } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
 import AccountsAccordion from "../components/accounts/AccountsAccordion";
-import Link from "../components/accounts/Link";
-import LoadingModal from "../components/shared/LoadingModal";
-import { getLinkToken } from "../services/linkService";
+import LaunchLink from "../components/launch-link/LaunchLink";
+import { useUserContext } from "../context/UserProvider";
+import { useCreateLinkToken } from "../hooks/useCreateLinkToken";
 
 function Accounts() {
-  const [linkToken, setLinkToken] = useState();
-  const [isLoading, setIsLoading] = useState<boolean>();
-  const [reload, setReload] = useState<boolean>();
-
-  const establishLink = async () => {
-    setIsLoading(true);
-    const newLinkToken = await getLinkToken();
-    setLinkToken(newLinkToken);
-    setIsLoading(false);
-    setReload(false);
-  };
-
-  useEffect(() => {
-    establishLink();
-  }, []);
-
-  useEffect(() => {
-    if (reload === true) {
-      setIsLoading(true);
-    } else if (reload === false) {
-      setIsLoading(false);
-    }
-  }, [reload]);
+  const {
+    userInfo: { userId },
+  } = useUserContext();
+  const linkToken = useCreateLinkToken({ userId });
 
   return (
     <>
@@ -37,11 +17,12 @@ function Accounts() {
           Accounts
         </Heading>
         <br />
-        <AccountsAccordion reload={reload} setReload={setReload} />
+        <AccountsAccordion />
         <br />
-        {linkToken && <Link linkToken={linkToken} setReload={setReload} />}
+        {linkToken && (
+          <LaunchLink linkToken={linkToken}>Link Account</LaunchLink>
+        )}
       </Box>
-      <LoadingModal isLoading={isLoading} />
     </>
   );
 }

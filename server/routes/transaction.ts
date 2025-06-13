@@ -1,4 +1,5 @@
 import express from "express";
+import { RemovedTransaction, Transaction } from "plaid";
 import plaidClient from "../clients/plaid-client";
 import { findAllPlaidBudgets } from "../db/queries/budget";
 import {
@@ -8,6 +9,7 @@ import {
 } from "../db/queries/item";
 import {
   createTransaction,
+  deleteAllTransactions,
   deleteTransaction,
   findAllTransactions,
   updateTransaction,
@@ -63,13 +65,23 @@ transactionRouter.delete("/:id/:rev", async (req, res, next) => {
   }
 });
 
+transactionRouter.delete("/", async (req, res, next) => {
+  try {
+    const deleted = await deleteAllTransactions();
+    console.log(`Successfully deleted all ${deleted.length} transactions`);
+    res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+});
+
 transactionRouter.put("/sync/:itemId", async (req, res, next) => {
   let itemId = req.params.itemId;
   try {
     let cursor = await findItemTransactionCursor(itemId);
-    let added = [];
-    let modified = [];
-    let removed = [];
+    let added: Transaction[] = [];
+    let modified: Transaction[] = [];
+    let removed: RemovedTransaction[] = [];
     let hasMore = true;
     while (hasMore) {
       const response = await plaidClient.transactionsSync({
@@ -103,6 +115,7 @@ transactionRouter.put("/sync/:itemId", async (req, res, next) => {
         _id: transaction.transaction_id,
         date: transaction.date,
         name: transaction.name,
+        description: undefined,
         category:
           plaidBudgetMap[transaction.personal_finance_category.detailed]
             .category,
@@ -112,6 +125,7 @@ transactionRouter.put("/sync/:itemId", async (req, res, next) => {
         amount: transaction.amount,
         account_id: transaction.account_id,
         merchant_name: transaction.merchant_name,
+        merchant_entity_id: transaction.merchant_entity_id,
         pending: transaction.pending,
       });
     }
@@ -121,6 +135,7 @@ transactionRouter.put("/sync/:itemId", async (req, res, next) => {
         _id: transaction.transaction_id,
         date: transaction.date,
         name: transaction.name,
+        description: undefined,
         category:
           plaidBudgetMap[transaction.personal_finance_category.detailed]
             .category,
@@ -128,8 +143,6 @@ transactionRouter.put("/sync/:itemId", async (req, res, next) => {
           plaidBudgetMap[transaction.personal_finance_category.detailed]
             .subcategory,
         amount: transaction.amount,
-        account_id: transaction.account_id,
-        merchant_name: transaction.merchant_name,
         pending: transaction.pending,
       });
     }

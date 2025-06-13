@@ -24,6 +24,29 @@ const createItem = async (item_id, access_token, accounts) => {
   });
 };
 
+export const findAllItems = async () => {
+  const itemDocs = await db.find({
+    selector: {
+      type: ITEM,
+    },
+  });
+  return itemDocs.docs;
+};
+
+export const updateItem = async (item_id, accounts) => {
+  const itemDoc = await db.get<ItemDoc>(item_id);
+  return await db.put<ItemDoc>({
+    ...itemDoc,
+    needs_attention: false,
+    accounts,
+  });
+};
+
+export const deleteItem = async (id) => {
+  const itemDoc = await db.get<ItemDoc>(id);
+  return await db.remove({ _id: id, _rev: itemDoc._rev });
+};
+
 const findItemTransactionCursor = async (itemId) => {
   const itemDoc = await db.get<{ cursor: string }>(itemId);
   return itemDoc.cursor;
@@ -40,7 +63,7 @@ const findAllAccounts = async () => {
     selector: {
       type: ITEM,
     },
-    fields: ["accounts", "created_timestamp", "needs_attention"],
+    fields: ["accounts", "created_timestamp", "needs_attention", "item_id"],
   });
   return itemDocs.docs;
 };

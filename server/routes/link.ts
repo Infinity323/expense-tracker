@@ -1,31 +1,40 @@
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 import { CountryCode, Products } from "plaid";
 import plaidClient from "../clients/plaid-client";
 import { createItem, findAllAccessTokens } from "../db/queries/item";
 import { createLinkMetadata } from "../db/queries/link-metadata";
+import { LinkTokenRequest } from "../types/linkTokenRequest";
 
 const linkRouter = express.Router();
 
-// Creates a Link token and return it
-linkRouter.post("/link-token/:userId", async (req, res, next) => {
-  try {
-    const tokenResponse = await plaidClient.linkTokenCreate({
-      user: { client_user_id: req.params.userId },
-      client_name: "Expense Tracker",
-      language: "en",
-      products: [Products.Transactions],
-      country_codes: [CountryCode.Us],
-    });
-    console.log(
-      `Successfully created link token for user ${req.params.userId}`
-    );
-    res.json(tokenResponse.data);
-  } catch (err) {
-    next(err);
+/** Creates a Link token and return it */
+linkRouter.post(
+  "/link-token",
+  async (
+    req: Request<{}, {}, LinkTokenRequest>,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const tokenResponse = await plaidClient.linkTokenCreate({
+        user: { client_user_id: req.body.userId },
+        client_name: "Expense Tracker",
+        language: "en",
+        products: [Products.Transactions],
+        country_codes: [CountryCode.Us],
+        access_token: req.body.accessToken,
+      });
+      console.log(
+        `Successfully created link token for user ${req.body.userId}`
+      );
+      res.json(tokenResponse.data);
+    } catch (err) {
+      next(err);
+    }
   }
-});
+);
 
-// Get all access tokens
+/** Get all access tokens */
 linkRouter.get("/access-token", async (req, res, next) => {
   try {
     const itemDocs = await findAllAccessTokens();
@@ -40,7 +49,7 @@ linkRouter.get("/access-token", async (req, res, next) => {
   }
 });
 
-// Exchanges the public token from Plaid Link for an access token
+/** Exchanges the public token from Plaid Link for an access token */
 linkRouter.post("/access-token", async (req, res, next) => {
   try {
     const exchangeResponse = await plaidClient.itemPublicTokenExchange({
@@ -68,7 +77,7 @@ linkRouter.post("/access-token", async (req, res, next) => {
   }
 });
 
-// Create account link
+/** Create account link */
 linkRouter.post("/", async (req, res, next) => {
   try {
     // TODO: check if link exists and throw error if duplicate

@@ -104,7 +104,9 @@ const updateTransaction = async ({
   let transactionDoc = db.get(_id);
   transactionDoc["date"] = date;
   transactionDoc["name"] = name;
-  transactionDoc["description"] = description;
+  if (description) {
+    transactionDoc["description"] = description;
+  }
   transactionDoc["pending"] = pending;
   transactionDoc["category"] = category;
   transactionDoc["subcategory"] = subcategory;
@@ -114,6 +116,18 @@ const updateTransaction = async ({
 
 const deleteTransaction = async ({ id, rev }) => {
   return await db.remove({ _id: id, _rev: rev });
+};
+
+export const deleteAllTransactions = async () => {
+  const transactionDocs = await db.find({
+    selector: {
+      type: TRANSACTION,
+    },
+  });
+  transactionDocs.docs.forEach(
+    async (doc) => await db.remove({ _id: doc._id, _rev: doc._rev })
+  );
+  return transactionDocs.docs;
 };
 
 export {

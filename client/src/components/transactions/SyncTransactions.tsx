@@ -15,9 +15,12 @@ import {
 } from "@chakra-ui/react";
 import { useEffect } from "react";
 import { FaCircleExclamation } from "react-icons/fa6";
+import { useUserContext } from "../../context/UserProvider";
 import { syncTransactions } from "../../services/transactionService";
 
 function SyncTransactions({ setReload }) {
+  const { accessTokens } = useUserContext();
+
   const {
     isOpen: refreshIsOpen,
     onOpen: refreshOnOpen,
@@ -31,7 +34,6 @@ function SyncTransactions({ setReload }) {
 
   const sync = async () => {
     refreshOnOpen();
-    let accessTokens = JSON.parse(sessionStorage.getItem("accessTokens"));
     for (const entry of accessTokens) {
       try {
         await syncTransactions(entry.itemId, entry.accessToken);

@@ -1,4 +1,7 @@
-import { Configuration, PlaidApi, PlaidEnvironments } from 'plaid';
+import * as dotenv from "dotenv";
+import { Configuration, PlaidApi, PlaidEnvironments } from "plaid";
+
+dotenv.config();
 
 const config = new Configuration({
   basePath: PlaidEnvironments[process.env.PLAID_ENV],

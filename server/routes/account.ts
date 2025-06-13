@@ -1,21 +1,23 @@
 import express from "express";
 import { findAllAccounts } from "../db/queries/item";
+import { AccountResponse } from "../types/accountResponse";
 
 const accountRouter = express.Router();
 
 accountRouter.get("/", async (req, res, next) => {
   try {
-    let accountDocs = await findAllAccounts();
-    let accounts = [];
-    accountDocs.forEach((doc) => {
-      let createdTimestamp = doc?.created_timestamp;
-      let needsAttention = doc?.needs_attention;
-      doc?.accounts?.forEach((account) => {
-        account["created_timestamp"] = createdTimestamp;
-        account["needs_attention"] = needsAttention;
-        accounts.push(account);
-      });
-    });
+    const accountDocs = await findAllAccounts();
+    const accounts: AccountResponse[] = accountDocs.flatMap((doc) =>
+      doc?.accounts.map((account) => {
+        const response: AccountResponse = {
+          ...account,
+          created_timestamp: doc?.created_timestamp,
+          needs_attention: doc?.needs_attention,
+          item_id: doc?.item_id,
+        };
+        return response;
+      })
+    );
     console.log(`Retrieved ${accounts.length} accounts from the database`);
     res.json(accounts);
   } catch (err) {

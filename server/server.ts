@@ -19,6 +19,7 @@ import {
 } from "./middleware/error-handler";
 
 import expressPouchDb from "express-pouchdb";
+import itemRouter from "./routes/item";
 
 dotenv.config();
 
@@ -70,6 +71,7 @@ app.use("/api/budget", budgetRouter);
 app.use("/api/transaction", transactionRouter);
 app.use("/api/account", accountRouter);
 app.use("/api/trends", trendsRouter);
+app.use("/api/item", itemRouter);
 
 // error handlers
 app.use(validationErrorHandler);

@@ -1,36 +1,28 @@
-import axios from "axios";
+import { LinkTokenCreateResponse } from "plaid";
+import { AccessToken } from "../types/accessToken";
+import { get, post } from "./httpService";
 
 const LINK_API = "/api/link";
 
-export const getLinkToken = async () => {
-  let userId = "test";
-  const response = await axios.post(`${LINK_API}/link-token/${userId}`);
-  return response.data.link_token;
-};
-
-export const getAccessTokens = async () => {
-  const response = await axios.get(`${LINK_API}/access-token`);
-  return response.data;
-};
-
-export const postAccessToken = async (publicToken) => {
-  const data = {
-    public_token: publicToken,
-  };
-  const response = await axios.post(`${LINK_API}/access-token`, data);
-  return response.data;
-};
-
-export const saveAccessTokenToSession = (accessTokenResponse) => {
-  let accessTokens = JSON.parse(sessionStorage.getItem("accessTokens"));
-  accessTokens.push({
-    itemId: accessTokenResponse.itemId,
-    accessToken: accessTokenResponse.accessToken,
+export const createLinkToken = async ({ queryKey }: any) => {
+  const [, { userId, accessToken }] = queryKey;
+  return await post<LinkTokenCreateResponse>({
+    uri: `${LINK_API}/link-token`,
+    data: {
+      userId,
+      accessToken,
+    },
   });
-  sessionStorage.setItem("accessTokens", JSON.stringify(accessTokens));
 };
 
-export const postLink = async (metadata) => {
-  const response = await axios.post(LINK_API, metadata);
-  return response.data;
-};
+export const getAccessTokens = async () =>
+  await get<AccessToken[]>({ uri: `${LINK_API}/access-token` });
+
+export const postAccessToken = async (publicToken) =>
+  await post<AccessToken>({
+    uri: `${LINK_API}/access-token`,
+    data: { public_token: publicToken },
+  });
+
+export const postLink = async (metadata) =>
+  await post<{}>({ uri: LINK_API, data: metadata });
