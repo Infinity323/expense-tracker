@@ -19,7 +19,7 @@ function DeleteTransaction({ transactionDoc: transaction, onDelete }) {
 
   const removeTransaction = async (event) => {
     event.preventDefault();
-    await deleteTransaction(transaction._id, transaction._rev);
+    await deleteTransaction(transaction._id);
     onDelete();
   };
 
