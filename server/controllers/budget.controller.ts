@@ -1,17 +1,17 @@
 import { parse } from "csv-parse";
 import * as fs from "fs";
 import {
-  createBudget,
+  create,
   deleteById,
-  findAllBudgets,
-  updateBudget,
+  findAll,
+  update,
 } from "../db/repositories/budget.repository";
 import { findCurrentMonthTransactions } from "../db/repositories/transaction.repository";
 import { round } from "../utils/dataUtil";
 
 export const getAllBudgets = async (req, res, next) => {
   try {
-    let budgetDocs = await findAllBudgets();
+    let budgetDocs = await findAll();
     if (!budgetDocs.length) {
       budgetDocs = await seedBudgets();
     }
@@ -37,7 +37,7 @@ const seedBudgets = async () => {
     .pipe(parse({ from_line: 2 }))
     .on("data", (row) => rows.push(row));
   for (const row of rows) {
-    await createBudget({
+    await create({
       primary: row[0],
       detailed: row[1],
       description: row[2],
@@ -46,14 +46,14 @@ const seedBudgets = async () => {
       amount: 0,
     });
   }
-  let budgetDocs = await findAllBudgets();
+  let budgetDocs = await findAll();
   console.log(`Seeded database with ${budgetDocs.length} budgets`);
   return budgetDocs;
 };
 
 export const addBudget = async (req, res, next) => {
   try {
-    const response = await createBudget(req.body);
+    const response = await create(req.body);
     console.log(`Successfully added new budget document ID [${response.id}]`);
     res.status(201).json(response);
   } catch (err) {
@@ -63,7 +63,7 @@ export const addBudget = async (req, res, next) => {
 
 export const putBudget = async (req, res, next) => {
   try {
-    const response = await updateBudget(req.body);
+    const response = await update(req.body);
     console.log(`Successfully updated budget document ID [${response.id}]`);
     res.status(204).send();
   } catch (err) {
@@ -85,7 +85,7 @@ export const deleteBudget = async (req, res, next) => {
 
 export const getBudgetComparison = async (req, res, next) => {
   try {
-    let budgetDocs = await findAllBudgets();
+    let budgetDocs = await findAll();
     let transactionDocs = await findCurrentMonthTransactions();
     let actualMap = {};
     transactionDocs.forEach((transaction) => {

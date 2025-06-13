@@ -1,4 +1,5 @@
 import db from "../database";
+import { TransactionDoc } from "../types/transactionDoc";
 
 const TRANSACTION = "transaction";
 
@@ -14,7 +15,7 @@ export const findAllExpenses = async () => {
     },
     sort: [{ date: "asc" }],
   });
-  return transactionDocs.docs;
+  return transactionDocs.docs as TransactionDoc[];
 };
 
 export const findAllIncome = async () => {
@@ -29,7 +30,7 @@ export const findAllIncome = async () => {
     },
     sort: [{ date: "asc" }],
   });
-  return transactionDocs.docs;
+  return transactionDocs.docs as TransactionDoc[];
 };
 
 export const findAllTransactions = async () => {
@@ -43,7 +44,7 @@ export const findAllTransactions = async () => {
     },
     sort: [{ date: "desc" }],
   });
-  return transactionDocs.docs;
+  return transactionDocs.docs as TransactionDoc[];
 };
 
 export const findCurrentMonthTransactions = async () => {
@@ -59,7 +60,7 @@ export const findCurrentMonthTransactions = async () => {
     },
     sort: [{ date: "desc" }],
   });
-  return transactionDocs.docs;
+  return transactionDocs.docs as TransactionDoc[];
 };
 
 export const createTransaction = async ({
@@ -101,7 +102,7 @@ export const updateTransaction = async ({
   amount,
   pending,
 }) => {
-  let transactionDoc = db.get(_id);
+  let transactionDoc = db.get<TransactionDoc>(_id);
   transactionDoc["date"] = date;
   transactionDoc["name"] = name;
   if (description) {
@@ -115,7 +116,7 @@ export const updateTransaction = async ({
 };
 
 export const deleteById = async (id) => {
-  const transactionDoc = await db.get(id);
+  const transactionDoc = await db.get<TransactionDoc>(id);
   return await db.remove({
     _id: transactionDoc._id,
     _rev: transactionDoc._rev,
@@ -131,5 +132,5 @@ export const deleteAll = async () => {
   transactionDocs.docs.forEach(
     async (doc) => await db.remove({ _id: doc._id, _rev: doc._rev })
   );
-  return transactionDocs.docs;
+  return transactionDocs.docs as TransactionDoc[];
 };

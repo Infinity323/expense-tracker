@@ -10,7 +10,7 @@ export const findAllAccessTokens = async () => {
     },
     fields: ["item_id", "access_token"],
   });
-  return itemDocs.docs;
+  return itemDocs.docs as ItemDoc[];
 };
 
 export const createItem = async (item_id, access_token, accounts) => {
@@ -31,7 +31,7 @@ export const findAll = async () => {
       type: ITEM,
     },
   });
-  return itemDocs.docs;
+  return itemDocs.docs as ItemDoc[];
 };
 
 export const updateAccounts = async (item_id, accounts) => {

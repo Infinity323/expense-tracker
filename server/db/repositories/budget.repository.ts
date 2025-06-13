@@ -1,8 +1,9 @@
 import db from "../database";
+import { BudgetDoc } from "../types/budgetDoc";
 
 const BUDGET = "budget";
 
-const findAllBudgets = async () => {
+export const findAll = async () => {
   await db.createIndex({
     index: { fields: ["category"] },
   });
@@ -17,10 +18,10 @@ const findAllBudgets = async () => {
     },
     sort: [{ category: "asc", subcategory: "asc" }],
   });
-  return budgetDocs.docs;
+  return budgetDocs.docs as BudgetDoc[];
 };
 
-const findAllPlaidBudgets = async () => {
+export const findAllPlaidBudgets = async () => {
   await db.createIndex({
     index: { fields: ["detailed"] },
   });
@@ -30,10 +31,10 @@ const findAllPlaidBudgets = async () => {
       detailed: { $exists: true },
     },
   });
-  return plaidBudgetDocs.docs;
+  return plaidBudgetDocs.docs as BudgetDoc[];
 };
 
-const createBudget = async ({
+export const create = async ({
   primary,
   detailed,
   description,
@@ -52,7 +53,7 @@ const createBudget = async ({
   });
 };
 
-const updateBudget = async ({ _id, _rev, category, subcategory, amount }) => {
+export const update = async ({ _id, _rev, category, subcategory, amount }) => {
   return await db.put({
     _id: _id,
     _rev: _rev,
@@ -63,15 +64,7 @@ const updateBudget = async ({ _id, _rev, category, subcategory, amount }) => {
   });
 };
 
-const deleteById = async (id) => {
+export const deleteById = async (id) => {
   const budgetDoc = await db.get(id);
   return await db.remove({ _id: budgetDoc._id, _rev: budgetDoc._rev });
-};
-
-export {
-  createBudget,
-  deleteById,
-  findAllBudgets,
-  findAllPlaidBudgets,
-  updateBudget,
 };
