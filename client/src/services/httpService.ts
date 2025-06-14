@@ -28,3 +28,16 @@ export const put = async <T extends any>({
   uri: string;
   data?: Record<string, any>;
 }): Promise<T> => (await axios.put<T>(uri, data)).data;
+
+export const delete_ = async <T extends any>({
+  uri,
+  params,
+}: {
+  uri: string;
+  params?: Record<string, any>;
+}): Promise<T> =>
+  (
+    await axios.delete<T>(uri, {
+      params,
+    })
+  ).data;

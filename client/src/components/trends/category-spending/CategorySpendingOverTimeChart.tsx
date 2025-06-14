@@ -1,20 +1,19 @@
 import { Box, Skeleton, Text } from "@chakra-ui/react";
 import { useQuery } from "react-query";
 import {
-  Area,
-  AreaChart,
+  Bar,
+  BarChart,
   CartesianGrid,
-  Legend,
   ResponsiveContainer,
   Tooltip,
   XAxis,
-  YAxis,
+  YAxis
 } from "recharts";
 import { getSortedBudgets } from "../../../services/budgetService";
 import { getSpendingOverTime } from "../../../services/trendsService";
-import { dateToString } from "../../../utils/DateUtil";
 import { COLOR_MAP } from "../../../utils/ColorUtil";
 import { formatCurrency } from "../../../utils/CurrencyUtil";
+import { dateToMMMYYYY, dateToString } from "../../../utils/DateUtil";
 
 function CategorySpendingOverTimeChart() {
   const { data: categoryData, isLoading: categoryIsLoading } = useQuery({
@@ -33,64 +32,38 @@ function CategorySpendingOverTimeChart() {
     ? Object.entries(categoryData).map((entry) => entry[0])
     : undefined;
 
+  // TODO: add filter
   return (
-    <ResponsiveContainer width="100%" height={500}>
+    <ResponsiveContainer width="100%" height={800}>
       {categoryIsLoading || spendingIsLoading ? (
         <Skeleton />
       ) : (
-        <AreaChart
+        <BarChart
           data={spendingData}
           margin={{ top: 50, left: 50, right: 50, bottom: 50 }}
         >
-          <defs>
-            {categories.map((category) => (
-              <linearGradient
-                id={`color${category.replace(" ", "")}`}
-                x1="0"
-                y1="0"
-                x2="0"
-                y2="1"
-              >
-                <stop
-                  offset="5%"
-                  stopColor={COLOR_MAP[category]}
-                  stopOpacity={0.8}
-                />
-                <stop
-                  offset="95%"
-                  stopColor={COLOR_MAP[category]}
-                  stopOpacity={0}
-                />
-              </linearGradient>
-            ))}
-          </defs>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis
-            dataKey="date"
-            type="number"
-            domain={["auto", "auto"]}
-            tickFormatter={dateToString}
-          />
+          <XAxis dataKey="date" tickFormatter={dateToMMMYYYY} />
           <YAxis
             domain={["auto", "auto"]}
             tickFormatter={(value, _) => formatCurrency(value)}
           />
-          <Legend />
+          {/* <Legend /> */}
           <Tooltip content={<CustomTooltip />} />
           {spendingData &&
             categories &&
             categories.map((category) => (
               <>
-                <Area
+                <Bar
                   dataKey={category}
-                  // dot={false}
+                  stackId={0}
                   stroke={COLOR_MAP[category]}
-                  strokeWidth={2}
-                  fill={`url(#color${category.replace(" ", "")})`}
+                  fill={COLOR_MAP[category]}
+                  barSize={100}
                 />
               </>
             ))}
-        </AreaChart>
+        </BarChart>
       )}
     </ResponsiveContainer>
   );

@@ -58,10 +58,12 @@ export const getBalances = async (req, res, next) => {
             const response = await plaidClient.accountsGet({
               access_token: doc.access_token,
             });
+            await updateItemNeedsAttention(doc.item_id, false);
             return response.data.accounts;
           } catch (err) {
             console.error(
-              `Error occurred while getting accounts for item ${doc.item_id}`
+              `Error occurred while getting accounts for item ${doc.item_id}`,
+              err
             );
             await updateItemNeedsAttention(doc.item_id, true);
             return [];

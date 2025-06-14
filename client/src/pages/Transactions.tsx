@@ -9,7 +9,7 @@ function Transactions() {
 
   return (
     <>
-      <Heading as="h1" size="lg">
+      <Heading as="h1" size="xl">
         Transactions
       </Heading>
       <br />

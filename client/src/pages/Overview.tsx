@@ -1,4 +1,4 @@
-import { Box, Heading, HStack, Stack, Text } from "@chakra-ui/react";
+import { Box, Grid, GridItem, Heading, HStack, Stack, Text } from "@chakra-ui/react";
 import CurrentMonthBudgetComparison from "../components/overview/CurrentMonthBudgetComparison";
 import MonthlySpending from "../components/overview/monthly-spending/MonthlySpending";
 import NetWorth from "../components/overview/net-worth/NetWorth";
@@ -19,14 +19,14 @@ function Overview() {
         </Heading>
         <Text>A summary of this month's income and expenses</Text>
       </Box>
-      <HStack spacing="2rem">
-        <Box width="50%">
+      <Grid templateColumns='repeat(2, 1fr)' gap="2rem">
+        <GridItem colSpan={1}>
           <CurrentMonthBudgetComparison />
-        </Box>
-        <Box width="50%">
+        </GridItem>
+        <GridItem colSpan={1}>
           <MonthlySpending />
-        </Box>
-      </HStack>
+        </GridItem>
+      </Grid>
     </Stack>
   );
 }

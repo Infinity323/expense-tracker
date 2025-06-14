@@ -15,6 +15,7 @@ import Overview from "./pages/Overview";
 import Swagger from "./pages/Swagger";
 import Transactions from "./pages/Transactions";
 import { getAccessTokens } from "./services/linkService";
+import AccountManagement from "./pages/AccountManagement";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -48,6 +49,7 @@ function App() {
                 <Route path="/accounts" Component={Accounts} />
                 <Route path="/login" Component={Login} />
                 <Route path="/api" Component={Swagger} />
+                <Route path="/account-management" Component={AccountManagement} />
               </Routes>
             </main>
             <Footer />

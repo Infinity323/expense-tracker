@@ -36,7 +36,7 @@ export const findAllIncome = async () => {
 
 export const findAllTransactions = async () => {
   await db.createIndex({
-    index: { fields: ["date", "category"] },
+    index: { fields: ["date"] },
   });
   const transactionDocs = await db.find({
     selector: {

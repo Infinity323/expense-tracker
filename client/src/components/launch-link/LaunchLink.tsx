@@ -5,6 +5,7 @@ import { useUserContext } from "../../context/UserProvider";
 import { updateItem } from "../../services/itemService";
 import { postAccessToken, postLink } from "../../services/linkService";
 import { AccessToken } from "../../types/accessToken";
+import { useAccounts } from "../../hooks/useAccounts";
 
 interface LaunchLinkProps {
   children: ReactNode;
@@ -15,6 +16,7 @@ interface LaunchLinkProps {
 const LaunchLink: React.FC<LaunchLinkProps> = (props) => {
   const { linkToken, children, itemId } = props;
   const { setAccessTokens } = useUserContext();
+  const { refetch } = useAccounts();
 
   const { open, ready } = usePlaidLink({
     token: linkToken,
@@ -26,6 +28,7 @@ const LaunchLink: React.FC<LaunchLinkProps> = (props) => {
           ...prev,
           accessTokenResponse,
         ]);
+        refetch();
       } else {
         await updateItem(itemId, metadata);
       }

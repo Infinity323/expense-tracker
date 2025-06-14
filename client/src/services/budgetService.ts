@@ -1,8 +1,7 @@
 import { BudgetDoc } from "@backend/db/types/budgetDoc";
 import { BudgetComparison } from "@backend/types/budgetComparison";
 import { SortedBudgets } from "@backend/types/sortedBudgets";
-import axios from "axios";
-import { get } from "./httpService";
+import { delete_, get, post, put } from "./httpService";
 
 const BUDGET_API = "/api/budget";
 
@@ -22,17 +21,11 @@ export const getSortedBudgets = async () =>
 export const getBudgetComparison = async () =>
   await get<BudgetComparison>({ uri: `${BUDGET_API}/comparison` });
 
-export const postBudget = async (budget) => {
-  const response = await axios.post(BUDGET_API, budget);
-  return response.data;
-};
+export const postBudget = async (budget) =>
+  await post({ uri: BUDGET_API, data: budget });
 
-export const putBudget = async (budgetDoc) => {
-  const response = await axios.put(BUDGET_API, budgetDoc);
-  return response.data;
-};
+export const putBudget = async (budgetDoc) =>
+  await put({ uri: BUDGET_API, data: budgetDoc });
 
-export const deleteBudget = async (id, rev) => {
-  const response = await axios.delete(`${BUDGET_API}/${id}/${rev}`);
-  return response.data;
-};
+export const deleteBudget = async (id) =>
+  await delete_({ uri: `${BUDGET_API}/${id}` });

@@ -14,6 +14,7 @@
     "@types/plaid-link": "^2.0.15",
     "@types/pouchdb": "^6.4.2",
     "axios": "^1.7.2",
+    "date-fns": "^4.1.0",
     "framer-motion": "^11.2.6",
     "plaid": "^35.0.0",
     "react": "^18.3.1",

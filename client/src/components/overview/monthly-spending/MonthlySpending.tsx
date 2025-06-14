@@ -5,6 +5,7 @@ import {
   Center,
   Heading,
   Skeleton,
+  Text,
 } from "@chakra-ui/react";
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer } from "recharts";
 import { useBudgetComparison } from "../../../hooks/useBudgetComparison";
@@ -25,11 +26,26 @@ const MonthlySpending: React.FC<MonthlySpendingProps> = (props) => {
 
   if (isLoading) {
     return (
-      <Card p="1.5rem">
+      <Card p="1.5rem" variant="outline">
         <CardHeader>
           <Heading size="lg">Spending Categories</Heading>
         </CardHeader>
-        <Skeleton height="40vh" />
+        <CardBody>
+          <Skeleton height="40vh" />
+        </CardBody>
+      </Card>
+    );
+  }
+
+  if (!expenses) {
+    return (
+      <Card p="1.5rem" variant="outline">
+        <CardHeader>
+          <Heading size="lg">Spending Categories</Heading>
+        </CardHeader>
+        <CardBody>
+          <Text>No spending data found.</Text>
+        </CardBody>
       </Card>
     );
   }

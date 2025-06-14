@@ -7,14 +7,20 @@ import {
   GridItem,
   Heading,
   HStack,
+  Icon,
   Skeleton,
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { useQuery } from "react-query";
-import { getBalances } from "../../../services/itemService";
-import { formatCurrency } from "../../../utils/CurrencyUtil";
+import {
+  FaCreditCard,
+  FaMoneyBill,
+  FaMoneyBillTrendUp,
+  FaSackDollar,
+} from "react-icons/fa6";
 import { useBalances } from "../../../hooks/useBalances";
+import { getBalance } from "../../../utils/BalanceUtil";
+import { formatCurrency } from "../../../utils/CurrencyUtil";
 
 interface NetWorthProps {}
 
@@ -25,16 +31,11 @@ const NetWorth: React.FC<NetWorthProps> = (props) => {
     return <Skeleton height="200px" />;
   }
 
-  const getBalance = (type: string) =>
-    balances
-      .filter((balance) => balance.type === type)
-      .map((balance) => balance.balances.current)
-      .reduce((sum, current) => sum + current, 0);
-
-  const cash = getBalance("depository");
-  const investment = getBalance("investment") + getBalance("brokerage");
-  const credit = getBalance("credit");
-  const loan = getBalance("loan");
+  const cash = getBalance(balances, "depository");
+  const investment =
+    getBalance(balances, "investment") + getBalance(balances, "brokerage");
+  const credit = getBalance(balances, "credit");
+  const loan = getBalance(balances, "loan");
   const liabilityWorth = credit + loan;
   const assetWorth = cash + investment;
   const netWorth = assetWorth - liabilityWorth;
@@ -61,9 +62,19 @@ const NetWorth: React.FC<NetWorthProps> = (props) => {
               templateColumns="repeat(2, 1fr)"
               gap="0.5rem"
             >
-              <GridItem>Cash</GridItem>
+              <GridItem>
+                <Text>
+                  <Icon as={FaMoneyBill} marginRight={2} />
+                  Cash
+                </Text>
+              </GridItem>
               <GridItem>{formatCurrency(cash)}</GridItem>
-              <GridItem>Investments</GridItem>
+              <GridItem>
+                <Text>
+                  <Icon as={FaMoneyBillTrendUp} marginRight={2} />
+                  Investments
+                </Text>
+              </GridItem>
               <GridItem>{formatCurrency(investment)}</GridItem>
             </Grid>
           </CardBody>
@@ -81,9 +92,19 @@ const NetWorth: React.FC<NetWorthProps> = (props) => {
               templateColumns="repeat(2, 1fr)"
               gap="0.5rem"
             >
-              <GridItem>Credit</GridItem>
+              <GridItem>
+                <Text>
+                  <Icon as={FaCreditCard} marginRight={2} />
+                  Credit
+                </Text>
+              </GridItem>
               <GridItem>{formatCurrency(credit)}</GridItem>
-              <GridItem>Loans</GridItem>
+              <GridItem>
+                <Text>
+                  <Icon as={FaSackDollar} marginRight={2} />
+                  Loans
+                </Text>
+              </GridItem>
               <GridItem>{formatCurrency(loan)}</GridItem>
             </Grid>
           </CardBody>

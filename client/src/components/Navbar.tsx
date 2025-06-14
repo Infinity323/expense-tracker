@@ -5,6 +5,7 @@ import {
   Divider,
   Flex,
   Heading,
+  HStack,
   Icon,
   Spacer,
 } from "@chakra-ui/react";
@@ -17,11 +18,12 @@ function Navbar() {
       <Flex minWidth="max-content" p="2" alignItems="center" gap="2">
         <Box p="2" justifyContent="center">
           <Link to="/">
-            <Icon as={FaChartLine} />
-            <Heading size="md" as="span">
-              {" "}
-              Expense Tracker
-            </Heading>
+            <HStack>
+              <Icon as={FaChartLine} boxSize={6} marginRight={2} />
+              <Heading size="md" as="span">
+                Expense Tracker
+              </Heading>
+            </HStack>
           </Link>
         </Box>
         <Box p="2">

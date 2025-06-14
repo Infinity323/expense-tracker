@@ -38,10 +38,9 @@ const AccountAccordionItem: React.FC<AccountAccordionItemProps> = (props) => {
         <AccordionButton>
           <Box as="span" flex="1" textAlign="left">
             <HStack>
-              <Text
-                as="span"
-                fontWeight="bold"
-              >{`${account.name} - ${account.mask}`}</Text>
+              <Text as="span" fontWeight="bold">
+                {account.name}
+              </Text>
               {account.needs_attention && (
                 <>
                   <Icon
@@ -60,7 +59,7 @@ const AccountAccordionItem: React.FC<AccountAccordionItemProps> = (props) => {
         </AccordionButton>
       </Heading>
       <AccordionPanel pb={4}>
-        {account.official_name}
+        {account.official_name} (...{account.mask})
         <br />
         Linked on {new Date(account.created_timestamp).toLocaleDateString()}
         <br />

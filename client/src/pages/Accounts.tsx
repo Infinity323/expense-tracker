@@ -1,24 +1,22 @@
-import { Heading, Stack } from "@chakra-ui/react";
-import AccountsAccordion from "../components/accounts/AccountsAccordion";
-import LaunchLink from "../components/launch-link/LaunchLink";
-import { useUserContext } from "../context/UserProvider";
-import { useCreateLinkToken } from "../hooks/useCreateLinkToken";
+import { Button, Flex, Heading, Spacer, Stack } from "@chakra-ui/react";
 import AccountList from "../components/accounts/account-list/AccountList";
+import { useNavigate } from "react-router-dom";
 
 function Accounts() {
-  const {
-    userInfo: { userId },
-  } = useUserContext();
-  const linkToken = useCreateLinkToken({ userId });
+  const navigate = useNavigate();
 
   return (
     <Stack spacing="2rem">
-      <Heading as="h1" size="lg">
-        Accounts
-      </Heading>
+      <Flex>
+        <Heading as="h1" size="xl">
+          Accounts
+        </Heading>
+        <Spacer />
+        <Button onClick={() => navigate("/account-management")}>
+          Manage Accounts
+        </Button>
+      </Flex>
       <AccountList />
-      <AccountsAccordion />
-      {linkToken && <LaunchLink linkToken={linkToken}>Link Account</LaunchLink>}
     </Stack>
   );
 }

@@ -53,17 +53,18 @@ function SyncTransactions({ setReload }) {
   return (
     <>
       <Button colorScheme="teal" onClick={sync}>
-        Refresh
+        Sync
       </Button>
       <Modal isOpen={refreshIsOpen} onClose={refreshOnClose} isCentered>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>
-            <Center>Refreshing transactions...</Center>
-          </ModalHeader>
+          <ModalHeader />
           <ModalBody>
             <Center>
-              <Spinner color="teal" size="xl" />
+              <VStack>
+                <Spinner color="teal" size="lg" />
+                <Text fontWeight="semibold">Syncing transactions...</Text>
+              </VStack>
             </Center>
           </ModalBody>
           <ModalFooter />

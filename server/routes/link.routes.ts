@@ -1,6 +1,7 @@
 import express from "express";
 import {
   createAccessToken,
+  createLink,
   createLinkToken,
   getAllAccessTokens,
 } from "../controllers/link.controller";
@@ -8,10 +9,12 @@ import {
 const linkRouter = express.Router();
 
 linkRouter.post("/link-token", createLinkToken);
+
 linkRouter
   .route("/access-token")
   .get(getAllAccessTokens)
   .post(createAccessToken);
-linkRouter.post("/");
+
+linkRouter.post("/", createLink);
 
 export default linkRouter;

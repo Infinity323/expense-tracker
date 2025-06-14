@@ -8,7 +8,7 @@ function Budgets() {
 
   return (
     <>
-      <Heading as="h1" size="lg">
+      <Heading as="h1" size="xl">
         Budgets
       </Heading>
       <br />

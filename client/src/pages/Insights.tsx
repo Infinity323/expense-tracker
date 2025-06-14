@@ -10,7 +10,7 @@ function Insights() {
       </Heading>
       <br />
       <Heading as="h3" size="lg">
-        Monthly Income vs Expenses
+        Monthly Cash Flow
       </Heading>
       <IncomeVsSpendingOverTime />
       <Heading as="h3" size="lg">

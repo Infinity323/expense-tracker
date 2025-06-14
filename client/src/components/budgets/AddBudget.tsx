@@ -14,7 +14,8 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { postBudget } from "../../services/budgetService";
+import { putBudget } from "../../services/budgetService";
+import BudgetsSelect from "./BudgetsSelect";
 
 function AddBudget({ setReload }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -25,7 +26,8 @@ function AddBudget({ setReload }) {
 
   const addBudget = async (event) => {
     event.preventDefault();
-    await postBudget({ category, subcategory, amount });
+    // TODO: get _id _rev in context
+    await putBudget({ category, subcategory, amount });
     onClose();
     setReload(true);
   };
@@ -49,17 +51,11 @@ function AddBudget({ setReload }) {
           <ModalCloseButton />
           <ModalBody>
             <Stack>
-              <Input
-                value={category}
-                onChange={(event) => setCategory(event.target.value)}
-                placeholder="Category"
-                isInvalid={category === ""}
-              />
-              <Input
-                value={subcategory}
-                onChange={(event) => setSubcategory(event.target.value)}
-                placeholder="Subcategory"
-                isInvalid={subcategory === ""}
+              <BudgetsSelect
+                selectedCategory={category}
+                selectedSubcategory={subcategory}
+                setCategory={setCategory}
+                setSubcategory={setSubcategory}
               />
               <InputGroup>
                 <InputLeftElement pointerEvents="none" color="gray.300">

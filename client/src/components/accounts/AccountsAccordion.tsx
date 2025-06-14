@@ -1,20 +1,16 @@
 import { Accordion, Box, Skeleton } from "@chakra-ui/react";
-import { useQuery } from "react-query";
-import { getAccounts } from "../../services/accountsService";
-import AccountAccordionItem from "./account-item/AccountAccordionItem";
+import { useAccounts } from "../../hooks/useAccounts";
+import AccountAccordionItem from "./account-accordion-item/AccountAccordionItem";
 
 function AccountsAccordion() {
-  const { data: accounts } = useQuery({
-    queryKey: ["accounts"],
-    queryFn: getAccounts,
-  });
+  const { accounts, isLoading } = useAccounts();
 
-  if (!accounts) {
+  if (isLoading) {
     return <Skeleton height="200px" />;
   }
 
-  if (!accounts.length) {
-    return <Box p="3rem">No accounts linked.</Box>;
+  if (!accounts?.length) {
+    return <Box p="1rem">No accounts linked.</Box>;
   }
 
   return (
