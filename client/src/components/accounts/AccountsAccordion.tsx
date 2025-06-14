@@ -1,4 +1,4 @@
-import { Accordion } from "@chakra-ui/react";
+import { Accordion, Box, Skeleton } from "@chakra-ui/react";
 import { useQuery } from "react-query";
 import { getAccounts } from "../../services/accountsService";
 import AccountAccordionItem from "./account-item/AccountAccordionItem";
@@ -8,6 +8,14 @@ function AccountsAccordion() {
     queryKey: ["accounts"],
     queryFn: getAccounts,
   });
+
+  if (!accounts) {
+    return <Skeleton height="200px" />;
+  }
+
+  if (!accounts.length) {
+    return <Box p="3rem">No accounts linked.</Box>;
+  }
 
   return (
     <Accordion allowToggle>

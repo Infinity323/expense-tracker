@@ -19,7 +19,7 @@ function CurrentMonthBudgetComparison() {
   });
 
   return (
-    <Card p="1rem">
+    <Card p="1.5rem">
       <CardHeader>
         <Heading size="lg">Income</Heading>
       </CardHeader>

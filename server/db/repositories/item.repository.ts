@@ -59,8 +59,11 @@ export const updateItemTransactionCursor = async ({ itemId, cursor }) => {
   return await db.put(itemDoc);
 };
 
-export const updateItemNeedsAttention = async (itemId, needsAttention) => {
-  let itemDoc = await db.get(itemId);
-  itemDoc["needs_attention"] = needsAttention;
+export const updateItemNeedsAttention = async (
+  itemId: string,
+  needsAttention: boolean
+) => {
+  let itemDoc = await db.get<ItemDoc>(itemId);
+  itemDoc.needs_attention = needsAttention;
   return await db.put(itemDoc);
 };

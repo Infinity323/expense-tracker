@@ -1,5 +1,6 @@
 import { Comparison } from "@backend/types/budgetComparison";
 import { Box, Heading, Progress, Text } from "@chakra-ui/react";
+import { formatCurrency } from "../../../utils/CurrencyUtil";
 
 interface ComparisonProgressProps {
   comparison: Comparison;
@@ -22,7 +23,7 @@ const ComparisonProgress: React.FC<ComparisonProgressProps> = (props) => {
   return (
     <Box p="0.5rem" key={comparison.name}>
       <Heading as="h4" fontSize="md">
-        {comparison.name}: ${comparison.expectedAmount}
+        {comparison.name}: {formatCurrency(comparison.expectedAmount)}
       </Heading>
       <Progress
         colorScheme={getStatusColor(multiplier * comparison.difference)}
@@ -33,13 +34,13 @@ const ComparisonProgress: React.FC<ComparisonProgressProps> = (props) => {
         )}
       />
       <Text as="span" fontSize="md">
-        {`$${comparison.actualAmount} this month `}
+        {formatCurrency(comparison.actualAmount)} this month
       </Text>
       <Text
         as="span"
         color={getStatusColor(multiplier * comparison.difference)}
       >
-        {`($${Math.abs(comparison.difference)} ${
+        {` (${formatCurrency(Math.abs(comparison.difference))} ${
           comparison.difference > 0 ? "underbudget" : "overbudget"
         })`}
       </Text>

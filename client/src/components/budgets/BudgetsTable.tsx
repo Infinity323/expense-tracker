@@ -13,6 +13,7 @@ import { getBudgets } from "../../services/budgetService";
 import LoadingModal from "../shared/LoadingModal";
 import DeleteBudget from "./DeleteBudget";
 import EditBudget from "./EditBudget";
+import { formatCurrency } from "../../utils/CurrencyUtil";
 
 function BudgetsTable({ reload, setReload }) {
   const {
@@ -50,7 +51,7 @@ function BudgetsTable({ reload, setReload }) {
                 <Tr key={budget._id}>
                   <Td>{budget.category}</Td>
                   <Td>{budget.subcategory}</Td>
-                  <Td isNumeric>${budget.amount}</Td>
+                  <Td isNumeric>{formatCurrency(budget.amount)}</Td>
                   <Td padding="0" width="0">
                     <EditBudget budgetDoc={budget} refetch={refetch} />
                     {!budget.isMaster && (

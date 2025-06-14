@@ -13,6 +13,7 @@ import { getTransactions } from "../../services/transactionService";
 import LoadingModal from "../shared/LoadingModal";
 import DeleteTransaction from "./DeleteTransaction";
 import EditTransaction from "./EditTransaction";
+import { formatCurrency } from "../../utils/CurrencyUtil";
 
 function TransactionsTable({ reload, setReload }) {
   const {
@@ -53,9 +54,13 @@ function TransactionsTable({ reload, setReload }) {
                   <Td>{transaction.date}</Td>
                   <Td>{transaction.name}</Td>
                   <Td>{transaction.description}</Td>
-                  <Td>{transaction.category}</Td>
-                  <Td>{transaction.subcategory}</Td>
-                  <Td isNumeric>${transaction.amount}</Td>
+                  <Td maxWidth="5" overflowX="hidden">
+                    {transaction.category}
+                  </Td>
+                  <Td maxWidth="5" overflowX="hidden">
+                    {transaction.subcategory}
+                  </Td>
+                  <Td isNumeric>{formatCurrency(transaction.amount)}</Td>
                   <Td padding="0">
                     <EditTransaction transactionDoc={transaction} />
                     <DeleteTransaction
