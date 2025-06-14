@@ -12,6 +12,7 @@ import {
 } from "recharts";
 import { getIncomeVsExpenses } from "../../../services/trendsService";
 import { dateToString } from "../../../utils/DateUtil";
+import { formatCurrency } from "../../../utils/CurrencyUtil";
 
 function IncomeVsSpendingOverTime() {
   const { data, isLoading } = useQuery({
@@ -47,7 +48,7 @@ function IncomeVsSpendingOverTime() {
           />
           <YAxis
             domain={["auto", "auto"]}
-            tickFormatter={(value, _) => `$${value}`}
+            tickFormatter={(value, _) => formatCurrency(value)}
           />
           <Legend />
           <Tooltip content={<CustomTooltip />} />
@@ -74,8 +75,8 @@ function CustomTooltip({ active, payload, label }: any) {
     return (
       <Box bg="white" rounded="md" boxShadow="md" padding="1rem">
         <Text as="b">{dateToString(Number(label))}</Text>
-        <Text>Total Income: ${payload[0] ? payload[0].value : 0}</Text>
-        <Text>Total Expenses: ${payload[1] ? payload[1].value : 0}</Text>
+        <Text>Total Income: {formatCurrency(payload[0].value)}</Text>
+        <Text>Total Expenses: {formatCurrency(payload[1].value)}</Text>
       </Box>
     );
   }

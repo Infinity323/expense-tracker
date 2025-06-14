@@ -14,6 +14,7 @@ import { getSortedBudgets } from "../../../services/budgetService";
 import { getSpendingOverTime } from "../../../services/trendsService";
 import { dateToString } from "../../../utils/DateUtil";
 import { COLOR_MAP } from "../../../utils/ColorUtil";
+import { formatCurrency } from "../../../utils/CurrencyUtil";
 
 function CategorySpendingOverTimeChart() {
   const { data: categoryData, isLoading: categoryIsLoading } = useQuery({
@@ -72,7 +73,7 @@ function CategorySpendingOverTimeChart() {
           />
           <YAxis
             domain={["auto", "auto"]}
-            tickFormatter={(value, _) => `$${value}`}
+            tickFormatter={(value, _) => formatCurrency(value)}
           />
           <Legend />
           <Tooltip content={<CustomTooltip />} />
@@ -104,7 +105,7 @@ function CustomTooltip({ active, payload, label }: any) {
           .sort((a, b) => b.value - a.value)
           .map((data) => (
             <Text color={COLOR_MAP[data.name]}>
-              {data.name}: ${data.value}
+              {data.name}: {formatCurrency(data.value)}
             </Text>
           ))}
       </Box>

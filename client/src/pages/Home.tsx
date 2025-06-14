@@ -1,14 +1,9 @@
-import { Box, Flex, Heading, Text } from "@chakra-ui/react";
+import { Box, Center, Heading, Text, VStack } from "@chakra-ui/react";
 
 function Home() {
   return (
-    <>
-      <Flex
-        direction="column"
-        paddingTop="7rem"
-        paddingBottom="7rem"
-        align="center"
-      >
+    <Center height="70vh">
+      <VStack>
         <Box textAlign="center" maxWidth="60em">
           <Heading size="4xl">
             Take command of your spending
@@ -24,8 +19,8 @@ function Home() {
           </Text>
           <Text fontSize="md"></Text>
         </Box>
-      </Flex>
-    </>
+      </VStack>
+    </Center>
   );
 }
 

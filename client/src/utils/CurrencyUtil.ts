@@ -1,4 +1,8 @@
 export const formatCurrency = (amount: number) => {
+  if (!amount) {
+    return "$0.00";
+  }
+
   const formattedAmount = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
