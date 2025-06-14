@@ -1,4 +1,4 @@
-import { Box, Heading } from "@chakra-ui/react";
+import { Heading } from "@chakra-ui/react";
 import AccountsAccordion from "../components/accounts/AccountsAccordion";
 import LaunchLink from "../components/launch-link/LaunchLink";
 import { useUserContext } from "../context/UserProvider";
@@ -12,17 +12,13 @@ function Accounts() {
 
   return (
     <>
-      <Box padding="7rem">
-        <Heading as="h1" size="lg">
-          Accounts
-        </Heading>
-        <br />
-        <AccountsAccordion />
-        <br />
-        {linkToken && (
-          <LaunchLink linkToken={linkToken}>Link Account</LaunchLink>
-        )}
-      </Box>
+      <Heading as="h1" size="lg">
+        Accounts
+      </Heading>
+      <br />
+      <AccountsAccordion />
+      <br />
+      {linkToken && <LaunchLink linkToken={linkToken}>Link Account</LaunchLink>}
     </>
   );
 }

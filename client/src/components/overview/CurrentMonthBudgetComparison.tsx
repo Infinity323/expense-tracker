@@ -1,6 +1,16 @@
-import { Box, Heading, Progress, Skeleton, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Card,
+  CardBody,
+  CardHeader,
+  Divider,
+  Heading,
+  Skeleton,
+  Text,
+} from "@chakra-ui/react";
 import { useQuery } from "react-query";
 import { getBudgetComparison } from "../../services/budgetService";
+import ComparisonProgress from "./comparison-progress/ComparisonProgress";
 
 function CurrentMonthBudgetComparison() {
   const { data, isLoading } = useQuery({
@@ -8,83 +18,48 @@ function CurrentMonthBudgetComparison() {
     queryFn: getBudgetComparison,
   });
 
-  const getStatusColor = (difference) => {
-    return difference > 0 ? "green" : "red";
-  };
-
-  const calculateProgress = (expected, actual) => {
-    return Math.min((actual / expected) * 100, 100);
-  };
-
   return (
-    <>
-      <Heading as="h3" size="lg">
-        Income
-      </Heading>
-      {isLoading ? (
-        <Box width="50%" padding="1rem">
-          <Skeleton height={20} />
-        </Box>
-      ) : (
-        data?.income?.map((comparison) => (
-          <Box padding="1rem" key={comparison.name} width="50%">
-            <Heading as="h4" fontSize="md">
-              {comparison.name}: ${comparison.expectedAmount}
-            </Heading>
-            <Progress
-              colorScheme={getStatusColor(-1 * comparison.difference)}
-              size="md"
-              value={calculateProgress(
-                comparison.expectedAmount,
-                comparison.actualAmount
-              )}
-            />
-            <Text as="span" fontSize="md">
-              {`$${comparison.actualAmount} this month `}
-            </Text>
-            <Text as="span" color={getStatusColor(-1 * comparison.difference)}>
-              {`($${Math.abs(comparison.difference)} ${
-                comparison.difference > 0 ? "underbudget" : "overbudget"
-              })`}
-            </Text>
+    <Card p="1rem">
+      <CardHeader>
+        <Heading size="lg">Income</Heading>
+      </CardHeader>
+      <CardBody>
+        {isLoading ? (
+          <Box p="1rem">
+            <Skeleton height={20} />
           </Box>
-        ))
-      )}
-      <Heading as="h3" size="lg">
-        Spending
-      </Heading>
-      {isLoading ? (
-        <Box width="50%" padding="1rem">
-          <Skeleton height={20} />
-        </Box>
-      ) : (
-        data &&
-        data.expenses &&
-        data.expenses.map((comparison) => (
-          <Box padding="1rem" key={comparison.name} width="50%">
-            <Heading as="h4" fontSize="md">
-              {comparison.name}: ${comparison.expectedAmount}
-            </Heading>
-            <Progress
-              colorScheme={getStatusColor(comparison.difference)}
-              size="md"
-              value={calculateProgress(
-                comparison.expectedAmount,
-                comparison.actualAmount
-              )}
-            />
-            <Text as="span" fontSize="md">
-              {`$${comparison.actualAmount} this month `}
-            </Text>
-            <Text as="span" color={getStatusColor(comparison.difference)}>
-              {`($${Math.abs(comparison.difference)} ${
-                comparison.difference > 0 ? "underbudget" : "overbudget"
-              })`}
-            </Text>
+        ) : data?.income?.length ? (
+          data.income.map((comparison) => (
+            <ComparisonProgress comparison={comparison} type="income" />
+          ))
+        ) : (
+          <Box p="1rem">
+            <Text>No income data to show.</Text>
           </Box>
-        ))
-      )}
-    </>
+        )}
+      </CardBody>
+      <Divider borderColor="gray.200" />
+      <CardHeader>
+        <Heading as="h3" size="lg">
+          Spending
+        </Heading>
+      </CardHeader>
+      <CardBody>
+        {isLoading ? (
+          <Box p="1rem">
+            <Skeleton height={20} />
+          </Box>
+        ) : data?.expenses?.length ? (
+          data.expenses.map((comparison) => (
+            <ComparisonProgress comparison={comparison} type="expense" />
+          ))
+        ) : (
+          <Box padding="1rem" width="50%">
+            No spending data to show.
+          </Box>
+        )}
+      </CardBody>
+    </Card>
   );
 }
 

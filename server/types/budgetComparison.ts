@@ -3,7 +3,7 @@ export interface BudgetComparison {
   expenses: Comparison[];
 }
 
-interface Comparison {
+export interface Comparison {
   name: string;
   expectedAmount: number;
   actualAmount: number;

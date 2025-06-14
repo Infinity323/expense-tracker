@@ -1,4 +1,4 @@
-import { Box, Heading, Stack } from "@chakra-ui/react";
+import { Heading, Stack } from "@chakra-ui/react";
 import { useState } from "react";
 import AddTransaction from "../components/transactions/AddTransaction";
 import SyncTransactions from "../components/transactions/SyncTransactions";
@@ -8,7 +8,7 @@ function Transactions() {
   const [reload, setReload] = useState(false);
 
   return (
-    <Box padding="7rem">
+    <>
       <Heading as="h1" size="lg">
         Transactions
       </Heading>
@@ -19,7 +19,7 @@ function Transactions() {
         <AddTransaction setReload={setReload} />
         <SyncTransactions setReload={setReload} />
       </Stack>
-    </Box>
+    </>
   );
 }
 

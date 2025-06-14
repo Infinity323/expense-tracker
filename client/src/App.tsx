@@ -38,16 +38,18 @@ function App() {
         <UserProvider>
           <BrowserRouter>
             <Navbar />
-            <Routes>
-              <Route path="/" Component={Home} />
-              <Route path="/overview" Component={Overview} />
-              <Route path="/insights" Component={Insights} />
-              <Route path="/budgets" Component={Budgets} />
-              <Route path="/transactions" Component={Transactions} />
-              <Route path="/accounts" Component={Accounts} />
-              <Route path="/login" Component={Login} />
-              <Route path="/api" Component={Swagger} />
-            </Routes>
+            <main className="app-main">
+              <Routes>
+                <Route path="/" Component={Home} />
+                <Route path="/overview" Component={Overview} />
+                <Route path="/insights" Component={Insights} />
+                <Route path="/budgets" Component={Budgets} />
+                <Route path="/transactions" Component={Transactions} />
+                <Route path="/accounts" Component={Accounts} />
+                <Route path="/login" Component={Login} />
+                <Route path="/api" Component={Swagger} />
+              </Routes>
+            </main>
             <Footer />
           </BrowserRouter>
         </UserProvider>

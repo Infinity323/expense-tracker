@@ -1,15 +1,22 @@
-import { Box, Heading } from "@chakra-ui/react";
+import { Grid, GridItem, Heading } from "@chakra-ui/react";
 import CurrentMonthBudgetComparison from "../components/overview/CurrentMonthBudgetComparison";
 
 function Overview() {
   return (
-    <Box padding="5rem">
+    <>
       <Heading as="h2" size="xl">
-        This month at a glance
+        Net Worth
+      </Heading>
+      <Heading as="h2" size="xl">
+        Monthly Income and Expenses
       </Heading>
       <br />
-      <CurrentMonthBudgetComparison />
-    </Box>
+      <Grid templateRows="repeat(1, 1fr)" templateColumns="repeat(2, 1fr)">
+        <GridItem rowSpan={1} colSpan={1}>
+          <CurrentMonthBudgetComparison />
+        </GridItem>
+      </Grid>
+    </>
   );
 }
 
