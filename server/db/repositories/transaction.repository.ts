@@ -1,3 +1,4 @@
+import { format, startOfMonth } from "date-fns";
 import db from "../database";
 import { TransactionDoc } from "../types/transactionDoc";
 
@@ -48,15 +49,15 @@ export const findAllTransactions = async () => {
 };
 
 export const findCurrentMonthTransactions = async () => {
-  let currentMonth = new Date(Date.now());
-  currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth());
+  const firstDayOfMonth = startOfMonth(new Date());
+  const formattedDate = format(firstDayOfMonth, "yyyy-MM-dd");
   await db.createIndex({
     index: { fields: ["date", "category"] },
   });
   const transactionDocs = await db.find({
     selector: {
       type: TRANSACTION,
-      date: { $gte: currentMonth },
+      date: { $gte: formattedDate },
     },
     sort: [{ date: "desc" }],
   });

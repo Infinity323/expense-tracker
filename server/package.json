@@ -4,6 +4,7 @@
     "@types/plaid-link": "^2.0.15",
     "@types/react-plaid-link": "^2.0.0",
     "csv": "^6.3.10",
+    "date-fns": "^4.1.0",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-pouchdb": "^4.2.0",

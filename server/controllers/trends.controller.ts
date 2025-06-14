@@ -1,7 +1,9 @@
 import {
   findAllExpenses,
   findAllIncome,
+  findCurrentMonthTransactions,
 } from "../db/repositories/transaction.repository";
+import { CurrentMonthExpense } from "../types/currentMonthExpense";
 import { round } from "../utils/dataUtil";
 
 const SUPPORTED_TIME_DIVISIONS = ["monthly", "quarterly", "annually"];
@@ -202,6 +204,23 @@ export const getIncomeVsExpenses = async (req, res, next) => {
     });
     results.sort((a, b) => a.date - b.date);
     res.json(results);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getCurrentMonthSpending = async (req, res, next) => {
+  try {
+    const transactionDocs = await findCurrentMonthTransactions();
+    const expenses: CurrentMonthExpense[] = transactionDocs
+      .filter((doc) => doc.category !== "Income")
+      .map((doc) => ({
+        name: doc.name,
+        category: doc.category,
+        subcategory: doc.subcategory,
+        amount: doc.amount,
+      }));
+    res.json(expenses);
   } catch (err) {
     next(err);
   }

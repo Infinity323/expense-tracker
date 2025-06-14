@@ -10,11 +10,16 @@ import { Cell, Legend, Pie, PieChart, ResponsiveContainer } from "recharts";
 import { useBudgetComparison } from "../../../hooks/useBudgetComparison";
 import { COLOR_MAP } from "../../../utils/ColorUtil";
 import { formatCurrency } from "../../../utils/CurrencyUtil";
+import { useQuery } from "react-query";
+import { getCurrentMonthSpending } from "../../../services/trendsService";
 
 interface MonthlySpendingProps {}
 
 const MonthlySpending: React.FC<MonthlySpendingProps> = (props) => {
-  const { comparisons, isLoading } = useBudgetComparison(); // TODO: change this
+  const { data: expenses, isLoading } = useQuery({
+    queryKey: ["currentMonthSpending"],
+    queryFn: getCurrentMonthSpending,
+  });
 
   const renderLabel = ({ value }) => formatCurrency(value);
 
@@ -29,12 +34,10 @@ const MonthlySpending: React.FC<MonthlySpendingProps> = (props) => {
     );
   }
 
-  const data = comparisons.expenses
-    .filter((expense) => expense.actualAmount)
-    .map((expense) => ({
-      name: expense.name,
-      value: expense.actualAmount,
-    }));
+  const data = expenses.map((expense) => ({
+    name: expense.category,
+    value: expense.amount,
+  }));
 
   return (
     <Card p="1.5rem" variant="outline">
