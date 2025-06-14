@@ -42,7 +42,7 @@ const NetWorth: React.FC<NetWorthProps> = (props) => {
   const netWorth = assetWorth - liabilityWorth;
 
   return (
-    <Stack>
+    <Stack spacing="2rem">
       <Box p="1rem">
         <Heading as="h3" size="lg">
           {formatCurrency(netWorth)}
@@ -50,7 +50,7 @@ const NetWorth: React.FC<NetWorthProps> = (props) => {
         <Text>Total Net Worth</Text>
       </Box>
       <HStack spacing="2rem">
-        <Card width="50%" p="1.5rem">
+        <Card width="50%" p="1.5rem" variant="outline">
           <CardHeader>
             <Heading as="h3" size="md">
               {formatCurrency(assetWorth)}
@@ -70,7 +70,7 @@ const NetWorth: React.FC<NetWorthProps> = (props) => {
             </Grid>
           </CardBody>
         </Card>
-        <Card width="50%" p="1.5rem">
+        <Card width="50%" p="1.5rem" variant="outline">
           <CardHeader>
             <Heading as="h3" size="md">
               {formatCurrency(liabilityWorth)}

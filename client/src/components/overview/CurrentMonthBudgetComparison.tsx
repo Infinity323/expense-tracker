@@ -8,18 +8,14 @@ import {
   Skeleton,
   Text,
 } from "@chakra-ui/react";
-import { useQuery } from "react-query";
-import { getBudgetComparison } from "../../services/budgetService";
+import { useBudgetComparison } from "../../hooks/useBudgetComparison";
 import ComparisonProgress from "./comparison-progress/ComparisonProgress";
 
 function CurrentMonthBudgetComparison() {
-  const { data, isLoading } = useQuery({
-    queryKey: ["budgetComparison"],
-    queryFn: getBudgetComparison,
-  });
+  const { comparisons, isLoading } = useBudgetComparison();
 
   return (
-    <Card p="1.5rem">
+    <Card p="1.5rem" variant="outline">
       <CardHeader>
         <Heading size="lg">Income</Heading>
       </CardHeader>
@@ -28,8 +24,8 @@ function CurrentMonthBudgetComparison() {
           <Box p="1rem">
             <Skeleton height={20} />
           </Box>
-        ) : data?.income?.length ? (
-          data.income.map((comparison) => (
+        ) : comparisons?.income?.length ? (
+          comparisons.income.map((comparison) => (
             <ComparisonProgress comparison={comparison} type="income" />
           ))
         ) : (
@@ -49,8 +45,8 @@ function CurrentMonthBudgetComparison() {
           <Box p="1rem">
             <Skeleton height={20} />
           </Box>
-        ) : data?.expenses?.length ? (
-          data.expenses.map((comparison) => (
+        ) : comparisons?.expenses?.length ? (
+          comparisons.expenses.map((comparison) => (
             <ComparisonProgress comparison={comparison} type="expense" />
           ))
         ) : (

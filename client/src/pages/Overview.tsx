@@ -1,20 +1,30 @@
-import { Box, Heading, HStack, Stack } from "@chakra-ui/react";
+import { Box, Heading, HStack, Stack, Text } from "@chakra-ui/react";
 import CurrentMonthBudgetComparison from "../components/overview/CurrentMonthBudgetComparison";
 import NetWorth from "../components/overview/net-worth/NetWorth";
+import MonthlySpending from "../components/overview/monthly-spending/MonthlySpending";
 
 function Overview() {
   return (
     <Stack spacing="3rem">
-      <Heading as="h2" size="xl">
-        Net Worth
-      </Heading>
+      <Box>
+        <Heading as="h2" size="xl">
+          Net Worth
+        </Heading>
+        <Text>A summary of assets and liabilities</Text>
+      </Box>
       <NetWorth />
-      <Heading as="h2" size="xl">
-        Monthly Income and Expenses
-      </Heading>
+      <Box>
+        <Heading as="h2" size="xl">
+          Monthly Overview
+        </Heading>
+        <Text>A summary of this month's income and expenses</Text>
+      </Box>
       <HStack spacing="2rem">
         <Box width="50%">
           <CurrentMonthBudgetComparison />
+        </Box>
+        <Box width="50%">
+          <MonthlySpending />
         </Box>
       </HStack>
     </Stack>
