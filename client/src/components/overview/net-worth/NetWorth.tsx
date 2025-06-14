@@ -14,14 +14,12 @@ import {
 import { useQuery } from "react-query";
 import { getBalances } from "../../../services/itemService";
 import { formatCurrency } from "../../../utils/CurrencyUtil";
+import { useBalances } from "../../../hooks/useBalances";
 
 interface NetWorthProps {}
 
 const NetWorth: React.FC<NetWorthProps> = (props) => {
-  const { data: balances } = useQuery({
-    queryKey: ["balances"],
-    queryFn: getBalances,
-  });
+  const { balances } = useBalances();
 
   if (!balances) {
     return <Skeleton height="200px" />;

@@ -41,7 +41,7 @@ const ComparisonProgress: React.FC<ComparisonProgressProps> = (props) => {
         color={getStatusColor(multiplier * comparison.difference)}
       >
         {` (${formatCurrency(Math.abs(comparison.difference))} ${
-          comparison.difference > 0 ? "underbudget" : "overbudget"
+          comparison.difference > 0 ? "under" : "over"
         })`}
       </Text>
     </Box>

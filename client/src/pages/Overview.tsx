@@ -1,7 +1,7 @@
 import { Box, Heading, HStack, Stack, Text } from "@chakra-ui/react";
 import CurrentMonthBudgetComparison from "../components/overview/CurrentMonthBudgetComparison";
-import NetWorth from "../components/overview/net-worth/NetWorth";
 import MonthlySpending from "../components/overview/monthly-spending/MonthlySpending";
+import NetWorth from "../components/overview/net-worth/NetWorth";
 
 function Overview() {
   return (
