@@ -38,6 +38,7 @@ const AccountListCard: React.FC<AccountListCardProps> = (props) => {
             balances.map((account) => (
               <Grid templateColumns="repeat(8, 1fr)">
                 <GridItem colSpan={1}>
+                  {/* TODO: logo */}
                   <Text>Placeholder</Text>
                 </GridItem>
                 <GridItem colSpan={6}>
