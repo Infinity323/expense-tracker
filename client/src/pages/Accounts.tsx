@@ -1,6 +1,14 @@
-import { Button, Flex, Heading, Spacer, Stack } from "@chakra-ui/react";
-import AccountList from "../components/accounts/account-list/AccountList";
+import {
+  Box,
+  Button,
+  Flex,
+  Heading,
+  Spacer,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import AccountList from "../components/accounts/account-list/AccountList";
 
 function Accounts() {
   const navigate = useNavigate();
@@ -8,11 +16,17 @@ function Accounts() {
   return (
     <Stack spacing="2rem">
       <Flex>
-        <Heading as="h1" size="xl">
-          Accounts
-        </Heading>
+        <Box>
+          <Heading as="h1" size="xl">
+            Accounts
+          </Heading>
+          <Text>An overview of all linked accounts</Text>
+        </Box>
         <Spacer />
-        <Button onClick={() => navigate("/account-management")}>
+        <Button
+          colorScheme="teal"
+          onClick={() => navigate("/account-management")}
+        >
           Manage Accounts
         </Button>
       </Flex>

@@ -18,24 +18,24 @@ import {
   FaMoneyBillTrendUp,
   FaSackDollar,
 } from "react-icons/fa6";
-import { useBalances } from "../../../hooks/useBalances";
+import { useAccounts } from "../../../hooks/useAccounts";
 import { getBalance } from "../../../utils/BalanceUtil";
 import { formatCurrency } from "../../../utils/CurrencyUtil";
 
 interface NetWorthProps {}
 
 const NetWorth: React.FC<NetWorthProps> = (props) => {
-  const { balances } = useBalances();
+  const { accounts } = useAccounts();
 
-  if (!balances) {
+  if (!accounts) {
     return <Skeleton height="200px" />;
   }
 
-  const cash = getBalance(balances, "depository");
+  const cash = getBalance(accounts, "depository");
   const investment =
-    getBalance(balances, "investment") + getBalance(balances, "brokerage");
-  const credit = getBalance(balances, "credit");
-  const loan = getBalance(balances, "loan");
+    getBalance(accounts, "investment") + getBalance(accounts, "brokerage");
+  const credit = getBalance(accounts, "credit");
+  const loan = getBalance(accounts, "loan");
   const liabilityWorth = credit + loan;
   const assetWorth = cash + investment;
   const netWorth = assetWorth - liabilityWorth;

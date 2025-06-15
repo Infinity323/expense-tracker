@@ -8,22 +8,14 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { useEffect } from "react";
-import { useQuery } from "react-query";
-import { getBudgets } from "../../services/budgetService";
+import { useBudgets } from "../../hooks/useBudgets";
+import { formatCurrency } from "../../utils/CurrencyUtil";
 import LoadingModal from "../shared/LoadingModal";
 import DeleteBudget from "./DeleteBudget";
 import EditBudget from "./EditBudget";
-import { formatCurrency } from "../../utils/CurrencyUtil";
 
 function BudgetsTable({ reload, setReload }) {
-  const {
-    data: budgets,
-    isLoading,
-    refetch,
-  } = useQuery({
-    queryKey: ["budgets"],
-    queryFn: getBudgets,
-  });
+  const { budgets, isLoading, refetch } = useBudgets();
 
   useEffect(() => {
     if (reload) {

@@ -9,7 +9,6 @@ import {
   Tabs,
   Text,
 } from "@chakra-ui/react";
-import { useBalances } from "../../../hooks/useBalances";
 import AccountListCard from "./account-list-card/AccountListCard";
 import {
   FaCreditCard,
@@ -18,17 +17,18 @@ import {
   FaMoneyBillTrendUp,
   FaSackDollar,
 } from "react-icons/fa6";
+import { useAccounts } from "../../../hooks/useAccounts";
 
 interface AccountListProps {}
 
 const AccountList: React.FC<AccountListProps> = (props) => {
-  const { balances, isLoading } = useBalances();
+  const { accounts, isLoading } = useAccounts();
 
   if (isLoading) {
     return <Skeleton height="200px" />;
   }
 
-  if (!balances) {
+  if (!accounts) {
     return <Text>No accounts linked.</Text>;
   }
 
@@ -60,14 +60,14 @@ const AccountList: React.FC<AccountListProps> = (props) => {
         <TabPanels>
           <TabPanel>
             <AccountListCard
-              balances={balances.filter(
+              balances={accounts.filter(
                 (account) => account.type === "depository"
               )}
             />
           </TabPanel>
           <TabPanel>
             <AccountListCard
-              balances={balances.filter(
+              balances={accounts.filter(
                 (account) =>
                   account.type === "investment" || account.type === "brokerage"
               )}
@@ -75,17 +75,17 @@ const AccountList: React.FC<AccountListProps> = (props) => {
           </TabPanel>
           <TabPanel>
             <AccountListCard
-              balances={balances.filter((account) => account.type === "credit")}
+              balances={accounts.filter((account) => account.type === "credit")}
             />
           </TabPanel>
           <TabPanel>
             <AccountListCard
-              balances={balances.filter((account) => account.type === "loan")}
+              balances={accounts.filter((account) => account.type === "loan")}
             />
           </TabPanel>
           <TabPanel>
             <AccountListCard
-              balances={balances.filter((account) => account.type === "other")}
+              balances={accounts.filter((account) => account.type === "other")}
             />
           </TabPanel>
         </TabPanels>

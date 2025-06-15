@@ -16,8 +16,10 @@ import {
 import { useState } from "react";
 import { putBudget } from "../../services/budgetService";
 import BudgetsSelect from "./BudgetsSelect";
+import { useBudgets } from "../../hooks/useBudgets";
 
 function AddBudget({ setReload }) {
+  const { budgets } = useBudgets();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [category, setCategory] = useState<string>();
@@ -26,8 +28,11 @@ function AddBudget({ setReload }) {
 
   const addBudget = async (event) => {
     event.preventDefault();
-    // TODO: get _id _rev in context
-    await putBudget({ category, subcategory, amount });
+    const _id = budgets.find(
+      (budget) =>
+        budget.category === category && budget.subcategory === subcategory
+    )._id;
+    await putBudget({ _id, category, subcategory, amount });
     onClose();
     setReload(true);
   };

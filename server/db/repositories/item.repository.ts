@@ -13,13 +13,12 @@ export const findAllAccessTokens = async () => {
   return itemDocs.docs as ItemDoc[];
 };
 
-export const createItem = async (item_id, access_token, accounts) => {
+export const createItem = async (item_id, access_token) => {
   return await db.put<ItemDoc>({
     _id: item_id,
     type: ITEM,
     item_id: item_id,
     access_token: access_token,
-    accounts: accounts,
     created_timestamp: new Date(),
   });
 };

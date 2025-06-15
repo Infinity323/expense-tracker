@@ -38,7 +38,7 @@ const LaunchLink: React.FC<LaunchLinkProps> = (props) => {
   const onClick = () => open();
 
   return (
-    <Button onClick={onClick} disabled={!ready}>
+    <Button colorScheme="teal" onClick={onClick} disabled={!ready}>
       {children}
     </Button>
   );

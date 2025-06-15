@@ -23,21 +23,20 @@ import itemRouter from "./routes/item.routes";
 
 dotenv.config();
 
-mkdirp("/tmp/expense-tracker");
-mkdirp("/tmp/expense-tracker/db");
-
 const app = express();
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // database
-app.use(
-  "/db",
-  expressPouchDb(PouchDB, {
-    configPath: "./pouchdb-config.json",
-  })
-);
+mkdirp("/tmp/expense-tracker/db").then(() => {
+  app.use(
+    "/db",
+    expressPouchDb(PouchDB, {
+      configPath: "./pouchdb-config.json",
+    })
+  );
+});
 
 // cors
 app.use((req, res, next) => {
@@ -48,9 +47,9 @@ app.use((req, res, next) => {
 });
 
 // add timestamps to log messages
-console.logCopy = console.log.bind(console);
+const logWithTimestamp = console.log.bind(console);
 console.log = function (message) {
-  this.logCopy(`[${new Date().toISOString()}]`, message);
+  logWithTimestamp(`[${new Date().toISOString()}]`, message);
 };
 
 // "request interceptor"

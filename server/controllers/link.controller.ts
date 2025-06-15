@@ -56,13 +56,9 @@ export const createAccessToken = async (req, res, next) => {
     console.log(
       `Successfully exchanged public token [${req.body.public_token}] for access token`
     );
-    let accountsResponse = await plaidClient.accountsGet({
-      access_token: exchangeResponseData.access_token,
-    });
     await createItem(
       exchangeResponseData.item_id,
-      exchangeResponseData.access_token,
-      accountsResponse.data.accounts
+      exchangeResponseData.access_token
     );
     console.log(`Saved new item [${exchangeResponseData.item_id}] to database`);
     res.status(201).json({

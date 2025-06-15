@@ -46,34 +46,3 @@ export const deleteItem = async (
     next(err);
   }
 };
-
-/** Gets all account balances associated with an account. */
-export const getBalances = async (req, res, next) => {
-  try {
-    const itemDocs = await findAllAccessTokens();
-    const accounts = (
-      await Promise.all(
-        itemDocs.map(async (doc) => {
-          try {
-            const response = await plaidClient.accountsGet({
-              access_token: doc.access_token,
-            });
-            await updateItemNeedsAttention(doc.item_id, false);
-            return response.data.accounts;
-          } catch (err) {
-            console.error(
-              `Error occurred while getting accounts for item ${doc.item_id}`,
-              err
-            );
-            await updateItemNeedsAttention(doc.item_id, true);
-            return [];
-          }
-        })
-      )
-    ).flatMap((arr) => arr);
-    console.log(`Retrieved balances for ${accounts.length} accounts.`);
-    res.json(accounts);
-  } catch (err) {
-    next(err);
-  }
-};
