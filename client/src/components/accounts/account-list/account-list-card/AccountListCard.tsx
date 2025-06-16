@@ -1,24 +1,28 @@
+import { AccountResponse } from "@backend/types/accountResponse";
 import {
   Box,
   Card,
   CardBody,
   CardHeader,
-  Grid,
-  GridItem,
+  Center,
+  Flex,
   Heading,
+  Image,
+  Spacer,
   Stack,
   StackDivider,
   Text,
 } from "@chakra-ui/react";
-import { AccountBase } from "plaid";
+import { useLinkedInstitutions } from "../../../../hooks/useLinkedInstitutions";
 import { formatCurrency } from "../../../../utils/CurrencyUtil";
 
 interface AccountListCardProps {
-  balances: AccountBase[];
+  balances: AccountResponse[];
 }
 
 const AccountListCard: React.FC<AccountListCardProps> = (props) => {
   const { balances } = props;
+  const { institutions } = useLinkedInstitutions();
 
   const totalBalance = balances
     .map((account) => account.balances.current)
@@ -35,13 +39,27 @@ const AccountListCard: React.FC<AccountListCardProps> = (props) => {
       <CardBody>
         <Stack divider={<StackDivider />}>
           {balances.length ? (
-            balances.map((account) => (
-              <Grid templateColumns="repeat(8, 1fr)">
-                <GridItem colSpan={1}>
-                  {/* TODO: logo */}
-                  <Text>Placeholder</Text>
-                </GridItem>
-                <GridItem colSpan={6}>
+            balances.map((account) => {
+              const institution = institutions?.find(
+                (institution) =>
+                  institution.institution.institution_id ===
+                  account.institution_id
+              )?.institution;
+              const logo = institution?.logo;
+
+              return (
+                <Flex gap={5}>
+                  <Center>
+                    <Image
+                      boxSize="50px"
+                      src={
+                        logo
+                          ? `data:image/png;base64,${logo}`
+                          : "https://placehold.co/50x50/png"
+                      }
+                      alt="logo"
+                    />
+                  </Center>
                   <Box>
                     <Text fontWeight="semibold">{account.name}</Text>
                     <Text>
@@ -49,12 +67,11 @@ const AccountListCard: React.FC<AccountListCardProps> = (props) => {
                     </Text>
                     <Text>{account.balances.last_updated_datetime}</Text>
                   </Box>
-                </GridItem>
-                <GridItem colSpan={1}>
+                  <Spacer />
                   <Text>{formatCurrency(account.balances.current)}</Text>
-                </GridItem>
-              </Grid>
-            ))
+                </Flex>
+              );
+            })
           ) : (
             <Text>No accounts linked.</Text>
           )}

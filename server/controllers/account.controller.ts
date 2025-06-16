@@ -8,15 +8,18 @@ export const getAllAccounts = async (req, res, next) => {
     const accounts: AccountResponse[] = (
       await Promise.all(
         itemDocs.map(async (doc) => {
-          const accountsResponse = await plaidClient.accountsGet({
-            access_token: doc.access_token,
-          });
-          return accountsResponse.data.accounts.map((account) => {
+          const accountsResponse = (
+            await plaidClient.accountsGet({
+              access_token: doc.access_token,
+            })
+          ).data;
+          return accountsResponse.accounts.map((account) => {
             const response: AccountResponse = {
               ...account,
               created_timestamp: doc?.created_timestamp,
               needs_attention: doc?.needs_attention,
               item_id: doc?.item_id,
+              institution_id: accountsResponse.item.institution_id,
             };
             return response;
           });

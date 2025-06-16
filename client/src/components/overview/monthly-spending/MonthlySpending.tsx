@@ -1,18 +1,22 @@
 import {
+  Box,
   Card,
   CardBody,
   CardHeader,
   Center,
+  FormControl,
+  FormLabel,
   Heading,
   Skeleton,
+  Switch,
   Text,
 } from "@chakra-ui/react";
+import { useQuery } from "react-query";
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer } from "recharts";
-import { useBudgetComparison } from "../../../hooks/useBudgetComparison";
+import { getCurrentMonthSpending } from "../../../services/trendsService";
 import { COLOR_MAP } from "../../../utils/ColorUtil";
 import { formatCurrency } from "../../../utils/CurrencyUtil";
-import { useQuery } from "react-query";
-import { getCurrentMonthSpending } from "../../../services/trendsService";
+import { useState } from "react";
 
 interface MonthlySpendingProps {}
 
@@ -21,6 +25,7 @@ const MonthlySpending: React.FC<MonthlySpendingProps> = (props) => {
     queryKey: ["currentMonthSpending"],
     queryFn: getCurrentMonthSpending,
   });
+  const [showSubcategories, setShowSubcategories] = useState<boolean>(false);
 
   const renderLabel = ({ value }) => formatCurrency(value);
 
@@ -51,7 +56,7 @@ const MonthlySpending: React.FC<MonthlySpendingProps> = (props) => {
   }
 
   const data = expenses.map((expense) => ({
-    name: expense.category,
+    name: showSubcategories ? expense.subcategory : expense.category,
     value: expense.amount,
   }));
 
@@ -61,6 +66,10 @@ const MonthlySpending: React.FC<MonthlySpendingProps> = (props) => {
         <Heading size="lg">Spending Categories</Heading>
       </CardHeader>
       <CardBody>
+        <FormControl display="flex" alignItems="center">
+          <FormLabel mb="0">Show by Subcategory</FormLabel>
+          <Switch onChange={() => setShowSubcategories((prev) => !prev)} />
+        </FormControl>
         <Center width="100%" height="40vh">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>

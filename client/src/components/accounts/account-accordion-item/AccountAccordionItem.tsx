@@ -15,6 +15,7 @@ import { FaCircleExclamation } from "react-icons/fa6";
 import { useUserContext } from "../../../context/UserProvider";
 import { useCreateLinkToken } from "../../../hooks/useCreateLinkToken";
 import LaunchLink from "../../launch-link/LaunchLink";
+import { useLinkedInstitutions } from "../../../hooks/useLinkedInstitutions";
 
 interface AccountAccordionItemProps {
   account: AccountResponse;
@@ -22,6 +23,7 @@ interface AccountAccordionItemProps {
 
 const AccountAccordionItem: React.FC<AccountAccordionItemProps> = (props) => {
   const { account } = props;
+  const { institutions } = useLinkedInstitutions();
   const {
     userInfo: { userId },
     accessTokens,
@@ -31,6 +33,10 @@ const AccountAccordionItem: React.FC<AccountAccordionItemProps> = (props) => {
     accessToken: accessTokens?.find((token) => token.itemId === account.item_id)
       .accessToken,
   });
+  const institutionName = institutions?.find(
+    (institution) =>
+      institution.institution.institution_id === account.institution_id
+  )?.institution.name;
 
   return (
     <AccordionItem key={account.account_id}>
@@ -39,7 +45,7 @@ const AccountAccordionItem: React.FC<AccountAccordionItemProps> = (props) => {
           <Box as="span" flex="1" textAlign="left">
             <HStack>
               <Text as="span" fontWeight="bold">
-                {account.name}
+                {institutionName} {account.name}
               </Text>
               {account.needs_attention && (
                 <>

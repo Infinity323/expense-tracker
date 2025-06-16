@@ -21,7 +21,9 @@ const AccountManagement: React.FC<AccountManagementProps> = (props) => {
       <AccountsAccordion />
       <Box>
         {linkToken && (
-          <LaunchLink linkToken={linkToken}>Link Account</LaunchLink>
+          <LaunchLink linkToken={linkToken} colorScheme="teal">
+            Link Account
+          </LaunchLink>
         )}
       </Box>
     </Stack>

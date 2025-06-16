@@ -11,10 +11,11 @@ interface LaunchLinkProps {
   children: ReactNode;
   linkToken: string;
   itemId?: string;
+  colorScheme?: string;
 }
 
 const LaunchLink: React.FC<LaunchLinkProps> = (props) => {
-  const { linkToken, children, itemId } = props;
+  const { linkToken, children, itemId, colorScheme } = props;
   const { setAccessTokens } = useUserContext();
   const { refetch } = useAccounts();
 
@@ -38,7 +39,7 @@ const LaunchLink: React.FC<LaunchLinkProps> = (props) => {
   const onClick = () => open();
 
   return (
-    <Button colorScheme="teal" onClick={onClick} disabled={!ready}>
+    <Button colorScheme={colorScheme} onClick={onClick} disabled={!ready}>
       {children}
     </Button>
   );
