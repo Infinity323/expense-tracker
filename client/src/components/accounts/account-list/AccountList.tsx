@@ -22,13 +22,13 @@ import { useAccounts } from "../../../hooks/useAccounts";
 interface AccountListProps {}
 
 const AccountList: React.FC<AccountListProps> = (props) => {
-  const { accounts, isLoading } = useAccounts();
+  const { flattenedAccounts, isLoading } = useAccounts();
 
   if (isLoading) {
     return <Skeleton height="200px" />;
   }
 
-  if (!accounts) {
+  if (!flattenedAccounts) {
     return <Text>No accounts linked.</Text>;
   }
 
@@ -60,14 +60,14 @@ const AccountList: React.FC<AccountListProps> = (props) => {
         <TabPanels>
           <TabPanel>
             <AccountListCard
-              balances={accounts.filter(
+              balances={flattenedAccounts.filter(
                 (account) => account.type === "depository"
               )}
             />
           </TabPanel>
           <TabPanel>
             <AccountListCard
-              balances={accounts.filter(
+              balances={flattenedAccounts.filter(
                 (account) =>
                   account.type === "investment" || account.type === "brokerage"
               )}
@@ -75,17 +75,23 @@ const AccountList: React.FC<AccountListProps> = (props) => {
           </TabPanel>
           <TabPanel>
             <AccountListCard
-              balances={accounts.filter((account) => account.type === "credit")}
+              balances={flattenedAccounts.filter(
+                (account) => account.type === "credit"
+              )}
             />
           </TabPanel>
           <TabPanel>
             <AccountListCard
-              balances={accounts.filter((account) => account.type === "loan")}
+              balances={flattenedAccounts.filter(
+                (account) => account.type === "loan"
+              )}
             />
           </TabPanel>
           <TabPanel>
             <AccountListCard
-              balances={accounts.filter((account) => account.type === "other")}
+              balances={flattenedAccounts.filter(
+                (account) => account.type === "other"
+              )}
             />
           </TabPanel>
         </TabPanels>

@@ -25,17 +25,18 @@ import { formatCurrency } from "../../../utils/CurrencyUtil";
 interface NetWorthProps {}
 
 const NetWorth: React.FC<NetWorthProps> = (props) => {
-  const { accounts } = useAccounts();
+  const { accounts, flattenedAccounts } = useAccounts();
 
   if (!accounts) {
     return <Skeleton height="200px" />;
   }
 
-  const cash = getBalance(accounts, "depository");
+  const cash = getBalance(flattenedAccounts, "depository");
   const investment =
-    getBalance(accounts, "investment") + getBalance(accounts, "brokerage");
-  const credit = getBalance(accounts, "credit");
-  const loan = getBalance(accounts, "loan");
+    getBalance(flattenedAccounts, "investment") +
+    getBalance(flattenedAccounts, "brokerage");
+  const credit = getBalance(flattenedAccounts, "credit");
+  const loan = getBalance(flattenedAccounts, "loan");
   const liabilityWorth = credit + loan;
   const assetWorth = cash + investment;
   const netWorth = assetWorth - liabilityWorth;

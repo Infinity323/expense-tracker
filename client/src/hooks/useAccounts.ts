@@ -1,5 +1,6 @@
 import { useQuery } from "react-query";
 import { getAccounts } from "../services/accountsService";
+import { ItemAccount } from "../types/itemAccount";
 
 export const useAccounts = () => {
   const {
@@ -12,5 +13,14 @@ export const useAccounts = () => {
     queryFn: getAccounts,
   });
 
-  return { accounts, isLoading, isError, refetch };
+  const flattenedAccounts: ItemAccount[] = accounts?.flatMap((item) => {
+    const updated = item.accounts.map((account) => ({
+      ...account,
+      institutionId: item.institution_id,
+      itemId: item.item_id,
+    }));
+    return updated;
+  });
+
+  return { accounts, flattenedAccounts, isLoading, isError, refetch };
 };

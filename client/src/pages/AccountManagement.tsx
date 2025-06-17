@@ -1,6 +1,6 @@
-import { Box, Heading, Stack } from "@chakra-ui/react";
+import { Box, Heading, Stack, Text } from "@chakra-ui/react";
 import React from "react";
-import AccountsAccordion from "../components/accounts/AccountsAccordion";
+import InstitutionGroups from "../components/accounts/institution-groups/InstitutionGroups";
 import LaunchLink from "../components/launch-link/LaunchLink";
 import { useUserContext } from "../context/UserProvider";
 import { useCreateLinkToken } from "../hooks/useCreateLinkToken";
@@ -15,10 +15,13 @@ const AccountManagement: React.FC<AccountManagementProps> = (props) => {
 
   return (
     <Stack spacing="2rem">
-      <Heading as="h1" size="xl">
-        Manage Accounts
-      </Heading>
-      <AccountsAccordion />
+      <Box>
+        <Heading as="h1" size="xl">
+          Manage Accounts
+        </Heading>
+        <Text>Link, unlink, or repair linked accounts</Text>
+      </Box>
+      <InstitutionGroups />
       <Box>
         {linkToken && (
           <LaunchLink linkToken={linkToken} colorScheme="teal">

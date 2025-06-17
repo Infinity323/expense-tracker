@@ -1,4 +1,3 @@
-import { AccountResponse } from "@backend/types/accountResponse";
 import {
   Box,
   Card,
@@ -14,10 +13,11 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { useLinkedInstitutions } from "../../../../hooks/useLinkedInstitutions";
+import { ItemAccount } from "../../../../types/itemAccount";
 import { formatCurrency } from "../../../../utils/CurrencyUtil";
 
 interface AccountListCardProps {
-  balances: AccountResponse[];
+  balances: ItemAccount[];
 }
 
 const AccountListCard: React.FC<AccountListCardProps> = (props) => {
@@ -43,7 +43,7 @@ const AccountListCard: React.FC<AccountListCardProps> = (props) => {
               const institution = institutions?.find(
                 (institution) =>
                   institution.institution.institution_id ===
-                  account.institution_id
+                  account.institutionId
               )?.institution;
               const logo = institution?.logo;
 
