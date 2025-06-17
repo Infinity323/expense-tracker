@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Box,
   Button,
   ButtonGroup,
@@ -7,12 +8,20 @@ import {
   Heading,
   HStack,
   Icon,
+  IconButton,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
   Spacer,
+  useColorMode,
 } from "@chakra-ui/react";
-import { FaChartLine } from "react-icons/fa6";
+import { FaChartLine, FaMoon, FaSun } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 
 function Navbar() {
+  const { colorMode, toggleColorMode } = useColorMode();
+
   return (
     <Box>
       <Flex minWidth="max-content" p="2" alignItems="center" gap="2">
@@ -46,10 +55,23 @@ function Navbar() {
           </ButtonGroup>
         </Box>
         <Spacer />
-        <ButtonGroup gap="2">
-          <Link to="/login">
-            <Button colorScheme="teal">Log In</Button>
-          </Link>
+        <ButtonGroup gap="2" alignItems="center">
+          <IconButton
+            aria-label="toggle mode"
+            icon={colorMode === "light" ? <FaMoon /> : <FaSun />}
+            onClick={toggleColorMode}
+          />
+          <Menu>
+            <MenuButton>
+              <Avatar name="Paul Lee" bg="teal" />
+            </MenuButton>
+            <MenuList>
+              <MenuItem>Preferences</MenuItem>
+              <MenuItem>
+                <Link to="/account-management">Manage Accounts</Link>
+              </MenuItem>
+            </MenuList>
+          </Menu>
         </ButtonGroup>
       </Flex>
       <Divider borderColor="gray.400" />
