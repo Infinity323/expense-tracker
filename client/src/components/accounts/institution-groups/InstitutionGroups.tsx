@@ -1,12 +1,17 @@
 import { Box, Skeleton } from "@chakra-ui/react";
 import React from "react";
+import { useUserContext } from "../../../context/UserProvider";
 import { useAccounts } from "../../../hooks/useAccounts";
+import { useLinkedInstitutions } from "../../../hooks/useLinkedInstitutions";
 import InstitutionCard from "../institution-card/InstitutionCard";
 
 const InstitutionGroups: React.FC = () => {
-  const { accounts, isLoading } = useAccounts();
+  const { accounts, isLoading: isAccountsLoading, refetch } = useAccounts();
+  const { institutions, isLoading: isInstitutionsLoading } =
+    useLinkedInstitutions();
+  const { accessTokens } = useUserContext();
 
-  if (isLoading) {
+  if (isAccountsLoading || isInstitutionsLoading) {
     return <Skeleton height="200px" />;
   }
 
@@ -16,9 +21,23 @@ const InstitutionGroups: React.FC = () => {
 
   return (
     <>
-      {accounts.map((group) => (
-        <InstitutionCard group={group} />
-      ))}
+      {accounts.map((group) => {
+        const institution = institutions.find(
+          (institution) =>
+            institution.institution.institution_id === group.institution_id
+        ).institution;
+        const accessToken = accessTokens.find(
+          (accessToken) => accessToken.itemId === group.item_id
+        ).accessToken;
+        return (
+          <InstitutionCard
+            group={group}
+            institution={institution}
+            accessToken={accessToken}
+            refetch={refetch}
+          />
+        );
+      })}
     </>
   );
 };

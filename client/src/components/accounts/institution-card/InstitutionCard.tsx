@@ -2,6 +2,7 @@ import { AccountResponse } from "@backend/types/accountResponse";
 import {
   Box,
   Button,
+  ButtonGroup,
   Card,
   CardBody,
   CardFooter,
@@ -11,55 +12,43 @@ import {
   Heading,
   Icon,
   Image,
-  Skeleton,
   Spacer,
   Text,
 } from "@chakra-ui/react";
+import { Institution } from "plaid";
 import { FaCircleExclamation } from "react-icons/fa6";
 import { useUserContext } from "../../../context/UserProvider";
 import { useCreateLinkToken } from "../../../hooks/useCreateLinkToken";
-import { useLinkedInstitutions } from "../../../hooks/useLinkedInstitutions";
 import LaunchLink from "../../launch-link/LaunchLink";
+import { useMutation } from "react-query";
+import { deleteItem } from "../../../services/itemService";
 
 interface InstitutionCardProps {
   group: AccountResponse;
+  institution: Institution;
+  accessToken: string;
+  refetch: () => void;
 }
 
 const InstitutionCard: React.FC<InstitutionCardProps> = (props) => {
-  const { group } = props;
-  const { institutions, isLoading } = useLinkedInstitutions();
+  const { group, institution, accessToken, refetch } = props;
   const {
     userInfo: { userId },
-    accessTokens,
   } = useUserContext();
   const linkToken = useCreateLinkToken({
     userId,
-    accessToken: accessTokens?.find(
-      (accessToken) => accessToken.itemId === group.item_id
-    ).accessToken,
+    accessToken,
+  });
+  const { mutate, isLoading } = useMutation({
+    mutationFn: deleteItem,
+    onSuccess: refetch,
   });
 
-  const institution = institutions?.find(
-    (institution) =>
-      institution.institution.institution_id === group.institution_id
-  )?.institution;
+  const institutionName = institution.name;
+  const logo = institution.logo;
+  const color = institution.primary_color;
 
-  if (isLoading) {
-    return (
-      <Card p="1.5rem" variant="outline">
-        <CardHeader>
-          <Skeleton height="20px" width="50%" />
-        </CardHeader>
-        <CardBody>
-          <Skeleton height="150px" />
-        </CardBody>
-      </Card>
-    );
-  }
-
-  const institutionName = institution?.name;
-  const logo = institution?.logo;
-  const color = institution?.primary_color;
+  const onUnlink = () => mutate(group.item_id);
 
   return (
     <Card p="1.5rem" variant="outline">
@@ -87,11 +76,13 @@ const InstitutionCard: React.FC<InstitutionCardProps> = (props) => {
             )}
           </Box>
           <Spacer />
-          {logo && <Image
-            boxSize="75px"
-            src={`data:image/png;base64,${logo}`}
-            alt="logo"
-          />}
+          {logo && (
+            <Image
+              boxSize="75px"
+              src={`data:image/png;base64,${logo}`}
+              alt="logo"
+            />
+          )}
         </Flex>
       </CardHeader>
       <CardBody>
@@ -110,7 +101,7 @@ const InstitutionCard: React.FC<InstitutionCardProps> = (props) => {
         </Grid>
       </CardBody>
       <CardFooter>
-        <Box>
+        <ButtonGroup spacing={2}>
           {linkToken ? (
             <LaunchLink linkToken={linkToken} itemId={group.item_id}>
               Update
@@ -120,7 +111,15 @@ const InstitutionCard: React.FC<InstitutionCardProps> = (props) => {
               Update
             </Button>
           )}
-        </Box>
+          <Button
+            colorScheme="red"
+            disabled={isLoading}
+            isLoading={isLoading}
+            onClick={onUnlink}
+          >
+            Unlink
+          </Button>
+        </ButtonGroup>
       </CardFooter>
     </Card>
   );
