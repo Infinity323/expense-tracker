@@ -2,10 +2,10 @@ import { Button } from "@chakra-ui/react";
 import React, { ReactNode } from "react";
 import { usePlaidLink } from "react-plaid-link";
 import { useUserContext } from "../../context/UserProvider";
-import { updateItem } from "../../services/itemService";
-import { postAccessToken, postLink } from "../../services/linkService";
-import { AccessToken } from "../../types/accessToken";
 import { useAccounts } from "../../hooks/useAccounts";
+import { updateItem } from "../../services/itemService";
+import { postAccessToken } from "../../services/linkService";
+import { AccessToken } from "../../types/accessToken";
 
 interface LaunchLinkProps {
   children: ReactNode;
@@ -19,21 +19,19 @@ const LaunchLink: React.FC<LaunchLinkProps> = (props) => {
   const { setAccessTokens } = useUserContext();
   const { refetch } = useAccounts();
 
+  const onSuccess = async (publicToken, metadata) => {
+    if (!itemId) {
+      const accessTokenResponse = await postAccessToken(publicToken, metadata);
+      setAccessTokens((prev: AccessToken[]) => [...prev, accessTokenResponse]);
+    } else {
+      await updateItem(itemId, metadata);
+    }
+    refetch();
+  };
+
   const { open, ready } = usePlaidLink({
     token: linkToken,
-    onSuccess: async (publicToken, metadata) => {
-      if (!itemId) {
-        await postLink(metadata);
-        const accessTokenResponse = await postAccessToken(publicToken);
-        setAccessTokens((prev: AccessToken[]) => [
-          ...prev,
-          accessTokenResponse,
-        ]);
-      } else {
-        await updateItem(itemId, metadata);
-      }
-      refetch();
-    },
+    onSuccess,
   });
 
   const onClick = () => open();

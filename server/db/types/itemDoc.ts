@@ -5,4 +5,6 @@ export interface ItemDoc extends Doc<"item"> {
   access_token: string;
   needs_attention?: boolean;
   created_timestamp: Date;
+  institution_id: string;
+  institution_name: string;
 }

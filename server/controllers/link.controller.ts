@@ -5,9 +5,11 @@ import plaidClient from "../clients/plaidClient";
 import {
   createItem,
   findAllAccessTokens,
+  findByInstitutionId,
 } from "../db/repositories/item.repository";
 import { createLinkMetadata } from "../db/repositories/linkMetadata.repository";
 import { LinkTokenRequest } from "../types/linkTokenRequest";
+import { PlaidLinkOnSuccessMetadata } from "react-plaid-link";
 
 /** Creates a Link token. */
 export const createLinkToken = async (
@@ -47,19 +49,35 @@ export const getAllAccessTokens = async (req, res, next) => {
 };
 
 /** Exchanges the public token from Plaid Link for an access token */
-export const createAccessToken = async (req, res, next) => {
+export const createAccessToken = async (
+  req: Request<
+    {},
+    {},
+    { publicToken: string; metadata: PlaidLinkOnSuccessMetadata }
+  >,
+  res,
+  next
+) => {
   try {
+    const institutionId = req.body.metadata.institution.institution_id;
+    if ((await findByInstitutionId(institutionId)).length) {
+      const error = new Error(`Institution [${institutionId}] already linked`);
+      error.name = "DuplicateInstitutionError";
+      throw error;
+    }
     const exchangeResponse = await plaidClient.itemPublicTokenExchange({
-      public_token: req.body.public_token,
+      public_token: req.body.publicToken,
     });
     const exchangeResponseData = exchangeResponse.data;
     console.log(
-      `Successfully exchanged public token [${req.body.public_token}] for access token`
+      `Successfully exchanged public token [${req.body.publicToken}] for access token`
     );
-    await createItem(
-      exchangeResponseData.item_id,
-      exchangeResponseData.access_token
-    );
+    await createItem({
+      item_id: exchangeResponseData.item_id,
+      access_token: exchangeResponseData.access_token,
+      institution_id: req.body.metadata.institution.institution_id,
+      institution_name: req.body.metadata.institution.name,
+    });
     console.log(`Saved new item [${exchangeResponseData.item_id}] to database`);
     res.status(201).json({
       itemId: exchangeResponseData.item_id,

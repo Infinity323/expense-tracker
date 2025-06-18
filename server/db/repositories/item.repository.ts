@@ -13,18 +13,37 @@ export const findAllAccessTokens = async () => {
   return itemDocs.docs as ItemDoc[];
 };
 
-export const createItem = async (item_id, access_token) => {
+export const findByInstitutionId = async (institutionId) => {
+  await db.createIndex({
+    index: { fields: ["institution_id"] },
+  });
+  const itemDocs = await db.find({
+    selector: {
+      type: ITEM,
+      institution_id: institutionId,
+    },
+  });
+  return itemDocs.docs;
+};
+
+export const createItem = async ({
+  item_id,
+  access_token,
+  institution_id,
+  institution_name,
+}) => {
   return await db.put<ItemDoc>({
     _id: item_id,
     type: ITEM,
-    item_id: item_id,
-    access_token: access_token,
+    item_id,
+    access_token,
+    institution_id,
+    institution_name,
     created_timestamp: new Date(),
   });
 };
 
 export const findAll = async () => {
-  // TODO: return institution info
   const itemDocs = await db.find({
     selector: {
       type: ITEM,
@@ -38,7 +57,6 @@ export const updateAccounts = async (item_id, accounts) => {
   return await db.put<ItemDoc>({
     ...itemDoc,
     needs_attention: false,
-    accounts,
   });
 };
 

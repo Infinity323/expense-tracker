@@ -1,4 +1,4 @@
-import { Box, Heading, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Heading, Stack, Text } from "@chakra-ui/react";
 import React from "react";
 import InstitutionGroups from "../components/accounts/institution-groups/InstitutionGroups";
 import LaunchLink from "../components/launch-link/LaunchLink";
@@ -23,10 +23,14 @@ const AccountManagement: React.FC<AccountManagementProps> = (props) => {
       </Box>
       <InstitutionGroups />
       <Box>
-        {linkToken && (
+        {linkToken ? (
           <LaunchLink linkToken={linkToken} colorScheme="teal">
             Link Account
           </LaunchLink>
+        ) : (
+          <Button disabled isLoading colorScheme="teal">
+            Link Account
+          </Button>
         )}
       </Box>
     </Stack>

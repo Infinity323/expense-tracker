@@ -18,10 +18,10 @@ export const createLinkToken = async ({ queryKey }: any) => {
 export const getAccessTokens = async () =>
   await get<AccessToken[]>({ uri: `${LINK_API}/access-token` });
 
-export const postAccessToken = async (publicToken) =>
+export const postAccessToken = async (publicToken, metadata) =>
   await post<AccessToken>({
     uri: `${LINK_API}/access-token`,
-    data: { public_token: publicToken },
+    data: { publicToken, metadata },
   });
 
 export const postLink = async (metadata) =>
