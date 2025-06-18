@@ -87,15 +87,11 @@ const InstitutionCard: React.FC<InstitutionCardProps> = (props) => {
             )}
           </Box>
           <Spacer />
-          <Image
-            boxSize="100px"
-            src={
-              logo
-                ? `data:image/png;base64,${logo}`
-                : "https://placehold.co/100x100/png"
-            }
+          {logo && <Image
+            boxSize="75px"
+            src={`data:image/png;base64,${logo}`}
             alt="logo"
-          />
+          />}
         </Flex>
       </CardHeader>
       <CardBody>

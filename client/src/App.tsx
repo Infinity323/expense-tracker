@@ -1,11 +1,11 @@
-import { ChakraProvider } from "@chakra-ui/react";
-import { useEffect } from "react";
+import { ChakraProvider, Divider } from "@chakra-ui/react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
 import { UserProvider } from "./context/UserProvider";
 import { useTheme } from "./hooks/useTheme";
+import AccountManagement from "./pages/AccountManagement";
 import Accounts from "./pages/Accounts";
 import Budgets from "./pages/Budgets";
 import Home from "./pages/Home";
@@ -14,8 +14,6 @@ import Login from "./pages/Login";
 import Overview from "./pages/Overview";
 import Swagger from "./pages/Swagger";
 import Transactions from "./pages/Transactions";
-import { getAccessTokens } from "./services/linkService";
-import AccountManagement from "./pages/AccountManagement";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -24,21 +22,13 @@ const queryClient = new QueryClient({
 });
 
 function App() {
-  const loadAccessTokens = async () => {
-    let accessTokens = await getAccessTokens();
-    sessionStorage.setItem("accessTokens", JSON.stringify(accessTokens));
-  };
-
-  useEffect(() => {
-    loadAccessTokens();
-  }, []);
-
   return (
     <ChakraProvider theme={useTheme()}>
       <QueryClientProvider client={queryClient}>
         <UserProvider>
           <BrowserRouter>
             <Navbar />
+            <Divider />
             <main className="app-main">
               <Routes>
                 <Route path="/" Component={Home} />
@@ -49,9 +39,13 @@ function App() {
                 <Route path="/accounts" Component={Accounts} />
                 <Route path="/login" Component={Login} />
                 <Route path="/api" Component={Swagger} />
-                <Route path="/account-management" Component={AccountManagement} />
+                <Route
+                  path="/account-management"
+                  Component={AccountManagement}
+                />
               </Routes>
             </main>
+            <Divider />
             <Footer />
           </BrowserRouter>
         </UserProvider>

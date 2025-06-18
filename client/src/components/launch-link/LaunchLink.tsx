@@ -29,10 +29,10 @@ const LaunchLink: React.FC<LaunchLinkProps> = (props) => {
           ...prev,
           accessTokenResponse,
         ]);
-        refetch();
       } else {
         await updateItem(itemId, metadata);
       }
+      refetch();
     },
   });
 

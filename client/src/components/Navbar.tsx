@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   ButtonGroup,
+  Circle,
   Divider,
   Flex,
   Heading,
@@ -28,7 +29,9 @@ function Navbar() {
         <Box p="2" justifyContent="center">
           <Link to="/">
             <HStack>
-              <Icon as={FaChartLine} boxSize={6} marginRight={2} />
+              <Circle bg="teal" size="30px" marginRight={1} >
+                <Icon as={FaChartLine} color="white" boxSize={4}/>
+              </Circle>
               <Heading size="md" as="span">
                 Expense Tracker
               </Heading>
@@ -74,7 +77,6 @@ function Navbar() {
           </Menu>
         </ButtonGroup>
       </Flex>
-      <Divider borderColor="gray.400" />
     </Box>
   );
 }

@@ -16,7 +16,7 @@ import { Cell, Legend, Pie, PieChart, ResponsiveContainer } from "recharts";
 import { getCurrentMonthSpending } from "../../../services/trendsService";
 import { COLOR_MAP } from "../../../utils/ColorUtil";
 import { formatCurrency } from "../../../utils/CurrencyUtil";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 interface MonthlySpendingProps {}
 
@@ -27,7 +27,37 @@ const MonthlySpending: React.FC<MonthlySpendingProps> = (props) => {
   });
   const [showSubcategories, setShowSubcategories] = useState<boolean>(false);
 
+  const categoryData = useMemo(
+    () =>
+      expenses
+        ? Object.entries(
+            expenses?.reduce((acc, expense) => {
+              acc[expense.category] = acc[expense.category] || 0;
+              acc[expense.category] += expense.amount;
+              return acc;
+            }, {} as Record<string, number>)
+          ).map(([name, value]) => ({ name, value }))
+        : undefined,
+    [expenses]
+  );
+
+  const subcategoryData = useMemo(
+    () =>
+      expenses
+        ? Object.entries(
+            expenses?.reduce((acc, expense) => {
+              const key = `${expense.category}|${expense.subcategory}`
+              acc[key] = acc[key] || 0;
+              acc[key] += expense.amount;
+              return acc;
+            }, {} as Record<string, number>)
+          ).map(([name, value]) => ({ name, value }))
+        : undefined,
+    [expenses]
+  );
+
   const renderLabel = ({ value }) => formatCurrency(value);
+  const renderLegendText = (value: string) => showSubcategories ? value.split('|')[1] : value;
 
   if (isLoading) {
     return (
@@ -55,10 +85,7 @@ const MonthlySpending: React.FC<MonthlySpendingProps> = (props) => {
     );
   }
 
-  const data = expenses.map((expense) => ({
-    name: showSubcategories ? expense.subcategory : expense.category,
-    value: expense.amount,
-  }));
+  const data = showSubcategories ? subcategoryData : categoryData;
 
   return (
     <Card p="1.5rem" variant="outline">
@@ -70,26 +97,28 @@ const MonthlySpending: React.FC<MonthlySpendingProps> = (props) => {
           <FormLabel mb="0">Show by Subcategory</FormLabel>
           <Switch onChange={() => setShowSubcategories((prev) => !prev)} />
         </FormControl>
-        <Center width="100%" height="40vh">
+        <Center width="100%" height="500px">
           <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
+            <PieChart key={showSubcategories.toString()}>
               <Pie
                 dataKey="value"
                 isAnimationActive
                 data={data}
                 cx="50%"
                 cy="50%"
-                innerRadius={100}
-                outerRadius={120}
-                paddingAngle={5}
+                innerRadius={130}
+                outerRadius={150}
+                paddingAngle={10}
                 labelLine
                 label={renderLabel}
+                animationBegin={50}
+                animationDuration={500}
               >
                 {data.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLOR_MAP[entry.name]} />
                 ))}
               </Pie>
-              <Legend verticalAlign="bottom" />
+              <Legend verticalAlign="bottom" formatter={renderLegendText} />
             </PieChart>
           </ResponsiveContainer>
         </Center>

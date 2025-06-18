@@ -1,4 +1,4 @@
-import { Box, Skeleton, Text } from "@chakra-ui/react";
+import { Box, Card, CardBody, Skeleton, Text } from "@chakra-ui/react";
 import { useQuery } from "react-query";
 import {
   Bar,
@@ -59,11 +59,13 @@ function IncomeVsSpendingOverTime() {
 function CustomTooltip({ active, payload, label }: any) {
   if (active && payload && payload.length) {
     return (
-      <Box bg="white" rounded="md" boxShadow="md" padding="1rem">
-        <Text as="b">{dateToString(Number(label))}</Text>
-        <Text>Total Income: {formatCurrency(payload[0]?.value)}</Text>
-        <Text>Total Expenses: {formatCurrency(payload[1]?.value)}</Text>
-      </Box>
+      <Card>
+        <CardBody>
+          <Text as="b">{dateToString(Number(label))}</Text>
+          <Text>Total Income: {formatCurrency(payload[0]?.value)}</Text>
+          <Text>Total Expenses: {formatCurrency(payload[1]?.value)}</Text>
+        </CardBody>
+      </Card>
     );
   }
 }

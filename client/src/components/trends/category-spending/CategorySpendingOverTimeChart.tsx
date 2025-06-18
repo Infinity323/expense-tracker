@@ -1,4 +1,4 @@
-import { Box, Skeleton, Text } from "@chakra-ui/react";
+import { Box, Card, CardBody, Skeleton, Text } from "@chakra-ui/react";
 import { useQuery } from "react-query";
 import {
   Bar,
@@ -72,16 +72,18 @@ function CategorySpendingOverTimeChart() {
 function CustomTooltip({ active, payload, label }: any) {
   if (active && payload && payload.length) {
     return (
-      <Box bg="white" rounded="md" boxShadow="md" padding="1rem">
-        <Text as="b">{dateToString(Number(label))}</Text>
-        {payload
-          .sort((a, b) => b.value - a.value)
-          .map((data) => (
-            <Text color={COLOR_MAP[data.name]}>
-              {data.name}: {formatCurrency(data.value)}
-            </Text>
-          ))}
-      </Box>
+      <Card>
+        <CardBody>
+          <Text as="b">{dateToString(Number(label))}</Text>
+          {payload
+            .sort((a, b) => b.value - a.value)
+            .map((data) => (
+              <Text color={COLOR_MAP[data.name]}>
+                {data.name}: {formatCurrency(data.value)}
+              </Text>
+            ))}
+        </CardBody>
+      </Card>
     );
   }
 }
