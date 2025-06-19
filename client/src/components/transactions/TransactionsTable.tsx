@@ -9,7 +9,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect } from "react";
 import { useQuery } from "react-query";
-import { useModal } from "../../context/GlobalModalProvider";
+import { useLoadingModal } from "../../hooks/useLoadingModal";
 import { getTransactions } from "../../services/transactionService";
 import { formatCurrency } from "../../utils/CurrencyUtil";
 import DeleteTransaction from "./DeleteTransaction";
@@ -24,7 +24,7 @@ function TransactionsTable({ reload, setReload }) {
     queryKey: ["transactions"],
     queryFn: getTransactions,
   });
-  const { openModal, closeModal } = useModal();
+  useLoadingModal({ isLoading });
 
   useEffect(() => {
     if (reload) {
@@ -32,11 +32,6 @@ function TransactionsTable({ reload, setReload }) {
       setReload(false);
     }
   }, [reload, setReload, refetch]);
-
-  useEffect(() => {
-    if (isLoading) openModal("loading", { body: "Loading..." });
-    else closeModal("loading");
-  }, [isLoading]);
 
   return (
     <TableContainer>

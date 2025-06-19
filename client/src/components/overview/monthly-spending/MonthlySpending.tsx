@@ -1,5 +1,4 @@
 import {
-  Box,
   Card,
   CardBody,
   CardHeader,
@@ -11,12 +10,12 @@ import {
   Switch,
   Text,
 } from "@chakra-ui/react";
+import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer } from "recharts";
 import { getCurrentMonthSpending } from "../../../services/trendsService";
 import { COLOR_MAP } from "../../../utils/ColorUtil";
 import { formatCurrency } from "../../../utils/CurrencyUtil";
-import { useMemo, useState } from "react";
 
 interface MonthlySpendingProps {}
 

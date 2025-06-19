@@ -1,4 +1,4 @@
-import { Box, Card, CardBody, Skeleton, Text } from "@chakra-ui/react";
+import { Card, CardBody, Flex, Skeleton, Spacer, Text } from "@chakra-ui/react";
 import { useQuery } from "react-query";
 import {
   Bar,
@@ -8,7 +8,7 @@ import {
   ResponsiveContainer,
   Tooltip,
   XAxis,
-  YAxis
+  YAxis,
 } from "recharts";
 import { getIncomeVsExpenses } from "../../../services/trendsService";
 import { formatCurrency } from "../../../utils/CurrencyUtil";
@@ -30,44 +30,46 @@ function IncomeVsSpendingOverTime() {
           margin={{ top: 50, left: 50, right: 50, bottom: 50 }}
         >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis
-            dataKey="date"
-            tickFormatter={dateToMMMYYYY}
-          />
+          <XAxis dataKey="date" tickFormatter={dateToMMMYYYY} />
           <YAxis
             domain={["auto", "auto"]}
             tickFormatter={(value, _) => formatCurrency(value)}
           />
           <Legend />
-          <Tooltip content={<CustomTooltip />} />
-          <Bar
-            dataKey="Income"
-            stroke="green"
-            fill="green"
+          <Tooltip
+            content={<CustomTooltip />}
+            cursor={{ fill: "black", opacity: 0.2 }}
           />
-          <Bar
-            dataKey="Expenses"
-            stroke="red"
-            fill="red"
-          />
+          <Bar dataKey="Income" stroke="green" fill="green" />
+          <Bar dataKey="Expenses" stroke="red" fill="red" />
         </BarChart>
       )}
     </ResponsiveContainer>
   );
 }
 
-function CustomTooltip({ active, payload, label }: any) {
+const CustomTooltip = (props) => {
+  const { active, payload, label } = props;
+
   if (active && payload && payload.length) {
     return (
       <Card>
         <CardBody>
           <Text as="b">{dateToString(Number(label))}</Text>
-          <Text>Total Income: {formatCurrency(payload[0]?.value)}</Text>
-          <Text>Total Expenses: {formatCurrency(payload[1]?.value)}</Text>
+          <Flex color="green">
+            <Text>Income</Text>
+            <Spacer marginLeft={2} marginRight={2} />
+            <Text>{formatCurrency(payload[0]?.value)}</Text>
+          </Flex>
+          <Flex color="red">
+            <Text>Expenses</Text>
+            <Spacer marginLeft={2} marginRight={2} />
+            <Text>{formatCurrency(payload[1]?.value)}</Text>
+          </Flex>
         </CardBody>
       </Card>
     );
   }
-}
+};
 
 export default IncomeVsSpendingOverTime;

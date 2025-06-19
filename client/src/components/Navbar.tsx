@@ -4,7 +4,6 @@ import {
   Button,
   ButtonGroup,
   Circle,
-  Divider,
   Flex,
   Heading,
   HStack,
@@ -29,8 +28,8 @@ function Navbar() {
         <Box p="2" justifyContent="center">
           <Link to="/">
             <HStack>
-              <Circle bg="teal" size="30px" marginRight={1} >
-                <Icon as={FaChartLine} color="white" boxSize={4}/>
+              <Circle bg="teal" size="30px" marginRight={1}>
+                <Icon as={FaChartLine} color="white" boxSize={4} />
               </Circle>
               <Heading size="md" as="span">
                 Expense Tracker
@@ -66,7 +65,7 @@ function Navbar() {
           />
           <Menu>
             <MenuButton>
-              <Avatar name="Paul Lee" bg="teal" />
+              <Avatar name="Paul Lee" bg="teal" size="md" />
             </MenuButton>
             <MenuList>
               <MenuItem>Preferences</MenuItem>

@@ -9,7 +9,7 @@ import { useQuery } from "react-query";
 import { getAccessTokens } from "../services/linkService";
 import { AccessToken } from "../types/accessToken";
 
-interface UserContext {
+type UserContextType = {
   userInfo?: {
     userId: string;
     firstName: string;
@@ -17,14 +17,14 @@ interface UserContext {
   };
   accessTokens: AccessToken[];
   setAccessTokens: React.Dispatch<React.SetStateAction<AccessToken[]>>;
-}
+};
 
-const defaultUserContext: UserContext = {
+const defaultUserContext: UserContextType = {
   accessTokens: [],
   setAccessTokens: () => {},
 };
 
-const UserContext = createContext<UserContext>(defaultUserContext);
+const UserContext = createContext<UserContextType>(defaultUserContext);
 
 const useUserContext = () => useContext(UserContext);
 

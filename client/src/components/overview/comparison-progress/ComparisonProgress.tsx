@@ -17,7 +17,7 @@ const ComparisonProgress: React.FC<ComparisonProgressProps> = (props) => {
   };
 
   const calculateProgress = (expected, actual) => {
-    return Math.min((actual / expected) * 100, 100);
+    return Math.min((Math.max(actual, 0) / expected) * 100, 100);
   };
 
   return (

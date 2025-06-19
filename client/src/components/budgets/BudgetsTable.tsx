@@ -8,15 +8,15 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { useEffect } from "react";
-import { useModal } from "../../context/GlobalModalProvider";
 import { useBudgets } from "../../hooks/useBudgets";
+import { useLoadingModal } from "../../hooks/useLoadingModal";
 import { formatCurrency } from "../../utils/CurrencyUtil";
 import DeleteBudget from "./DeleteBudget";
 import EditBudget from "./EditBudget";
 
 function BudgetsTable({ reload, setReload }) {
   const { budgets, isLoading, refetch } = useBudgets();
-  const { openModal, closeModal } = useModal();
+  useLoadingModal({ isLoading });
 
   useEffect(() => {
     if (reload) {
@@ -24,11 +24,6 @@ function BudgetsTable({ reload, setReload }) {
       setReload(false);
     }
   }, [reload, setReload, refetch]);
-
-  useEffect(() => {
-    if (isLoading) openModal("loading", { body: "Loading..." });
-    else closeModal("loading");
-  }, [isLoading]);
 
   return (
     <TableContainer>
