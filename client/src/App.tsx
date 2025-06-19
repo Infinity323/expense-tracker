@@ -14,6 +14,7 @@ import Login from "./pages/Login";
 import Overview from "./pages/Overview";
 import Swagger from "./pages/Swagger";
 import Transactions from "./pages/Transactions";
+import { GlobalModalProvider } from "./context/GlobalModalProvider";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -25,30 +26,32 @@ function App() {
   return (
     <ChakraProvider theme={useTheme()}>
       <QueryClientProvider client={queryClient}>
-        <UserProvider>
-          <BrowserRouter>
-            <Navbar />
-            <Divider />
-            <main className="app-main">
-              <Routes>
-                <Route path="/" Component={Home} />
-                <Route path="/overview" Component={Overview} />
-                <Route path="/insights" Component={Insights} />
-                <Route path="/budgets" Component={Budgets} />
-                <Route path="/transactions" Component={Transactions} />
-                <Route path="/accounts" Component={Accounts} />
-                <Route path="/login" Component={Login} />
-                <Route path="/api" Component={Swagger} />
-                <Route
-                  path="/account-management"
-                  Component={AccountManagement}
-                />
-              </Routes>
-            </main>
-            <Divider />
-            <Footer />
-          </BrowserRouter>
-        </UserProvider>
+        <GlobalModalProvider>
+          <UserProvider>
+            <BrowserRouter>
+              <Navbar />
+              <Divider />
+              <main className="app-main">
+                <Routes>
+                  <Route path="/" Component={Home} />
+                  <Route path="/overview" Component={Overview} />
+                  <Route path="/insights" Component={Insights} />
+                  <Route path="/budgets" Component={Budgets} />
+                  <Route path="/transactions" Component={Transactions} />
+                  <Route path="/accounts" Component={Accounts} />
+                  <Route path="/login" Component={Login} />
+                  <Route path="/api" Component={Swagger} />
+                  <Route
+                    path="/account-management"
+                    Component={AccountManagement}
+                  />
+                </Routes>
+              </main>
+              <Divider />
+              <Footer />
+            </BrowserRouter>
+          </UserProvider>
+        </GlobalModalProvider>
       </QueryClientProvider>
     </ChakraProvider>
   );

@@ -7,6 +7,7 @@ import {
   Flex,
   Heading,
   Image,
+  Skeleton,
   Spacer,
   Stack,
   StackDivider,
@@ -50,15 +51,19 @@ const AccountListCard: React.FC<AccountListCardProps> = (props) => {
               return (
                 <Flex gap={5}>
                   <Center>
-                    <Image
-                      boxSize="50px"
-                      src={
-                        logo
-                          ? `data:image/png;base64,${logo}`
-                          : "https://placehold.co/50x50/png"
-                      }
-                      alt="logo"
-                    />
+                    {logo === undefined ? (
+                      <Skeleton boxSize="50px" />
+                    ) : (
+                      <Image
+                        boxSize="50px"
+                        src={
+                          logo
+                            ? `data:image/png;base64,${logo}`
+                            : "https://placehold.co/50x50/png"
+                        }
+                        alt="logo"
+                      />
+                    )}
                   </Center>
                   <Box>
                     <Text fontWeight="semibold">{account.name}</Text>

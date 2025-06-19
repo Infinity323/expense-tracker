@@ -6,6 +6,7 @@ import { useAccounts } from "../../hooks/useAccounts";
 import { updateItem } from "../../services/itemService";
 import { postAccessToken } from "../../services/linkService";
 import { AccessToken } from "../../types/accessToken";
+import { useModal } from "../../context/GlobalModalProvider";
 
 interface LaunchLinkProps {
   children: ReactNode;
@@ -18,11 +19,25 @@ const LaunchLink: React.FC<LaunchLinkProps> = (props) => {
   const { linkToken, children, itemId, colorScheme } = props;
   const { setAccessTokens } = useUserContext();
   const { refetch } = useAccounts();
+  const { openModal } = useModal();
 
   const onSuccess = async (publicToken, metadata) => {
     if (!itemId) {
-      const accessTokenResponse = await postAccessToken(publicToken, metadata);
-      setAccessTokens((prev: AccessToken[]) => [...prev, accessTokenResponse]);
+      try {
+        const accessTokenResponse = await postAccessToken(
+          publicToken,
+          metadata
+        );
+        setAccessTokens((prev: AccessToken[]) => [
+          ...prev,
+          accessTokenResponse,
+        ]);
+      } catch {
+        openModal("alert", {
+          header: "Error",
+          body: "The same institution cannot be linked more than once. Please update the existing institution link instead.",
+        });
+      }
     } else {
       await updateItem(itemId, metadata);
     }

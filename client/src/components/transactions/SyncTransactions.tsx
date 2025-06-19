@@ -42,13 +42,8 @@ function SyncTransactions({ setReload }) {
       }
     }
     refreshOnClose();
+    setReload(true);
   };
-
-  useEffect(() => {
-    if (!errorIsOpen) {
-      setReload(true);
-    }
-  }, [errorIsOpen]);
 
   return (
     <>

@@ -22,6 +22,7 @@ import { useCreateLinkToken } from "../../../hooks/useCreateLinkToken";
 import LaunchLink from "../../launch-link/LaunchLink";
 import { useMutation } from "react-query";
 import { deleteItem } from "../../../services/itemService";
+import { useModal } from "../../../context/GlobalModalProvider";
 
 interface InstitutionCardProps {
   group: AccountResponse;
@@ -43,12 +44,22 @@ const InstitutionCard: React.FC<InstitutionCardProps> = (props) => {
     mutationFn: deleteItem,
     onSuccess: refetch,
   });
+  const { openModal } = useModal();
 
   const institutionName = institution.name;
   const logo = institution.logo;
   const color = institution.primary_color;
 
-  const onUnlink = () => mutate(group.item_id);
+  const onUnlink = () => {
+    openModal("confirmation", {
+      header: "Unlink Institution",
+      body: `Are you sure you want to unlink ${institutionName}? This will remove all accounts associated with this institution.`,
+      confirmButton: {
+        label: "Unlink",
+        callback: () => mutate(group.item_id),
+      },
+    });
+  };
 
   return (
     <Card p="1.5rem" variant="outline">

@@ -8,21 +8,22 @@ import {
   ModalOverlay,
   Spinner,
   Text,
-  useDisclosure,
   VStack,
 } from "@chakra-ui/react";
-import { useEffect } from "react";
+import React from "react";
+import { useModal } from "../../context/GlobalModalProvider";
+import { ModalProps } from "../../types/modalProps";
 
-function LoadingModal({ isLoading }) {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+export interface LoadingModalProps {
+  body: string;
+}
 
-  useEffect(() => {
-    if (isLoading) {
-      onOpen();
-    } else {
-      onClose();
-    }
-  }, [isLoading, onOpen, onClose]);
+const LoadingModal: React.FC<ModalProps> = (props) => {
+  const { isOpen, onClose } = props;
+
+  const { props: modalProps } = useModal() as {
+    props?: LoadingModalProps;
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
@@ -33,7 +34,7 @@ function LoadingModal({ isLoading }) {
           <Center>
             <VStack>
               <Spinner color="teal" size="lg" />
-              <Text fontWeight="semibold">Loading...</Text>
+              <Text fontWeight="semibold">{modalProps?.body}</Text>
             </VStack>
           </Center>
         </ModalBody>
@@ -41,6 +42,6 @@ function LoadingModal({ isLoading }) {
       </ModalContent>
     </Modal>
   );
-}
+};
 
 export default LoadingModal;

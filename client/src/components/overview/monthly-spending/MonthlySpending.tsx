@@ -36,7 +36,9 @@ const MonthlySpending: React.FC<MonthlySpendingProps> = (props) => {
               acc[expense.category] += expense.amount;
               return acc;
             }, {} as Record<string, number>)
-          ).map(([name, value]) => ({ name, value }))
+          )
+            .map(([name, value]) => ({ name, value }))
+            .filter((entry) => entry.value > 0)
         : undefined,
     [expenses]
   );
@@ -46,18 +48,21 @@ const MonthlySpending: React.FC<MonthlySpendingProps> = (props) => {
       expenses
         ? Object.entries(
             expenses?.reduce((acc, expense) => {
-              const key = `${expense.category}|${expense.subcategory}`
+              const key = `${expense.category}|${expense.subcategory}`;
               acc[key] = acc[key] || 0;
               acc[key] += expense.amount;
               return acc;
             }, {} as Record<string, number>)
-          ).map(([name, value]) => ({ name, value }))
+          )
+            .map(([name, value]) => ({ name, value }))
+            .filter((entry) => entry.value > 0)
         : undefined,
     [expenses]
   );
 
   const renderLabel = ({ value }) => formatCurrency(value);
-  const renderLegendText = (value: string) => showSubcategories ? value.split('|')[1] : value;
+  const renderLegendText = (value: string) =>
+    showSubcategories ? value.split("|")[1] : value;
 
   if (isLoading) {
     return (
