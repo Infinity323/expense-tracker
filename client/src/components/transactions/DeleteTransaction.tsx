@@ -14,13 +14,13 @@ import {
 import { FaRegTrashCan } from "react-icons/fa6";
 import { deleteTransaction } from "../../services/transactionService";
 
-function DeleteTransaction({ transactionDoc: transaction, onDelete }) {
+function DeleteTransaction({ transactionDoc: transaction, refetch }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const removeTransaction = async (event) => {
     event.preventDefault();
     await deleteTransaction(transaction._id);
-    onDelete();
+    refetch();
   };
 
   return (

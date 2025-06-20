@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  HStack,
   Icon,
   Modal,
   ModalBody,

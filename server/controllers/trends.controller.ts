@@ -197,8 +197,8 @@ export const getIncomeVsExpenses = async (req, res, next) => {
     new Map(Object.entries(comparisonMap)).forEach((totals: any, date) => {
       let dateResult = {
         date: date,
-        Income: totals.income,
-        Expenses: totals.expenses,
+        Income: totals.income || 0,
+        Expenses: totals.expenses || 0,
       };
       results.push(dateResult);
     });

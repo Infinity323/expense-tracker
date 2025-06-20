@@ -30,6 +30,11 @@ const ConfirmationModal: React.FC<ModalProps> = (props) => {
     props?: ConfirmationModalProps;
   };
 
+  const onConfirm = () => {
+    onClose();
+    modalProps?.confirmButton.callback();
+  };
+
   return (
     <AlertDialog
       leastDestructiveRef={cancelRef}
@@ -46,7 +51,7 @@ const ConfirmationModal: React.FC<ModalProps> = (props) => {
           <Button ref={cancelRef} onClick={onClose}>
             Cancel
           </Button>
-          <Button colorScheme="red" ml={3}>
+          <Button colorScheme="red" ml={3} onClick={onConfirm}>
             {modalProps?.confirmButton?.label}
           </Button>
         </AlertDialogFooter>

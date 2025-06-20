@@ -62,10 +62,13 @@ function TransactionsTable({ reload, setReload }) {
                 </Td>
                 <Td isNumeric>{formatCurrency(transaction.amount)}</Td>
                 <Td padding="0">
-                  <EditTransaction transactionDoc={transaction} />
+                  <EditTransaction
+                    transactionDoc={transaction}
+                    refetch={refetch}
+                  />
                   <DeleteTransaction
                     transactionDoc={transaction}
-                    onDelete={refetch}
+                    refetch={refetch}
                   />
                 </Td>
               </Tr>

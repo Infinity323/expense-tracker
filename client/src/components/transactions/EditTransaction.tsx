@@ -20,7 +20,7 @@ import { FaPencil } from "react-icons/fa6";
 import { putTransaction } from "../../services/transactionService";
 import BudgetsSelect from "../budgets/BudgetsSelect";
 
-function EditTransaction({ transactionDoc }) {
+function EditTransaction({ transactionDoc, refetch }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [date, setDate] = useState(transactionDoc.date);
@@ -44,6 +44,7 @@ function EditTransaction({ transactionDoc }) {
       subcategory,
       amount,
     });
+    refetch();
     onClose();
   };
 
