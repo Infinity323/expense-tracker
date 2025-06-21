@@ -1,33 +1,29 @@
-import axios from "axios";
+import { TransactionDoc } from "@backend/db/types/transactionDoc";
+import { delete_, get, post, put } from "./httpService";
 
 const TRANSACTION_API = "/api/transaction";
 
-export const getTransactions = async () => {
-  const response = await axios.get(TRANSACTION_API);
-  return response.data;
+export const getTransactions = async ({ queryKey }) => {
+  const [, { month }] = queryKey;
+  return await get<TransactionDoc[]>({
+    uri: TRANSACTION_API,
+    params: { month },
+  });
 };
 
 export const postTransaction = async (transaction) => {
-  const response = await axios.post(TRANSACTION_API, transaction);
-  return response.data;
+  return await post({ uri: TRANSACTION_API, data: transaction });
 };
 
 export const putTransaction = async (transactionDoc) => {
-  const response = await axios.put(TRANSACTION_API, transactionDoc);
-  return response.data;
+  return await put({ uri: TRANSACTION_API, data: transactionDoc });
 };
 
-export const syncTransactions = async (itemId, accessToken) => {
-  const headers = {
-    access_token: accessToken,
-  };
-  const response = await axios.put(`${TRANSACTION_API}/sync/${itemId}`, {
-    headers: headers,
+export const syncTransactions = async (itemId, accessToken) =>
+  await put({
+    uri: `${TRANSACTION_API}/sync/${itemId}`,
+    data: { access_token: accessToken },
   });
-  return response.data;
-};
 
-export const deleteTransaction = async (id) => {
-  const response = await axios.delete(`${TRANSACTION_API}/${id}`);
-  return response.data;
-};
+export const deleteTransaction = async (id) =>
+  await delete_({ uri: `${TRANSACTION_API}/${id}` });

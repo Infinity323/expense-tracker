@@ -11,12 +11,17 @@ import {
   deleteAll,
   deleteById,
   findAllTransactions,
+  findByMonth,
   updateTransaction,
 } from "../db/repositories/transaction.repository";
+import { Request } from "express";
 
-export const getAllTransactions = async (req, res, next) => {
+export const getAllTransactions = async (req: Request, res, next) => {
   try {
-    const transactionDocs = await findAllTransactions();
+    const month = req.query.month;
+    const transactionDocs = month
+      ? await findByMonth(month)
+      : await findAllTransactions();
     console.log(
       `Retrieved ${transactionDocs.length} transactions from the database`
     );
@@ -82,7 +87,7 @@ export const syncTransactions = async (req, res, next) => {
     let hasMore = true;
     while (hasMore) {
       const response = await plaidClient.transactionsSync({
-        access_token: req.body.headers.access_token,
+        access_token: req.body.access_token,
         cursor: cursor,
       });
       const data = response.data;

@@ -15,16 +15,17 @@ import { formatCurrency } from "../../utils/CurrencyUtil";
 import DeleteTransaction from "./DeleteTransaction";
 import EditTransaction from "./EditTransaction";
 
-function TransactionsTable({ reload, setReload }) {
+function TransactionsTable({ reload, setReload, month }) {
   const {
     data: transactions,
     isLoading,
     refetch,
+    isRefetching,
   } = useQuery({
-    queryKey: ["transactions"],
+    queryKey: ["transactions", { month }],
     queryFn: getTransactions,
   });
-  useLoadingModal({ isLoading });
+  useLoadingModal({ isLoading: isLoading || isRefetching });
 
   useEffect(() => {
     if (reload) {

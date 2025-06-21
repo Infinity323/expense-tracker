@@ -1,11 +1,21 @@
-import { Box, Heading, Stack, Text } from "@chakra-ui/react";
+import {
+  Box,
+  ButtonGroup,
+  FormControl,
+  FormLabel,
+  Heading,
+  Input,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 import { useState } from "react";
 import AddTransaction from "../components/transactions/AddTransaction";
 import SyncTransactions from "../components/transactions/SyncTransactions";
 import TransactionsTable from "../components/transactions/TransactionsTable";
 
 function Transactions() {
-  const [reload, setReload] = useState(false);
+  const [reload, setReload] = useState<boolean>(false);
+  const [month, setMonth] = useState<string>();
 
   return (
     <Stack spacing="3rem">
@@ -15,11 +25,22 @@ function Transactions() {
         </Heading>
         <Text>All transactions across all linked accounts</Text>
       </Box>
-      <TransactionsTable reload={reload} setReload={setReload} />
-      <Stack direction="row" spacing={4}>
+      <Box width="266px">
+        <FormControl>
+          <FormLabel>Filter by Month</FormLabel>
+          <Input
+            type="month"
+            value={month}
+            onChange={(e) => setMonth(e.target.value)}
+            placeholder="Month"
+          />
+        </FormControl>
+      </Box>
+      <TransactionsTable reload={reload} setReload={setReload} month={month} />
+      <ButtonGroup spacing={4}>
         <AddTransaction setReload={setReload} />
         <SyncTransactions setReload={setReload} />
-      </Stack>
+      </ButtonGroup>
     </Stack>
   );
 }
