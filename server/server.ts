@@ -1,28 +1,29 @@
-import * as dotenv from "dotenv";
-
 import bodyParser from "body-parser";
+import * as dotenv from "dotenv";
 import express from "express";
+import expressPouchDb from "express-pouchdb";
 import { mkdirp } from "mkdirp";
+import path from "path";
 import PouchDB from "pouchdb";
-
-import swaggerSpec from "./middleware/swagger";
-import accountRouter from "./routes/account.routes";
-import budgetRouter from "./routes/budget.routes";
-import linkRouter from "./routes/link.routes";
-import transactionRouter from "./routes/transaction.routes";
-import trendsRouter from "./routes/trends.routes";
-
+import { fileURLToPath } from "url";
 import {
   clientErrorHandler,
   defaultErrorHandler,
   validationErrorHandler,
 } from "./middleware/errorHandler";
-
-import expressPouchDb from "express-pouchdb";
-import itemRouter from "./routes/item.routes";
+import swaggerSpec from "./middleware/swagger";
+import accountRouter from "./routes/account.routes";
+import budgetRouter from "./routes/budget.routes";
 import institutionRouter from "./routes/institution.routes";
+import itemRouter from "./routes/item.routes";
+import linkRouter from "./routes/link.routes";
+import transactionRouter from "./routes/transaction.routes";
+import trendsRouter from "./routes/trends.routes";
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
@@ -78,6 +79,12 @@ app.use("/api/institution", institutionRouter);
 app.use(validationErrorHandler);
 app.use(clientErrorHandler);
 app.use(defaultErrorHandler);
+
+// serve static React build
+app.use(express.static(path.join(__dirname, "../client/build")));
+app.get("*", (req, res, next) => {
+  res.sendFile(path.join(__dirname, "../client/build/index.html"));
+});
 
 app.listen(process.env.SERVER_PORT || 8080, () => {
   console.log(`Server is running on port ${process.env.SERVER_PORT}`);

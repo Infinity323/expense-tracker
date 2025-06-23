@@ -6,6 +6,8 @@ Account transaction data provided by the [Plaid API](https://plaid.com/docs/).
 
 ## How to Run
 
+### Development
+
 ```bash
 # ./client
 npm start
@@ -13,6 +15,20 @@ npm start
 # ./server
 tsx server.ts
 ```
+
+App will be available at http://localhost:3000.
+
+### Production
+
+```bash
+# ./client
+npm run build
+
+# ./server
+tsx server.ts
+```
+
+App will be available at http://localhost:8080.
 
 ## Screenshots
 
