@@ -32,7 +32,7 @@ App will be available at http://localhost:8080.
 
 ## Screenshots
 
-![Overview](client/src/assets/images/overview.png)
-![Insights](client/src/assets/images/insights.png)
-![Transactions](client/src/assets/images/transactions.png)
-![Accounts](client/src/assets/images/accounts.png)
+![Overview](client/public/assets/images/overview.png)
+![Insights](client/public/assets/images/insights.png)
+![Transactions](client/public/assets/images/transactions.png)
+![Accounts](client/public/assets/images/accounts.png)
