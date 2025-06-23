@@ -16,7 +16,7 @@ import {
   Spacer,
   useColorMode,
 } from "@chakra-ui/react";
-import { FaChartLine, FaMoon, FaSun } from "react-icons/fa6";
+import { FaChartLine, FaGithub, FaMoon, FaSun } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 
 function Navbar() {
@@ -57,24 +57,37 @@ function Navbar() {
           </ButtonGroup>
         </Box>
         <Spacer />
-        <ButtonGroup gap="2" alignItems="center">
+        <ButtonGroup
+          gap={2}
+          alignItems="center"
+          variant="ghost"
+          colorScheme="grayAlpha" // TODO
+          marginRight={5}
+        >
+          <Link
+            to="https://github.com/Infinity323/expense-tracker"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <IconButton aria-label="GitHub" icon={<FaGithub />} />
+          </Link>
           <IconButton
             aria-label="toggle mode"
             icon={colorMode === "light" ? <FaMoon /> : <FaSun />}
             onClick={toggleColorMode}
           />
-          <Menu>
-            <MenuButton>
-              <Avatar name="Paul Lee" bg="teal" size="md" />
-            </MenuButton>
-            <MenuList>
-              <MenuItem>Preferences</MenuItem>
-              <MenuItem>
-                <Link to="/account-management">Manage Accounts</Link>
-              </MenuItem>
-            </MenuList>
-          </Menu>
         </ButtonGroup>
+        <Menu>
+          <MenuButton>
+            <Avatar bg="teal" size="sm" />
+          </MenuButton>
+          <MenuList>
+            <MenuItem>Preferences</MenuItem>
+            <MenuItem>
+              <Link to="/account-management">Manage Accounts</Link>
+            </MenuItem>
+          </MenuList>
+        </Menu>
       </Flex>
     </Box>
   );
