@@ -4,6 +4,7 @@ import {
   CardBody,
   CardHeader,
   Center,
+  Circle,
   Flex,
   Heading,
   Image,
@@ -53,14 +54,12 @@ const AccountListCard: React.FC<AccountListCardProps> = (props) => {
                   <Center>
                     {logo === undefined ? (
                       <Skeleton boxSize="50px" />
+                    ) : logo === null ? (
+                      <Circle size="50px" />
                     ) : (
                       <Image
                         boxSize="50px"
-                        src={
-                          logo
-                            ? `data:image/png;base64,${logo}`
-                            : "https://placehold.co/50x50/png"
-                        }
+                        src={`data:image/png;base64,${logo}`}
                         alt="logo"
                       />
                     )}

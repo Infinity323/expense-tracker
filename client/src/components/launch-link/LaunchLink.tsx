@@ -12,6 +12,7 @@ import { updateItem } from "../../services/itemService";
 import { postAccessToken } from "../../services/linkService";
 import { AccessToken } from "../../types/accessToken";
 import { useModal } from "../../context/GlobalModalProvider";
+import { useLinkedInstitutions } from "../../hooks/useLinkedInstitutions";
 
 interface LaunchLinkProps {
   children: ReactNode;
@@ -23,7 +24,8 @@ interface LaunchLinkProps {
 const LaunchLink: React.FC<LaunchLinkProps> = (props) => {
   const { linkToken, children, itemId, colorScheme } = props;
   const { setAccessTokens } = useUserContext();
-  const { refetch } = useAccounts();
+  const { refetch: refetchAccounts } = useAccounts();
+  const { refetch: refetchInstitutions } = useLinkedInstitutions();
   const { openModal } = useModal();
 
   const onSuccess = useCallback<PlaidLinkOnSuccess>(
@@ -48,9 +50,10 @@ const LaunchLink: React.FC<LaunchLinkProps> = (props) => {
       } else {
         await updateItem(itemId, metadata);
       }
-      refetch();
+      refetchAccounts();
+      refetchInstitutions();
     },
-    [itemId, openModal, refetch, setAccessTokens]
+    [itemId, openModal, refetchAccounts, refetchInstitutions, setAccessTokens]
   );
 
   const onExit = useCallback<PlaidLinkOnExit>(

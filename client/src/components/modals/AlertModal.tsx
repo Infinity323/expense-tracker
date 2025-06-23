@@ -1,6 +1,6 @@
 import {
-  Box,
   Button,
+  HStack,
   Icon,
   Modal,
   ModalBody,
@@ -9,7 +9,6 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Stack,
   Text,
 } from "@chakra-ui/react";
 import {
@@ -38,8 +37,8 @@ const AlertModal: React.FC<ModalProps> = (props) => {
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />
       <ModalContent>
-        <Stack direction="row" spacing={0}>
-          <ModalHeader>
+        <ModalHeader>
+          <HStack>
             {modalProps?.status && (
               <Icon
                 as={
@@ -60,23 +59,20 @@ const AlertModal: React.FC<ModalProps> = (props) => {
                     ? "green"
                     : "blue"
                 }
-                boxSize={10}
+                boxSize={8}
+                marginRight={1}
               />
             )}
-          </ModalHeader>
-          <Box>
-            <ModalHeader>
-              <Text>{modalProps?.header}</Text>
-            </ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>{modalProps?.body}</ModalBody>
-            <ModalFooter>
-              <Button mr={3} onClick={onClose}>
-                Close
-              </Button>
-            </ModalFooter>
-          </Box>
-        </Stack>
+            <Text>{modalProps?.header}</Text>
+          </HStack>
+        </ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>{modalProps?.body}</ModalBody>
+        <ModalFooter>
+          <Button mr={3} onClick={onClose}>
+            Close
+          </Button>
+        </ModalFooter>
       </ModalContent>
     </Modal>
   );

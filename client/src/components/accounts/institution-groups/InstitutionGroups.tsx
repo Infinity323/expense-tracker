@@ -25,7 +25,11 @@ const InstitutionGroups: React.FC = () => {
         const institution = institutions.find(
           (institution) =>
             institution.institution.institution_id === group.institution_id
-        ).institution;
+        )?.institution;
+        if (!institution) {
+          return null;
+        }
+
         const accessToken = accessTokens.find(
           (accessToken) => accessToken.itemId === group.item_id
         ).accessToken;
