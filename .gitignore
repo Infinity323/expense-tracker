@@ -11,6 +11,7 @@ coverage
 # production
 build
 dist
+.swc
 
 # misc
 .DS_Store
