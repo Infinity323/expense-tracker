@@ -82,9 +82,9 @@ app.use(clientErrorHandler);
 app.use(defaultErrorHandler);
 
 // serve static React build
-app.use(express.static(path.join(__dirname, "../client/build")));
+app.use(express.static(path.join(__dirname, "../../client/build")));
 app.get("*", (req, res, next) => {
-  res.sendFile(path.join(__dirname, "../client/build/index.html"));
+  res.sendFile(path.join(__dirname, "../../client/build/index.html"));
 });
 
 app.listen(process.env.SERVER_PORT || 8080, () => {
