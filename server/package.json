@@ -17,9 +17,17 @@
     "swagger-jsdoc": "^6.2.8"
   },
   "devDependencies": {
+    "@swc/cli": "^0.7.7",
+    "@swc/core": "^1.12.6",
+    "@swc/plugin-transform-imports": "^8.0.3",
     "@types/node": "^24.0.0",
     "@types/pouchdb": "^6.4.2",
     "tsx": "^4.19.4"
+  },
+  "scripts": {
+    "start": "tsx index.ts",
+    "build": "npx swc . -d dist",
+    "build:ci": "tsc && npm run build"
   },
   "type": "module"
 }

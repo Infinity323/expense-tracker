@@ -1,5 +1,5 @@
 import bodyParser from "body-parser";
-import * as dotenv from "dotenv";
+import dotenv from "dotenv";
 import express from "express";
 import expressPouchDb from "express-pouchdb";
 import { mkdirp } from "mkdirp";

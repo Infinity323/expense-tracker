@@ -1,0 +1,35 @@
+{
+  "exclude": "node_modules/",
+  "jsc": {
+    "parser": {
+      "syntax": "typescript",
+      "topLevelAwait": true
+    },
+    "target": "esnext",
+    "baseUrl": ".",
+    "paths": {
+      "*": [
+        "./*.js"
+      ]
+    },
+    "experimental": {
+      "plugins": [
+        [
+          "@swc/plugin-transform-imports",
+          {
+            "^(\\.?\\.?/.*|@/[^/]*)(/.*)?$": {
+              "skipDefaultConversion": true,
+              "preventFullImport": true,
+              "handleDefaultImport": true,
+              "handleNamespaceImport": true,
+              "transform": "{{matches.[1]}}{{matches.[2]}}.js"
+            }
+          }
+        ]
+      ]
+    }
+  },
+  "module": {
+    "type": "nodenext"
+  }
+}
