@@ -6,6 +6,7 @@ import { mkdirp } from "mkdirp";
 import path from "path";
 import PouchDB from "pouchdb";
 import { fileURLToPath } from "url";
+import authorizeUser from "./middleware/authorizeUser";
 import {
   clientErrorHandler,
   defaultErrorHandler,
@@ -55,7 +56,7 @@ console.log = function (message) {
 };
 
 // "request interceptor"
-app.use("/api/", (req, res, next) => {
+app.use("/api/", authorizeUser, (req, res, next) => {
   console.log(`Received ${req.method} request for ${req.url}`);
   next();
 });

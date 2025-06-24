@@ -8,13 +8,9 @@ import {
 import { useQuery } from "react-query";
 import { getAccessTokens } from "../services/linkService";
 import { AccessToken } from "../types/accessToken";
+import { useAuth } from "react-oidc-context";
 
 type UserContextType = {
-  userInfo?: {
-    userId: string;
-    firstName: string;
-    lastName: string;
-  };
   accessTokens: AccessToken[];
   setAccessTokens: React.Dispatch<React.SetStateAction<AccessToken[]>>;
 };
@@ -29,16 +25,13 @@ const UserContext = createContext<UserContextType>(defaultUserContext);
 const useUserContext = () => useContext(UserContext);
 
 const UserProvider = ({ children }: { children: ReactNode }) => {
+  const { isAuthenticated } = useAuth();
+
   const { data } = useQuery({
     queryKey: ["accessTokens"],
     queryFn: getAccessTokens,
+    enabled: isAuthenticated,
   });
-
-  const userInfo = {
-    userId: "test",
-    firstName: "First",
-    lastName: "Last",
-  };
 
   const [accessTokens, setAccessTokens] = useState<AccessToken[]>();
 
@@ -49,7 +42,7 @@ const UserProvider = ({ children }: { children: ReactNode }) => {
   }, [data]);
 
   return (
-    <UserContext.Provider value={{ userInfo, accessTokens, setAccessTokens }}>
+    <UserContext.Provider value={{ accessTokens, setAccessTokens }}>
       {children}
     </UserContext.Provider>
   );

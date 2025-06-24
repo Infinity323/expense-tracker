@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 
 import { CountryCode, Products } from "plaid";
+import { PlaidLinkOnSuccessMetadata } from "react-plaid-link";
 import plaidClient from "../clients/plaidClient";
 import {
   createItem,
@@ -9,7 +10,7 @@ import {
 } from "../db/repositories/item.repository";
 import { createLinkMetadata } from "../db/repositories/linkMetadata.repository";
 import { LinkTokenRequest } from "../types/linkTokenRequest";
-import { PlaidLinkOnSuccessMetadata } from "react-plaid-link";
+import { getUserId } from "../utils/authUtil";
 
 /** Creates a Link token. */
 export const createLinkToken = async (
@@ -18,15 +19,17 @@ export const createLinkToken = async (
   next: NextFunction
 ) => {
   try {
+    // const userId = getUserId(req);
+    const userId = "test";
     const tokenResponse = await plaidClient.linkTokenCreate({
-      user: { client_user_id: req.body.userId },
+      user: { client_user_id: userId },
       client_name: "Expense Tracker",
       language: "en",
       products: [Products.Transactions],
       country_codes: [CountryCode.Us],
       access_token: req.body.accessToken,
     });
-    console.log(`Successfully created link token for user ${req.body.userId}`);
+    console.log(`Successfully created link token for user ${userId}`);
     res.json(tokenResponse.data);
   } catch (err) {
     next(err);

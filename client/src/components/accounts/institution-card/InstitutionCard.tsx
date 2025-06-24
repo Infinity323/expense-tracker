@@ -27,7 +27,6 @@ import { Institution } from "plaid";
 import { FaCircleExclamation } from "react-icons/fa6";
 import { useMutation } from "react-query";
 import { useModal } from "../../../context/GlobalModalProvider";
-import { useUserContext } from "../../../context/UserProvider";
 import { useCreateLinkToken } from "../../../hooks/useCreateLinkToken";
 import { deleteItem } from "../../../services/itemService";
 import { formatCurrency } from "../../../utils/CurrencyUtil";
@@ -41,11 +40,7 @@ interface InstitutionCardProps {
 
 const InstitutionCard: React.FC<InstitutionCardProps> = (props) => {
   const { group, institution, accessToken, refetch } = props;
-  const {
-    userInfo: { userId },
-  } = useUserContext();
   const linkToken = useCreateLinkToken({
-    userId,
     accessToken,
   });
   const { mutate, isLoading } = useMutation({

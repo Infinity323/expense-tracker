@@ -5,11 +5,10 @@ import { get, post } from "./httpService";
 const LINK_API = "/api/link";
 
 export const createLinkToken = async ({ queryKey }: any) => {
-  const [, { userId, accessToken }] = queryKey;
+  const [, { accessToken }] = queryKey;
   return await post<LinkTokenCreateResponse>({
     uri: `${LINK_API}/link-token`,
     data: {
-      userId,
       accessToken,
     },
   });

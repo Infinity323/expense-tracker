@@ -2,16 +2,12 @@ import { Box, Button, Heading, Stack, Text } from "@chakra-ui/react";
 import React from "react";
 import InstitutionGroups from "../components/accounts/institution-groups/InstitutionGroups";
 import LaunchLink from "../components/launch-link/LaunchLink";
-import { useUserContext } from "../context/UserProvider";
 import { useCreateLinkToken } from "../hooks/useCreateLinkToken";
 
 interface AccountManagementProps {}
 
 const AccountManagement: React.FC<AccountManagementProps> = (props) => {
-  const {
-    userInfo: { userId },
-  } = useUserContext();
-  const linkToken = useCreateLinkToken({ userId });
+  const linkToken = useCreateLinkToken({});
 
   return (
     <Stack spacing="2rem">
