@@ -1,0 +1,6 @@
+{
+  "name": "expense-tracker",
+  "main": "./server/dist/index.js",
+  "compatibility_date": "2025-06-24",
+  "compatibility_flags": ["nodejs_compat"]
+}
