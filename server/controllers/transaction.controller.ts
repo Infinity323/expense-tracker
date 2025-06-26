@@ -1,27 +1,29 @@
+import { Request } from "express";
 import { RemovedTransaction, Transaction } from "plaid";
 import plaidClient from "../clients/plaidClient";
-import { findAllPlaidBudgets } from "../db/repositories/budget.repository";
+import { findAllPlaidBudgetsByUserId } from "../db/repositories/budget.repository";
 import {
-  findItemTransactionCursor,
-  updateItemNeedsAttention,
+  findTransactionCursorById,
   updateItemTransactionCursor,
+  updateNeedsAttentionById,
 } from "../db/repositories/item.repository";
 import {
   createTransaction,
-  deleteAll,
   deleteById,
-  findAllTransactions,
-  findByMonth,
+  deleteByUserId,
+  findByMonthAndUserId,
+  findByUserId,
   updateTransaction,
 } from "../db/repositories/transaction.repository";
-import { Request } from "express";
+import { getUserId } from "../utils/authUtil";
 
 export const getAllTransactions = async (req: Request, res, next) => {
   try {
-    const month = req.query.month;
+    const userId = getUserId(req);
+    const month = req.query.month as string;
     const transactionDocs = month
-      ? await findByMonth(month)
-      : await findAllTransactions();
+      ? await findByMonthAndUserId(userId, month)
+      : await findByUserId(userId);
     console.log(
       `Retrieved ${transactionDocs.length} transactions from the database`
     );
@@ -35,7 +37,7 @@ export const addTransaction = async (req, res, next) => {
   try {
     const response = await createTransaction(req.body);
     console.log(
-      `Successfully added new transaction document ID [${response.id}]`
+      `Successfully added new transaction document ID [${response.transactionId}]`
     );
     res.status(201).json(response);
   } catch (err) {
@@ -47,7 +49,7 @@ export const putTransaction = async (req, res, next) => {
   try {
     const response = await updateTransaction(req.body);
     console.log(
-      `Successfully updated transaction document ID [${response.id}]`
+      `Successfully updated transaction document ID [${response.transactionId}]`
     );
     res.status(204).send();
   } catch (err) {
@@ -57,7 +59,8 @@ export const putTransaction = async (req, res, next) => {
 
 export const deleteAllTransactions = async (req, res, next) => {
   try {
-    const deleted = await deleteAll();
+    const userId = getUserId(req);
+    const deleted = await deleteByUserId(userId);
     console.log(`Successfully deleted all ${deleted.length} transactions`);
     res.status(204).send();
   } catch (err) {
@@ -78,9 +81,10 @@ export const deleteTransaction = async (req, res, next) => {
 };
 
 export const syncTransactions = async (req, res, next) => {
-  let itemId = req.params.itemId;
+  const itemId = req.params.itemId;
+  const userId = getUserId(req);
   try {
-    let cursor = await findItemTransactionCursor(itemId);
+    let cursor = await findTransactionCursorById(itemId);
     let added: Transaction[] = [];
     let modified: Transaction[] = [];
     let removed: RemovedTransaction[] = [];
@@ -100,7 +104,7 @@ export const syncTransactions = async (req, res, next) => {
       cursor = data.next_cursor;
     }
 
-    const plaidBudgetDocs = await findAllPlaidBudgets();
+    const plaidBudgetDocs = await findAllPlaidBudgetsByUserId(userId);
     const plaidBudgetMap = plaidBudgetDocs.reduce(
       (map, doc) => (
         (map[doc.detailed] = {
@@ -113,10 +117,9 @@ export const syncTransactions = async (req, res, next) => {
     );
     for (const transaction of added) {
       await createTransaction({
-        _id: transaction.transaction_id,
+        transactionId: transaction.transaction_id,
         date: transaction.date,
         name: transaction.name,
-        description: undefined,
         category:
           plaidBudgetMap[transaction.personal_finance_category.detailed]
             .category,
@@ -124,19 +127,19 @@ export const syncTransactions = async (req, res, next) => {
           plaidBudgetMap[transaction.personal_finance_category.detailed]
             .subcategory,
         amount: transaction.amount,
-        account_id: transaction.account_id,
-        merchant_name: transaction.merchant_name,
-        merchant_entity_id: transaction.merchant_entity_id,
+        accountId: transaction.account_id,
+        merchantName: transaction.merchant_name,
+        merchantEntityId: transaction.merchant_entity_id,
         pending: transaction.pending,
+        userId,
       });
     }
     console.log(`Added ${added.length} transactions for item ${itemId}`);
     for (const transaction of modified) {
       await updateTransaction({
-        _id: transaction.transaction_id,
+        transactionId: transaction.transaction_id,
         date: transaction.date,
         name: transaction.name,
-        description: undefined,
         category:
           plaidBudgetMap[transaction.personal_finance_category.detailed]
             .category,
@@ -145,6 +148,7 @@ export const syncTransactions = async (req, res, next) => {
             .subcategory,
         amount: transaction.amount,
         pending: transaction.pending,
+        userId,
       });
     }
     console.log(`Updated ${modified.length} transactions for item ${itemId}`);
@@ -160,7 +164,7 @@ export const syncTransactions = async (req, res, next) => {
           err.response.data
         )}`
       );
-      await updateItemNeedsAttention(itemId, true);
+      await updateNeedsAttentionById(itemId, true);
     }
     next(err);
   }

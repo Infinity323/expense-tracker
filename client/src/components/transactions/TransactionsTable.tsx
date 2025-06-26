@@ -51,7 +51,7 @@ function TransactionsTable({ reload, setReload, month }) {
         <Tbody>
           {transactions && transactions.length ? (
             transactions.map((transaction) => (
-              <Tr key={transaction._id}>
+              <Tr key={transaction.transactionId}>
                 <Td>{transaction.date}</Td>
                 <Td>{transaction.name}</Td>
                 <Td>{transaction.description}</Td>

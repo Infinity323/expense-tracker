@@ -1,6 +1,5 @@
-import { Doc } from "./doc";
-
-export interface BudgetDoc extends Doc<"budget"> {
+export interface BudgetDoc {
+  budgetId: string;
   primary: string;
   detailed: string;
   description: string;
@@ -8,4 +7,5 @@ export interface BudgetDoc extends Doc<"budget"> {
   subcategory: string;
   amount: number;
   isMaster: boolean;
+  userId: string;
 }

@@ -1,14 +1,14 @@
-import { Doc } from "./doc";
-
-export interface TransactionDoc extends Doc<"transaction"> {
+export interface TransactionDoc {
+  transactionId: string;
   date: string;
-  account_id: string;
+  accountId: string;
   name: string;
   description: string;
-  merchant_name: string;
-  merchant_entity_id: string;
-  pending: false;
+  merchantName: string;
+  merchantEntityId: string;
+  pending: boolean;
   category: string;
   subcategory: string;
   amount: number;
+  userId: string;
 }

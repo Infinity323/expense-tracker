@@ -1,7 +1,6 @@
 import express from "express";
 import {
   createAccessToken,
-  createLink,
   createLinkToken,
   getAllAccessTokens,
 } from "../controllers/link.controller";
@@ -14,7 +13,5 @@ linkRouter
   .route("/access-token")
   .get(getAllAccessTokens)
   .post(createAccessToken);
-
-linkRouter.post("/", createLink);
 
 export default linkRouter;

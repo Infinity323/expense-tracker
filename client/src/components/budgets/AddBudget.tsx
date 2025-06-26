@@ -28,11 +28,11 @@ function AddBudget({ setReload }) {
 
   const addBudget = async (event) => {
     event.preventDefault();
-    const _id = budgets.find(
+    const budgetId = budgets.find(
       (budget) =>
         budget.category === category && budget.subcategory === subcategory
-    )._id;
-    await putBudget({ _id, category, subcategory, amount });
+    ).budgetId;
+    await putBudget({ budgetId, category, subcategory, amount });
     onClose();
     setReload(true);
   };

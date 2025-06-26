@@ -1,4 +1,5 @@
 import {
+  Box,
   Card,
   CardBody,
   Flex,
@@ -68,6 +69,21 @@ const CategorySpendingOverTimeChart: React.FC = () => {
     setHover(undefined);
   };
 
+  if (categoryIsLoading || spendingIsLoading) {
+    return (
+      <Box>
+        <Skeleton height={300} />
+      </Box>
+    );
+  }
+
+  if (!categoryData?.length && !spendingData?.length) {
+    return (
+      <Box p="1.5rem">
+        <Text>No data available.</Text>
+      </Box>
+    );
+  }
   return (
     <ResponsiveContainer width="100%" height={800}>
       {categoryIsLoading || spendingIsLoading ? (

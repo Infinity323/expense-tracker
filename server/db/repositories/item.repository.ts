@@ -1,86 +1,163 @@
-import { ScanCommand } from "@aws-sdk/client-dynamodb";
-import db, { ddb } from "../database";
+import {
+  DeleteCommand,
+  GetCommand,
+  PutCommand,
+  QueryCommand,
+  UpdateCommand,
+} from "@aws-sdk/lib-dynamodb";
+import db from "../database";
+import {
+  IGetCommandOutput,
+  IQueryCommandOutput,
+} from "../types/iCommandOutput";
 import { ItemDoc } from "../types/itemDoc";
 
-const ITEM = "item";
+const TableName = "Items";
 
-export const findAllAccessTokens = async () => {
-  const result = await ddb.send(
-    new ScanCommand({
-      TableName: "Items",
+export const findAccessTokensByUserId = async (userId: string) => {
+  const result = (await db.send(
+    new QueryCommand({
+      TableName,
+      IndexName: "userId-institutionId-index",
+      KeyConditionExpression: "userId = :userId",
+      ExpressionAttributeValues: {
+        ":userId": userId,
+      },
+      ProjectionExpression: "itemId, accessToken",
     })
-  );
+  )) as IQueryCommandOutput<ItemDoc>;
   return result.Items;
 };
 
-export const findByInstitutionId = async (institutionId) => {
-  await db.createIndex({
-    index: { fields: ["institution_id"] },
-  });
-  const itemDocs = await db.find({
-    selector: {
-      type: ITEM,
-      institution_id: institutionId,
-    },
-  });
-  return itemDocs.docs;
+export const findByInstitutionIdAndUserId = async (
+  institutionId: string,
+  userId: string
+) => {
+  const result = (await db.send(
+    new QueryCommand({
+      TableName,
+      IndexName: "userId-institutionId-index",
+      KeyConditionExpression:
+        "userId = :userId AND institutionId = :institutionId",
+      ExpressionAttributeValues: {
+        ":userId": userId,
+        ":institutionId": institutionId,
+      },
+      Limit: 1,
+    })
+  )) as IQueryCommandOutput<ItemDoc>;
+  return result.Items;
 };
 
 export const createItem = async ({
-  item_id,
-  access_token,
-  institution_id,
-  institution_name,
+  itemId,
+  accessToken,
+  institutionId,
+  institutionName,
+  userId,
+}: Partial<ItemDoc>) => {
+  return await db.send(
+    new PutCommand({
+      TableName,
+      Item: {
+        itemId,
+        userId,
+        accessToken,
+        institutionId,
+        institutionName,
+        createdTimestamp: new Date().toISOString(),
+      },
+    })
+  );
+};
+
+export const findByUserId = async (userId: string) => {
+  const result = (await db.send(
+    new QueryCommand({
+      TableName,
+      IndexName: "userId-institutionId-index",
+      KeyConditionExpression: "userId = :userId",
+      ExpressionAttributeValues: {
+        ":userId": userId,
+      },
+    })
+  )) as IQueryCommandOutput<ItemDoc>;
+  return result.Items;
+};
+
+export const updateAccounts = async (itemId: string, accounts: any) => {
+  return await db.send(
+    new UpdateCommand({
+      TableName,
+      Key: { itemId },
+      UpdateExpression:
+        "SET accounts = :accounts, NeedsAttention = :needsAttention, updatedTimestamp = :updatedTimestamp",
+      ExpressionAttributeValues: {
+        ":accounts": accounts,
+        ":needsAttention": false,
+        ":updatedTimestamp": new Date().toISOString(),
+      },
+    })
+  );
+};
+
+export const deleteById = async (itemId: string) => {
+  return await db.send(
+    new DeleteCommand({
+      TableName,
+      Key: {
+        itemId,
+      },
+    })
+  );
+};
+
+export const findTransactionCursorById = async (itemId: string) => {
+  const result = (await db.send(
+    new GetCommand({
+      TableName,
+      Key: { itemId },
+      ProjectionExpression: "cursor",
+    })
+  )) as IGetCommandOutput<ItemDoc>;
+  return result.Item.cursor;
+};
+
+export const updateItemTransactionCursor = async ({
+  itemId,
+  cursor,
+}: {
+  itemId: string;
+  cursor: string;
 }) => {
-  return await db.put<ItemDoc>({
-    _id: item_id,
-    type: ITEM,
-    item_id,
-    access_token,
-    institution_id,
-    institution_name,
-    created_timestamp: new Date(),
-  });
+  return await db.send(
+    new UpdateCommand({
+      TableName,
+      Key: { itemId },
+      UpdateExpression:
+        "SET cursor = :cursor, updatedTimestamp = :updatedTimestamp",
+      ExpressionAttributeValues: {
+        ":cursor": cursor,
+        ":updatedTimestamp": new Date().toISOString(),
+      },
+    })
+  );
 };
 
-export const findAll = async () => {
-  const itemDocs = await db.find({
-    selector: {
-      type: ITEM,
-    },
-  });
-  return itemDocs.docs as ItemDoc[];
-};
-
-export const updateAccounts = async (item_id, accounts) => {
-  const itemDoc = await db.get<ItemDoc>(item_id);
-  return await db.put<ItemDoc>({
-    ...itemDoc,
-    needs_attention: false,
-  });
-};
-
-export const deleteById = async (id) => {
-  const itemDoc = await db.get<ItemDoc>(id);
-  return await db.remove({ _id: id, _rev: itemDoc._rev });
-};
-
-export const findItemTransactionCursor = async (itemId) => {
-  const itemDoc = await db.get<{ cursor: string }>(itemId);
-  return itemDoc.cursor;
-};
-
-export const updateItemTransactionCursor = async ({ itemId, cursor }) => {
-  let itemDoc = await db.get(itemId);
-  itemDoc["cursor"] = cursor;
-  return await db.put(itemDoc);
-};
-
-export const updateItemNeedsAttention = async (
+export const updateNeedsAttentionById = async (
   itemId: string,
   needsAttention: boolean
 ) => {
-  let itemDoc = await db.get<ItemDoc>(itemId);
-  itemDoc.needs_attention = needsAttention;
-  return await db.put(itemDoc);
+  return await db.send(
+    new UpdateCommand({
+      TableName,
+      Key: { itemId },
+      UpdateExpression:
+        "SET NeedsAttention = :needsAttention, updatedTimestamp = :updatedTimestamp",
+      ExpressionAttributeValues: {
+        ":needsAttention": needsAttention,
+        ":updatedTimestamp": new Date().toISOString(),
+      },
+    })
+  );
 };

@@ -5,10 +5,9 @@ import { PlaidLinkOnSuccessMetadata } from "react-plaid-link";
 import plaidClient from "../clients/plaidClient";
 import {
   createItem,
-  findAllAccessTokens,
-  findByInstitutionId,
+  findAccessTokensByUserId,
+  findByInstitutionIdAndUserId,
 } from "../db/repositories/item.repository";
-import { createLinkMetadata } from "../db/repositories/linkMetadata.repository";
 import { LinkTokenRequest } from "../types/linkTokenRequest";
 import { getUserId } from "../utils/authUtil";
 
@@ -19,8 +18,7 @@ export const createLinkToken = async (
   next: NextFunction
 ) => {
   try {
-    // const userId = getUserId(req);
-    const userId = "test";
+    const userId = getUserId(req);
     const tokenResponse = await plaidClient.linkTokenCreate({
       user: { client_user_id: userId },
       client_name: "Expense Tracker",
@@ -39,11 +37,12 @@ export const createLinkToken = async (
 /** Get all access tokens. */
 export const getAllAccessTokens = async (req, res, next) => {
   try {
-    const itemDocs = await findAllAccessTokens();
+    const userId = getUserId(req);
+    const itemDocs = await findAccessTokensByUserId(userId);
     console.log(`Retrieved ${itemDocs.length} access tokens from the database`);
     let accessTokens = itemDocs.map((doc) => ({
-      itemId: doc.item_id,
-      accessToken: doc.access_token,
+      itemId: doc.itemId,
+      accessToken: doc.accessToken,
     }));
     res.json(accessTokens);
   } catch (err) {
@@ -62,8 +61,9 @@ export const createAccessToken = async (
   next
 ) => {
   try {
+    const userId = getUserId(req);
     const institutionId = req.body.metadata.institution.institution_id;
-    if ((await findByInstitutionId(institutionId)).length) {
+    if ((await findByInstitutionIdAndUserId(institutionId, userId)).length) {
       const error = new Error(`Institution [${institutionId}] already linked`);
       error.name = "DuplicateInstitutionError";
       throw error;
@@ -76,30 +76,17 @@ export const createAccessToken = async (
       `Successfully exchanged public token [${req.body.publicToken}] for access token`
     );
     await createItem({
-      item_id: exchangeResponseData.item_id,
-      access_token: exchangeResponseData.access_token,
-      institution_id: req.body.metadata.institution.institution_id,
-      institution_name: req.body.metadata.institution.name,
+      itemId: exchangeResponseData.item_id,
+      accessToken: exchangeResponseData.access_token,
+      institutionId: req.body.metadata.institution.institution_id,
+      institutionName: req.body.metadata.institution.name,
+      userId,
     });
     console.log(`Saved new item [${exchangeResponseData.item_id}] to database`);
     res.status(201).json({
       itemId: exchangeResponseData.item_id,
       accessToken: exchangeResponseData.access_token,
     });
-  } catch (err) {
-    next(err);
-  }
-};
-
-/** Create account link */
-export const createLink = async (req, res, next) => {
-  try {
-    // TODO: check if link exists and throw error if duplicate
-    await createLinkMetadata(req.body);
-    console.log(
-      `Saved new institution [${req.body.institution.institution_id}] link metadata to database`
-    );
-    res.status(201).send();
   } catch (err) {
     next(err);
   }

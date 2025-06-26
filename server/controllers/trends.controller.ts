@@ -1,15 +1,17 @@
 import {
-  findAllExpenses,
-  findAllIncome,
-  findCurrentMonthTransactions,
+  findByCurrentMonthAndUserId,
+  findExpensesByUserId,
+  findIncomeByUserId,
 } from "../db/repositories/transaction.repository";
 import { CurrentMonthExpense } from "../types/currentMonthExpense";
+import { getUserId } from "../utils/authUtil";
 import { round } from "../utils/dataUtil";
 
 const SUPPORTED_TIME_DIVISIONS = ["monthly", "quarterly", "annually"];
 const SUPPORTED_GROUP_BY = ["category", "subcategory"];
 
 export const getSpendingOverTime = async (req, res, next) => {
+  const userId = getUserId(req);
   try {
     let division = req.query.division; // monthly, quarterly, annually
     if (!division) {
@@ -24,7 +26,7 @@ export const getSpendingOverTime = async (req, res, next) => {
     }
     let groupBy = req.query.groupBy; // category, subcategory
     let resultMap = {};
-    let transactionDocs = await findAllExpenses();
+    let transactionDocs = await findExpensesByUserId(userId);
     transactionDocs.forEach((transaction) => {
       let transactionDate = new Date(transaction.date);
       let timeKey = getTimeKey(division, transactionDate);
@@ -84,6 +86,7 @@ const getTimeKey = (division, date) => {
 };
 
 export const getSpendingByCategory = async (req, res, next) => {
+  const userId = getUserId(req);
   try {
     let groupBy = req.query.groupBy; // category, subcategory
     if (!groupBy) {
@@ -98,7 +101,7 @@ export const getSpendingByCategory = async (req, res, next) => {
     }
     let division = req.query.division; // monthly, quarterly, annually
     let resultMap = {};
-    let transactionDocs = await findAllExpenses();
+    let transactionDocs = await findExpensesByUserId(userId);
     transactionDocs.forEach((transaction) => {
       let transactionDate = new Date(transaction.date);
       let timeKey = getTimeKey(division, transactionDate);
@@ -174,10 +177,11 @@ const processByCategoryResults = (resultMap, groupBy) => {
 };
 
 export const getIncomeVsExpenses = async (req, res, next) => {
+  const userId = getUserId(req);
   try {
     // TODO: expand to not just monthly
-    let income = await findAllIncome();
-    let expenses = await findAllExpenses();
+    let income = await findIncomeByUserId(userId);
+    let expenses = await findExpensesByUserId(userId);
     let comparisonMap = {};
     income.forEach((transaction) => {
       let key = getTimeKey("monthly", new Date(transaction.date));
@@ -210,8 +214,9 @@ export const getIncomeVsExpenses = async (req, res, next) => {
 };
 
 export const getCurrentMonthSpending = async (req, res, next) => {
+  const userId = getUserId(req);
   try {
-    const transactionDocs = await findCurrentMonthTransactions();
+    const transactionDocs = await findByCurrentMonthAndUserId(userId);
     const expenses: CurrentMonthExpense[] = transactionDocs
       .filter((doc) => doc.category !== "Income")
       .map((doc) => ({

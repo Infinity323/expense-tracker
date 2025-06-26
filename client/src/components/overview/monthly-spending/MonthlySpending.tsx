@@ -76,7 +76,7 @@ const MonthlySpending: React.FC<MonthlySpendingProps> = (props) => {
     );
   }
 
-  if (!expenses) {
+  if (!expenses?.length) {
     return (
       <Card p="1.5rem" variant="outline">
         <CardHeader>

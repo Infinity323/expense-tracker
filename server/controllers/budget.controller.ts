@@ -1,20 +1,23 @@
 import { parse } from "csv-parse";
 import fs from "fs";
 import {
+  batchCreate,
   create,
-  deleteAll,
   deleteById,
-  findAll,
+  deleteByUserId,
+  findByUserId,
   update,
 } from "../db/repositories/budget.repository";
-import { findCurrentMonthTransactions } from "../db/repositories/transaction.repository";
+import { findByCurrentMonthAndUserId } from "../db/repositories/transaction.repository";
+import { getUserId } from "../utils/authUtil";
 import { round } from "../utils/dataUtil";
 
 export const getAllBudgets = async (req, res, next) => {
   try {
-    let budgetDocs = await findAll();
+    const userId = getUserId(req);
+    let budgetDocs = await findByUserId(userId);
     if (!budgetDocs.length) {
-      budgetDocs = await seedBudgets();
+      budgetDocs = await seedBudgets(userId);
     }
     console.log(`Retrieved ${budgetDocs.length} budgets from the database`);
     if (req.query.sorted) {
@@ -32,22 +35,29 @@ export const getAllBudgets = async (req, res, next) => {
   }
 };
 
-const seedBudgets = async () => {
+const seedBudgets = async (userId: string) => {
   const parser = fs
     .createReadStream("db/budget-seed-data.csv")
     .pipe(parse({ from_line: 2 }));
+
+  const rows: any[] = [];
   for await (const row of parser) {
-    await create({
-      primary: row[0],
-      detailed: row[1],
-      description: row[2],
-      category: row[3],
-      subcategory: row[4],
-      amount: 0,
-      isMaster: true,
-    });
+    rows.push(row);
   }
-  let budgetDocs = await findAll();
+
+  const parsedBudgets = rows.map((row) => ({
+    primary: row[0],
+    detailed: row[1],
+    description: row[2],
+    category: row[3],
+    subcategory: row[4],
+    amount: 0,
+    isMaster: true,
+    userId,
+  }));
+
+  await batchCreate(parsedBudgets);
+  let budgetDocs = await findByUserId(userId);
   console.log(`Seeded database with ${budgetDocs.length} budgets`);
   return budgetDocs;
 };
@@ -55,7 +65,9 @@ const seedBudgets = async () => {
 export const addBudget = async (req, res, next) => {
   try {
     const response = await create(req.body);
-    console.log(`Successfully added new budget document ID [${response.id}]`);
+    console.log(
+      `Successfully added new budget document ID [${response.budgetId}]`
+    );
     res.status(201).json(response);
   } catch (err) {
     next(err);
@@ -65,7 +77,9 @@ export const addBudget = async (req, res, next) => {
 export const putBudget = async (req, res, next) => {
   try {
     const response = await update(req.body);
-    console.log(`Successfully updated budget document ID [${response.id}]`);
+    console.log(
+      `Successfully updated budget document ID [${response.budgetId}]`
+    );
     res.status(204).send();
   } catch (err) {
     next(err);
@@ -86,8 +100,9 @@ export const deleteBudget = async (req, res, next) => {
 
 export const getBudgetComparison = async (req, res, next) => {
   try {
-    let budgetDocs = await findAll();
-    let transactionDocs = await findCurrentMonthTransactions();
+    const userId = getUserId(req);
+    let budgetDocs = await findByUserId(userId);
+    let transactionDocs = await findByCurrentMonthAndUserId(userId);
     let actualMap = {};
     transactionDocs.forEach((transaction) => {
       let key = `${transaction.category} - ${transaction.subcategory}`;
@@ -120,7 +135,8 @@ export const getBudgetComparison = async (req, res, next) => {
 
 export const deleteAllBudgets = async (req, res, next) => {
   try {
-    const budgetDocs = await deleteAll();
+    const userId = getUserId(req);
+    const budgetDocs = await deleteByUserId(userId);
     console.log(`Deleted ${budgetDocs.length} budgets`);
     res.status(204).send();
   } catch (err) {

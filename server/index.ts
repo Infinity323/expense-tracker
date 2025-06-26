@@ -1,10 +1,7 @@
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import express from "express";
-import expressPouchDb from "express-pouchdb";
-import { mkdirp } from "mkdirp";
 import path from "path";
-import PouchDB from "pouchdb";
 import { fileURLToPath } from "url";
 import authorizeUser from "./middleware/authorizeUser";
 import {
@@ -30,16 +27,6 @@ const app = express();
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-
-// database
-mkdirp("/tmp/expense-tracker/db").then(() => {
-  app.use(
-    "/db",
-    expressPouchDb(PouchDB, {
-      configPath: "./pouchdb-config.json",
-    })
-  );
-});
 
 // cors
 app.use((req, res, next) => {

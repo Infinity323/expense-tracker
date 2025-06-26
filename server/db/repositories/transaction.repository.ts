@@ -1,116 +1,144 @@
+import {
+  DeleteCommand,
+  PutCommand,
+  QueryCommand,
+  ScanCommand,
+  UpdateCommand,
+} from "@aws-sdk/lib-dynamodb";
+import { randomUUID } from "crypto";
 import { addMonths, format, startOfMonth } from "date-fns";
 import db from "../database";
+import {
+  IPutCommandOutput,
+  IUpdateCommandOutput,
+} from "../types/iCommandOutput";
 import { TransactionDoc } from "../types/transactionDoc";
 
-const TRANSACTION = "transaction";
+const TableName = "Transactions";
 
-export const findAllExpenses = async () => {
-  await db.createIndex({
-    index: { fields: ["date", "category"] },
-  });
-  const transactionDocs = await db.find({
-    selector: {
-      type: TRANSACTION,
-      date: { $exists: true },
-      category: { $ne: "Income" },
-    },
-    sort: [{ date: "asc" }],
-  });
-  return transactionDocs.docs as TransactionDoc[];
+export const findExpensesByUserId = async (userId: string) => {
+  const result = await db.send(
+    new ScanCommand({
+      TableName,
+      IndexName: "userId-category-index",
+      FilterExpression: "category <> :category AND userId = :userId",
+      ExpressionAttributeValues: {
+        ":category": "Income",
+        ":userId": userId,
+      },
+    })
+  );
+  return result.Items as TransactionDoc[];
 };
 
-export const findAllIncome = async () => {
-  await db.createIndex({
-    index: { fields: ["date", "category"] },
-  });
-  const transactionDocs = await db.find({
-    selector: {
-      type: TRANSACTION,
-      date: { $exists: true },
-      category: "Income",
-    },
-    sort: [{ date: "asc" }],
-  });
-  return transactionDocs.docs as TransactionDoc[];
+export const findIncomeByUserId = async (userId: string) => {
+  const result = await db.send(
+    new ScanCommand({
+      TableName,
+      IndexName: "userId-category-index",
+      FilterExpression: "category = :category AND userId = :userId",
+      ExpressionAttributeValues: {
+        ":category": "Income",
+        ":userId": userId,
+      },
+    })
+  );
+  return result.Items as TransactionDoc[];
 };
 
-export const findAllTransactions = async () => {
-  await db.createIndex({
-    index: { fields: ["date"] },
-  });
-  const transactionDocs = await db.find({
-    selector: {
-      type: TRANSACTION,
-      date: { $exists: true },
-    },
-    sort: [{ date: "desc" }],
-  });
-  return transactionDocs.docs as TransactionDoc[];
+export const findByUserId = async (userId: string) => {
+  const result = await db.send(
+    new QueryCommand({
+      TableName,
+      IndexName: "userId-date-index",
+      KeyConditionExpression: "userId = :userId",
+      ExpressionAttributeValues: {
+        ":userId": userId,
+      },
+    })
+  );
+  return result.Items as TransactionDoc[];
 };
 
-export const findByMonth = async (month) => {
+export const findByMonthAndUserId = async (userId: string, month: string) => {
   const nextMonth = format(addMonths(new Date(month), 2), "yyyy-MM");
-  console.log(nextMonth);
-  await db.createIndex({
-    index: { fields: ["date"] },
-  });
-  const transactionDocs = await db.find({
-    selector: {
-      type: TRANSACTION,
-      date: { $gte: month, $lt: nextMonth },
-    },
-    sort: [{ date: "desc" }],
-  });
-  return transactionDocs.docs as TransactionDoc[];
+  const result = await db.send(
+    new ScanCommand({
+      TableName,
+      IndexName: "userId-date-index",
+      FilterExpression:
+        "userId = :userId AND #dt >= :month AND #dt < :nextMonth",
+      ExpressionAttributeNames: {
+        "#dt": "date",
+      },
+      ExpressionAttributeValues: {
+        ":userId": userId,
+        ":month": month,
+        ":nextMonth": nextMonth,
+      },
+    })
+  );
+  return result.Items as TransactionDoc[];
 };
 
-export const findCurrentMonthTransactions = async () => {
+export const findByCurrentMonthAndUserId = async (userId: string) => {
   const firstDayOfMonth = startOfMonth(new Date());
   const formattedDate = format(firstDayOfMonth, "yyyy-MM-dd");
-  await db.createIndex({
-    index: { fields: ["date"] },
-  });
-  const transactionDocs = await db.find({
-    selector: {
-      type: TRANSACTION,
-      date: { $gte: formattedDate },
-    },
-    sort: [{ date: "desc" }],
-  });
-  return transactionDocs.docs as TransactionDoc[];
+  const result = await db.send(
+    new ScanCommand({
+      TableName,
+      IndexName: "userId-date-index",
+      FilterExpression: "userId = :userId AND #dt >= :startDate",
+      ExpressionAttributeNames: {
+        "#dt": "date",
+      },
+      ExpressionAttributeValues: {
+        ":userId": userId,
+        ":startDate": formattedDate,
+      },
+    })
+  );
+  return result.Items as TransactionDoc[];
 };
 
 export const createTransaction = async ({
-  _id,
+  transactionId,
   date,
   name,
   description,
   category,
   subcategory,
   amount,
-  account_id,
-  merchant_name,
-  merchant_entity_id,
+  accountId,
+  merchantName,
+  merchantEntityId,
   pending,
-}) => {
-  return await db.put<TransactionDoc>({
-    _id: _id ? _id : crypto.randomUUID(),
-    type: TRANSACTION,
-    date: date,
-    account_id: account_id,
-    name: name,
-    description: description,
-    merchant_name: merchant_name,
-    merchant_entity_id: merchant_entity_id,
-    pending: pending,
-    category: category,
-    subcategory: subcategory,
-    amount: parseFloat(amount),
-  });
+  userId,
+}: Partial<TransactionDoc>) => {
+  const result = (await db.send(
+    new PutCommand({
+      TableName,
+      Item: {
+        transactionId: transactionId || randomUUID(),
+        date,
+        accountId,
+        name,
+        description,
+        merchantName,
+        merchantEntityId,
+        pending,
+        category,
+        subcategory,
+        amount,
+        userId,
+      },
+    })
+  )) as IPutCommandOutput<TransactionDoc>;
+  return result.Attributes;
 };
 
 export const updateTransaction = async ({
-  _id,
+  transactionId,
   date,
   name,
   description,
@@ -118,36 +146,67 @@ export const updateTransaction = async ({
   subcategory,
   amount,
   pending,
-}) => {
-  let transactionDoc = await db.get<TransactionDoc>(_id);
-  transactionDoc.date = date;
-  transactionDoc.name = name;
-  if (description) {
-    transactionDoc.description = description;
-  }
-  transactionDoc.pending = pending;
-  transactionDoc.category = category;
-  transactionDoc.subcategory = subcategory;
-  transactionDoc.amount = parseFloat(amount);
-  return await db.put(transactionDoc);
+}: Partial<TransactionDoc>) => {
+  const result = (await db.send(
+    new UpdateCommand({
+      TableName,
+      Key: { transactionId },
+      UpdateExpression:
+        "set date = :date, name = :name, description = :description, pending = :pending, category = :category, subcategory = :subcategory, amount = :amount",
+      ExpressionAttributeNames: {
+        date: "date",
+        name: "name",
+        description: "description",
+        pending: "pending",
+        category: "category",
+        subcategory: "subcategory",
+        amount: "amount",
+      },
+      ExpressionAttributeValues: {
+        ":date": date,
+        ":name": name,
+        ":description": description,
+        ":pending": pending,
+        ":category": category,
+        ":subcategory": subcategory,
+        ":amount": parseFloat(amount as any),
+      },
+      ReturnValues: "ALL_NEW",
+    })
+  )) as IUpdateCommandOutput<TransactionDoc>;
+  return result.Attributes;
 };
 
-export const deleteById = async (id) => {
-  const transactionDoc = await db.get<TransactionDoc>(id);
-  return await db.remove({
-    _id: transactionDoc._id,
-    _rev: transactionDoc._rev,
-  });
-};
-
-export const deleteAll = async () => {
-  const transactionDocs = await db.find({
-    selector: {
-      type: TRANSACTION,
-    },
-  });
-  transactionDocs.docs.forEach(
-    async (doc) => await db.remove({ _id: doc._id, _rev: doc._rev })
+export const deleteById = async (transactionId: string) => {
+  return await db.send(
+    new DeleteCommand({
+      TableName,
+      Key: { transactionId },
+    })
   );
-  return transactionDocs.docs as TransactionDoc[];
+};
+
+export const deleteByUserId = async (userId: string) => {
+  const result = await db.send(
+    new QueryCommand({
+      TableName,
+      IndexName: "userId-date-index",
+      FilterExpression: "userId = :userId",
+      ExpressionAttributeValues: {
+        ":userId": userId,
+      },
+      ProjectionExpression: "transactionId",
+    })
+  );
+  if (result.Items) {
+    for (const item of result.Items) {
+      await db.send(
+        new DeleteCommand({
+          TableName,
+          Key: { transactionId: item.transactionId },
+        })
+      );
+    }
+  }
+  return result.Items as TransactionDoc[];
 };

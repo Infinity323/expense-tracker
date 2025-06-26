@@ -15,12 +15,20 @@ import {
   Stack,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { FaPencil } from "react-icons/fa6";
 import { putTransaction } from "../../services/transactionService";
 import BudgetsSelect from "../budgets/BudgetsSelect";
+import { TransactionDoc } from "@backend/db/types/transactionDoc";
 
-function EditTransaction({ transactionDoc, refetch }) {
+interface EditTransactionProps {
+  transactionDoc: TransactionDoc;
+  refetch: () => void;
+}
+
+const EditTransaction: React.FC<EditTransactionProps> = (props) => {
+  const { transactionDoc, refetch } = props;
+
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [date, setDate] = useState(transactionDoc.date);
@@ -28,15 +36,12 @@ function EditTransaction({ transactionDoc, refetch }) {
   const [description, setDescription] = useState(transactionDoc.description);
   const [category, setCategory] = useState(transactionDoc.category);
   const [subcategory, setSubcategory] = useState(transactionDoc.subcategory);
-  const [amount, setAmount] = useState(transactionDoc.amount);
+  const [amount, setAmount] = useState(transactionDoc.amount.toString());
 
   const editTransaction = async (event) => {
     event.preventDefault();
-    let _id = transactionDoc._id;
-    let _rev = transactionDoc._rev;
     await putTransaction({
-      _id,
-      _rev,
+      transactionId: transactionDoc.transactionId,
       date,
       name,
       description,
@@ -115,6 +120,6 @@ function EditTransaction({ transactionDoc, refetch }) {
       </Modal>
     </>
   );
-}
+};
 
 export default EditTransaction;

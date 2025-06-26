@@ -1,17 +1,15 @@
 import { Request } from "express";
 import { PlaidLinkOnSuccessMetadata } from "react-plaid-link";
-import plaidClient from "../clients/plaidClient";
 import {
   deleteById,
-  findAll,
-  findAllAccessTokens,
+  findByUserId,
   updateAccounts,
-  updateItemNeedsAttention,
 } from "../db/repositories/item.repository";
+import { getUserId } from "../utils/authUtil";
 
 export const getAllItems = async (req, res, next) => {
   try {
-    const itemDocs = await findAll();
+    const itemDocs = await findByUserId(getUserId(req));
     console.log(`Retrieved ${itemDocs.length} items`);
     res.json(itemDocs);
   } catch (err) {

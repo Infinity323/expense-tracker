@@ -1,4 +1,12 @@
-import { Card, CardBody, Flex, Skeleton, Spacer, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Card,
+  CardBody,
+  Flex,
+  Skeleton,
+  Spacer,
+  Text,
+} from "@chakra-ui/react";
 import { useQuery } from "react-query";
 import {
   Bar,
@@ -20,30 +28,42 @@ function IncomeVsSpendingOverTime() {
     queryFn: getIncomeVsExpenses,
   });
 
+  if (isLoading) {
+    return (
+      <Box>
+        <Skeleton height={300} />
+      </Box>
+    );
+  }
+
+  if (!data?.length) {
+    return (
+      <Box p="1.5rem">
+        <Text>No data available.</Text>
+      </Box>
+    );
+  }
+
   return (
     <ResponsiveContainer width="100%" height={500}>
-      {isLoading ? (
-        <Skeleton />
-      ) : (
-        <BarChart
-          data={data}
-          margin={{ top: 50, left: 50, right: 50, bottom: 50 }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="date" tickFormatter={dateToMMMYYYY} />
-          <YAxis
-            domain={["auto", "auto"]}
-            tickFormatter={(value, _) => formatCurrency(value)}
-          />
-          <Legend />
-          <Tooltip
-            content={<CustomTooltip />}
-            cursor={{ fill: "black", opacity: 0.2 }}
-          />
-          <Bar dataKey="Income" stroke="green" fill="green" />
-          <Bar dataKey="Expenses" stroke="red" fill="red" />
-        </BarChart>
-      )}
+      <BarChart
+        data={data}
+        margin={{ top: 50, left: 50, right: 50, bottom: 50 }}
+      >
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="date" tickFormatter={dateToMMMYYYY} />
+        <YAxis
+          domain={["auto", "auto"]}
+          tickFormatter={(value, _) => formatCurrency(value)}
+        />
+        <Legend />
+        <Tooltip
+          content={<CustomTooltip />}
+          cursor={{ fill: "black", opacity: 0.2 }}
+        />
+        <Bar dataKey="Income" stroke="green" fill="green" />
+        <Bar dataKey="Expenses" stroke="red" fill="red" />
+      </BarChart>
     </ResponsiveContainer>
   );
 }

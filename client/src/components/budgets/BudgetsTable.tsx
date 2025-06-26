@@ -25,6 +25,8 @@ function BudgetsTable({ reload, setReload }) {
     }
   }, [reload, setReload, refetch]);
 
+  const displayedBudgets = budgets?.filter((budget) => budget.amount);
+
   return (
     <TableContainer>
       <Table size="sm" variant="striped">
@@ -38,22 +40,20 @@ function BudgetsTable({ reload, setReload }) {
           </Tr>
         </Thead>
         <Tbody>
-          {budgets?.length ? (
-            budgets
-              .filter((budget) => budget.amount)
-              .map((budget) => (
-                <Tr key={budget._id}>
-                  <Td>{budget.category}</Td>
-                  <Td>{budget.subcategory}</Td>
-                  <Td isNumeric>{formatCurrency(budget.amount)}</Td>
-                  <Td padding="0" width="0">
-                    <EditBudget budgetDoc={budget} refetch={refetch} />
-                    {!budget.isMaster && (
-                      <DeleteBudget budgetDoc={budget} onDelete={refetch} />
-                    )}
-                  </Td>
-                </Tr>
-              ))
+          {displayedBudgets?.length ? (
+            displayedBudgets.map((budget) => (
+              <Tr key={budget.budgetId}>
+                <Td>{budget.category}</Td>
+                <Td>{budget.subcategory}</Td>
+                <Td isNumeric>{formatCurrency(budget.amount)}</Td>
+                <Td padding="0" width="0">
+                  <EditBudget budgetDoc={budget} refetch={refetch} />
+                  {!budget.isMaster && (
+                    <DeleteBudget budgetDoc={budget} onDelete={refetch} />
+                  )}
+                </Td>
+              </Tr>
+            ))
           ) : (
             <Tr>
               <Td colSpan={100}>No budgets found.</Td>

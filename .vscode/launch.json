@@ -2,7 +2,7 @@
     "configurations": [
         {
             "name": "Launch Server",
-            "program": "${workspaceFolder}/server/server.ts",
+            "program": "${workspaceFolder}/server/index.ts",
             "request": "launch",
             "type": "node",
             "cwd": "${workspaceFolder}/server",
