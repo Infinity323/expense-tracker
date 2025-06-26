@@ -1,16 +1,16 @@
-import db from "../database";
+import { ScanCommand } from "@aws-sdk/client-dynamodb";
+import db, { ddb } from "../database";
 import { ItemDoc } from "../types/itemDoc";
 
 const ITEM = "item";
 
 export const findAllAccessTokens = async () => {
-  const itemDocs = await db.find({
-    selector: {
-      type: ITEM,
-    },
-    fields: ["item_id", "access_token"],
-  });
-  return itemDocs.docs as ItemDoc[];
+  const result = await ddb.send(
+    new ScanCommand({
+      TableName: "Items",
+    })
+  );
+  return result.Items;
 };
 
 export const findByInstitutionId = async (institutionId) => {

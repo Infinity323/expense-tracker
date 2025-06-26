@@ -12,4 +12,8 @@ const createTypeIndex = async () => {
 };
 createTypeIndex();
 
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+
+export const ddb = new DynamoDBClient({ region: "us-east-2" });
+
 export default db;

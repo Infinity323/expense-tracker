@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.835.0",
     "@types/express": "^5.0.3",
     "@types/plaid-link": "^2.0.15",
     "@types/react-plaid-link": "^2.0.0",
