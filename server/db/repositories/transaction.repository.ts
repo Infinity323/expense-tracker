@@ -55,6 +55,7 @@ export const findByUserId = async (userId: string) => {
       ExpressionAttributeValues: {
         ":userId": userId,
       },
+      ScanIndexForward: false,
     })
   );
   return result.Items as TransactionDoc[];
@@ -63,11 +64,11 @@ export const findByUserId = async (userId: string) => {
 export const findByMonthAndUserId = async (userId: string, month: string) => {
   const nextMonth = format(addMonths(new Date(month), 2), "yyyy-MM");
   const result = await db.send(
-    new ScanCommand({
+    new QueryCommand({
       TableName,
       IndexName: "userId-date-index",
-      FilterExpression:
-        "userId = :userId AND #dt >= :month AND #dt < :nextMonth",
+      KeyConditionExpression:
+        "userId = :userId AND #dt BETWEEN :month AND :nextMonth",
       ExpressionAttributeNames: {
         "#dt": "date",
       },
@@ -76,6 +77,7 @@ export const findByMonthAndUserId = async (userId: string, month: string) => {
         ":month": month,
         ":nextMonth": nextMonth,
       },
+      ScanIndexForward: false,
     })
   );
   return result.Items as TransactionDoc[];
@@ -85,10 +87,10 @@ export const findByCurrentMonthAndUserId = async (userId: string) => {
   const firstDayOfMonth = startOfMonth(new Date());
   const formattedDate = format(firstDayOfMonth, "yyyy-MM-dd");
   const result = await db.send(
-    new ScanCommand({
+    new QueryCommand({
       TableName,
       IndexName: "userId-date-index",
-      FilterExpression: "userId = :userId AND #dt >= :startDate",
+      KeyConditionExpression: "userId = :userId AND #dt >= :startDate",
       ExpressionAttributeNames: {
         "#dt": "date",
       },
@@ -96,6 +98,7 @@ export const findByCurrentMonthAndUserId = async (userId: string) => {
         ":userId": userId,
         ":startDate": formattedDate,
       },
+      ScanIndexForward: false,
     })
   );
   return result.Items as TransactionDoc[];

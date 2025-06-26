@@ -6,5 +6,5 @@ export interface ItemDoc {
   createdTimestamp: Date;
   institutionId: string;
   institutionName: string;
-  cursor?: string;
+  transactionCursor?: string;
 }

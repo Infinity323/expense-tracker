@@ -15,22 +15,32 @@ import {
   Stack,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { FaPencil } from "react-icons/fa6";
 import { putBudget } from "../../services/budgetService";
+import { BudgetDoc } from "@backend/db/types/budgetDoc";
 
-function EditBudget({ budgetDoc, refetch }) {
-  // TODO: implement reloading
+interface EditBudgetProps {
+  budgetDoc: BudgetDoc;
+  refetch: () => void;
+}
+
+const EditBudget: React.FC<EditBudgetProps> = (props) => {
+  const { budgetDoc, refetch } = props;
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [category, setCategory] = useState(budgetDoc.category);
   const [subcategory, setSubcategory] = useState(budgetDoc.subcategory);
-  const [amount, setAmount] = useState(budgetDoc.amount);
+  const [amount, setAmount] = useState(budgetDoc.amount.toString());
 
   const editBudget = async (event) => {
     event.preventDefault();
-    const _id = budgetDoc._id;
-    await putBudget({ _id, category, subcategory, amount });
+    await putBudget({
+      budgetId: budgetDoc.budgetId,
+      category,
+      subcategory,
+      amount: parseFloat(amount),
+    });
     onClose();
     refetch();
   };
@@ -89,6 +99,6 @@ function EditBudget({ budgetDoc, refetch }) {
       </Modal>
     </>
   );
-}
+};
 
 export default EditBudget;

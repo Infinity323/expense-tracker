@@ -84,7 +84,7 @@ export const syncTransactions = async (req, res, next) => {
   const itemId = req.params.itemId;
   const userId = getUserId(req);
   try {
-    let cursor = await findTransactionCursorById(itemId);
+    let transactionCursor = await findTransactionCursorById(itemId);
     let added: Transaction[] = [];
     let modified: Transaction[] = [];
     let removed: RemovedTransaction[] = [];
@@ -92,7 +92,7 @@ export const syncTransactions = async (req, res, next) => {
     while (hasMore) {
       const response = await plaidClient.transactionsSync({
         access_token: req.body.access_token,
-        cursor: cursor,
+        cursor: transactionCursor,
       });
       const data = response.data;
 
@@ -101,7 +101,7 @@ export const syncTransactions = async (req, res, next) => {
       removed = removed.concat(data.removed);
 
       hasMore = data.has_more;
-      cursor = data.next_cursor;
+      transactionCursor = data.next_cursor;
     }
 
     const plaidBudgetDocs = await findAllPlaidBudgetsByUserId(userId);
@@ -153,7 +153,7 @@ export const syncTransactions = async (req, res, next) => {
     }
     console.log(`Updated ${modified.length} transactions for item ${itemId}`);
 
-    await updateItemTransactionCursor({ itemId, cursor });
+    await updateItemTransactionCursor({ itemId, transactionCursor });
     console.log(`Successfully synced transactions for item [${itemId}]`);
     res.json(added);
   } catch (err) {

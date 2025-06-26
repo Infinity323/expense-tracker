@@ -117,27 +117,27 @@ export const findTransactionCursorById = async (itemId: string) => {
     new GetCommand({
       TableName,
       Key: { itemId },
-      ProjectionExpression: "cursor",
+      ProjectionExpression: "transactionCursor",
     })
   )) as IGetCommandOutput<ItemDoc>;
-  return result.Item.cursor;
+  return result.Item.transactionCursor;
 };
 
 export const updateItemTransactionCursor = async ({
   itemId,
-  cursor,
+  transactionCursor,
 }: {
   itemId: string;
-  cursor: string;
+  transactionCursor: string;
 }) => {
   return await db.send(
     new UpdateCommand({
       TableName,
       Key: { itemId },
       UpdateExpression:
-        "SET cursor = :cursor, updatedTimestamp = :updatedTimestamp",
+        "SET transactionCursor = :transactionCursor, updatedTimestamp = :updatedTimestamp",
       ExpressionAttributeValues: {
-        ":cursor": cursor,
+        ":transactionCursor": transactionCursor,
         ":updatedTimestamp": new Date().toISOString(),
       },
     })

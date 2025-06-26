@@ -47,7 +47,7 @@ const EditTransaction: React.FC<EditTransactionProps> = (props) => {
       description,
       category,
       subcategory,
-      amount,
+      amount: parseFloat(amount),
     });
     refetch();
     onClose();
