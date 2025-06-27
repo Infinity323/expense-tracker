@@ -9,7 +9,7 @@ export const get = async <T extends any>({
   params?: Record<string, any>;
 }): Promise<T> =>
   (
-    await axios.get<T>(uri, {
+    await axios.get<T>(getUrl(uri), {
       headers: {
         Authorization: "Bearer " + getToken(),
       },
@@ -25,7 +25,7 @@ export const post = async <T extends any>({
   data?: Record<string, any>;
 }): Promise<T> =>
   (
-    await axios.post<T>(uri, data, {
+    await axios.post<T>(getUrl(uri), data, {
       headers: {
         Authorization: "Bearer " + getToken(),
       },
@@ -40,7 +40,7 @@ export const put = async <T extends any>({
   data?: Record<string, any>;
 }): Promise<T> =>
   (
-    await axios.put<T>(uri, data, {
+    await axios.put<T>(getUrl(uri), data, {
       headers: {
         Authorization: "Bearer " + getToken(),
       },
@@ -55,7 +55,7 @@ export const delete_ = async <T extends any>({
   params?: Record<string, any>;
 }): Promise<T> =>
   (
-    await axios.delete<T>(uri, {
+    await axios.delete<T>(getUrl(uri), {
       headers: {
         Authorization: "Bearer " + getToken(),
       },
@@ -72,4 +72,6 @@ const getToken = () => {
   }
 
   return User.fromStorageString(oidcStorage).access_token;
-}
+};
+
+const getUrl = (uri: string) => process.env.REACT_APP_API_URL + uri;

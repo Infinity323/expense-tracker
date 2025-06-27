@@ -1,8 +1,7 @@
 import bodyParser from "body-parser";
+import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
-import path from "path";
-import { fileURLToPath } from "url";
 import authorizeUser from "./middleware/authorizeUser";
 import {
   clientErrorHandler,
@@ -20,21 +19,21 @@ import trendsRouter from "./routes/trends.routes";
 
 dotenv.config();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 const app = express();
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // cors
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-  res.setHeader("Access-Control-Allow-Methods", "*");
-  res.setHeader("Access-Control-Allow-Headers", "*");
-  next();
-});
+app.use(
+  "*",
+  cors({
+    origin: process.env.CLIENT_URL,
+  }),
+  (req, res, next) => {
+    next();
+  }
+);
 
 // add timestamps to log messages
 const logWithTimestamp = console.log.bind(console);
@@ -67,12 +66,6 @@ app.use("/api/institution", institutionRouter);
 app.use(validationErrorHandler);
 app.use(clientErrorHandler);
 app.use(defaultErrorHandler);
-
-// serve static React build
-app.use(express.static(path.join(__dirname, "../../client/build")));
-app.get("*", (req, res, next) => {
-  res.sendFile(path.join(__dirname, "../../client/build/index.html"));
-});
 
 app.listen(process.env.SERVER_PORT || 8080, () => {
   console.log(`Server is running on port ${process.env.SERVER_PORT}`);
