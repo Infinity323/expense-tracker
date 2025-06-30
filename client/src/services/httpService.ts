@@ -1,6 +1,8 @@
 import axios from "axios";
 import { User } from "oidc-client-ts";
 
+axios.defaults.withCredentials = true;
+
 export const get = async <T extends any>({
   uri,
   params,
