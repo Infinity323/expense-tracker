@@ -12,6 +12,7 @@ coverage
 build
 dist
 .swc
+*.zip
 
 # misc
 .DS_Store

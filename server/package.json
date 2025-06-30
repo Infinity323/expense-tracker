@@ -3,6 +3,7 @@
     "@aws-sdk/client-dynamodb": "^3.835.0",
     "@aws-sdk/credential-providers": "^3.835.0",
     "@aws-sdk/lib-dynamodb": "^3.835.0",
+    "@codegenie/serverless-express": "^4.16.0",
     "@types/express": "^5.0.3",
     "@types/plaid-link": "^2.0.15",
     "@types/react-plaid-link": "^2.0.0",
@@ -22,12 +23,15 @@
     "@swc/core": "^1.12.6",
     "@swc/plugin-transform-imports": "^8.0.3",
     "@types/node": "^24.0.0",
+    "esbuild": "^0.25.5",
     "tsx": "^4.19.4"
   },
   "scripts": {
     "start": "tsx index.ts",
-    "build": "npx swc . -d dist",
-    "build:ci": "tsc && npm run build"
+    "clean": "(rm -r dist || true) && (rm server.zip || true)",
+    "build": "npm run clean && npx swc . -d dist",
+    "build:ci": "tsc && npm run build && npx esbuild dist/lambda.js --bundle --platform=node --outfile=dist/index.cjs",
+    "package": "npm run build:ci && cd dist && zip ../server.zip index.cjs"
   },
   "type": "module"
 }

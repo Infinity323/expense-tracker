@@ -35,6 +35,14 @@ app.use(
   }
 );
 
+app.use((req, res, next) => {
+  const stagePrefix = /^\/[^/]+\/expense-tracker/;
+  if (stagePrefix.test(req.path)) {
+    req.url = req.url.replace(stagePrefix, "");
+  }
+  next();
+});
+
 // add timestamps to log messages
 const logWithTimestamp = console.log.bind(console);
 console.log = function (message) {
@@ -67,6 +75,10 @@ app.use(validationErrorHandler);
 app.use(clientErrorHandler);
 app.use(defaultErrorHandler);
 
-app.listen(process.env.SERVER_PORT || 8080, () => {
-  console.log(`Server is running on port ${process.env.SERVER_PORT}`);
-});
+if (!process.env.LAMBDA_TASK_ROOT) {
+  app.listen(process.env.SERVER_PORT || 8080, () => {
+    console.log(`Server is running on port ${process.env.SERVER_PORT}`);
+  });
+}
+
+export default app;
