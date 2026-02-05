@@ -1,5 +1,5 @@
 import { useDisclosure } from "@chakra-ui/react";
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, ReactNode, useContext, useState } from "react";
 import AlertModal, { AlertModalProps } from "../components/modals/AlertModal";
 import ConfirmationModal, {
   ConfirmationModalProps,
@@ -13,15 +13,15 @@ type GlobalModalType = "alert" | "loading" | "confirmation";
 type GlobalModalProps<T extends GlobalModalType> = T extends "alert"
   ? AlertModalProps
   : T extends "loading"
-  ? LoadingModalProps
-  : T extends "confirmation"
-  ? ConfirmationModalProps
-  : never;
+    ? LoadingModalProps
+    : T extends "confirmation"
+      ? ConfirmationModalProps
+      : never;
 
 type GlobalModalContextType = {
   openModal: <T extends GlobalModalType>(
     type: T,
-    props: GlobalModalProps<T>
+    props: GlobalModalProps<T>,
   ) => void;
   closeModal: (type: GlobalModalType) => void;
   props: any;
@@ -35,9 +35,7 @@ type GlobalModalProviderProps = {
   children: ReactNode;
 };
 
-export const GlobalModalProvider: React.FC<GlobalModalProviderProps> = ({
-  children,
-}) => {
+export const GlobalModalProvider = ({ children }: GlobalModalProviderProps) => {
   const {
     isOpen: isAlertOpen,
     onOpen: onAlertOpen,
@@ -57,7 +55,7 @@ export const GlobalModalProvider: React.FC<GlobalModalProviderProps> = ({
 
   const openModal = <T extends GlobalModalType>(
     type: T,
-    props: GlobalModalProps<T>
+    props: GlobalModalProps<T>,
   ) => {
     if (type === "alert") {
       onAlertOpen();

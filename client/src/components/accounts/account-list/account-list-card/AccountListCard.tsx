@@ -22,7 +22,7 @@ interface AccountListCardProps {
   balances: ItemAccount[];
 }
 
-const AccountListCard: React.FC<AccountListCardProps> = (props) => {
+const AccountListCard = (props: AccountListCardProps) => {
   const { balances } = props;
   const { institutions } = useLinkedInstitutions();
 
@@ -45,7 +45,7 @@ const AccountListCard: React.FC<AccountListCardProps> = (props) => {
               const institution = institutions?.find(
                 (institution) =>
                   institution.institution.institution_id ===
-                  account.institutionId
+                  account.institutionId,
               )?.institution;
               const logo = institution?.logo;
 

@@ -31,6 +31,7 @@ import { useCreateLinkToken } from "../../../hooks/useCreateLinkToken";
 import { deleteItem } from "../../../services/itemService";
 import { formatCurrency } from "../../../utils/CurrencyUtil";
 import LaunchLink from "../../launch-link/LaunchLink";
+
 interface InstitutionCardProps {
   group: AccountResponse;
   institution: Institution;
@@ -38,7 +39,7 @@ interface InstitutionCardProps {
   refetch: () => void;
 }
 
-const InstitutionCard: React.FC<InstitutionCardProps> = (props) => {
+const InstitutionCard = (props: InstitutionCardProps) => {
   const { group, institution, accessToken, refetch } = props;
   const linkToken = useCreateLinkToken({
     accessToken,
@@ -129,7 +130,7 @@ const InstitutionCard: React.FC<InstitutionCardProps> = (props) => {
                         Last updated{" "}
                         {format(
                           new Date(account.balances.last_updated_datetime),
-                          "MMMM dd, yyyy"
+                          "MMMM dd, yyyy",
                         )}
                       </Text>
                     )}

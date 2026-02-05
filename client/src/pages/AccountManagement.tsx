@@ -1,12 +1,11 @@
 import { Box, Button, Heading, Stack, Text } from "@chakra-ui/react";
-import React from "react";
 import InstitutionGroups from "../components/accounts/institution-groups/InstitutionGroups";
 import LaunchLink from "../components/launch-link/LaunchLink";
 import { useCreateLinkToken } from "../hooks/useCreateLinkToken";
 
 interface AccountManagementProps {}
 
-const AccountManagement: React.FC<AccountManagementProps> = (props) => {
+const AccountManagement = (props: AccountManagementProps) => {
   const linkToken = useCreateLinkToken({});
 
   return (

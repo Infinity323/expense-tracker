@@ -26,7 +26,7 @@ export interface AlertModalProps {
   status?: "error" | "info" | "success" | "warning";
 }
 
-const AlertModal: React.FC<ModalProps> = (props) => {
+const AlertModal = (props: ModalProps) => {
   const { isOpen, onClose } = props;
 
   const { props: modalProps } = useModal() as {
@@ -45,19 +45,19 @@ const AlertModal: React.FC<ModalProps> = (props) => {
                   modalProps.status === "error"
                     ? FaCircleExclamation
                     : modalProps.status === "warning"
-                    ? FaTriangleExclamation
-                    : modalProps.status === "success"
-                    ? FaCircleCheck
-                    : FaCircleInfo
+                      ? FaTriangleExclamation
+                      : modalProps.status === "success"
+                        ? FaCircleCheck
+                        : FaCircleInfo
                 }
                 color={
                   modalProps.status === "error"
                     ? "red"
                     : modalProps.status === "warning"
-                    ? "orange"
-                    : modalProps.status === "success"
-                    ? "green"
-                    : "blue"
+                      ? "orange"
+                      : modalProps.status === "success"
+                        ? "green"
+                        : "blue"
                 }
                 boxSize={8}
                 marginRight={1}

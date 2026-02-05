@@ -9,7 +9,6 @@ import {
   Tabs,
   Text,
 } from "@chakra-ui/react";
-import AccountListCard from "./account-list-card/AccountListCard";
 import {
   FaCreditCard,
   FaEllipsis,
@@ -18,10 +17,11 @@ import {
   FaSackDollar,
 } from "react-icons/fa6";
 import { useAccounts } from "../../../hooks/useAccounts";
+import AccountListCard from "./account-list-card/AccountListCard";
 
 interface AccountListProps {}
 
-const AccountList: React.FC<AccountListProps> = (props) => {
+const AccountList = (props: AccountListProps) => {
   const { flattenedAccounts, isLoading } = useAccounts();
 
   if (isLoading) {
@@ -61,7 +61,7 @@ const AccountList: React.FC<AccountListProps> = (props) => {
           <TabPanel>
             <AccountListCard
               balances={flattenedAccounts.filter(
-                (account) => account.type === "depository"
+                (account) => account.type === "depository",
               )}
             />
           </TabPanel>
@@ -69,28 +69,28 @@ const AccountList: React.FC<AccountListProps> = (props) => {
             <AccountListCard
               balances={flattenedAccounts.filter(
                 (account) =>
-                  account.type === "investment" || account.type === "brokerage"
+                  account.type === "investment" || account.type === "brokerage",
               )}
             />
           </TabPanel>
           <TabPanel>
             <AccountListCard
               balances={flattenedAccounts.filter(
-                (account) => account.type === "credit"
+                (account) => account.type === "credit",
               )}
             />
           </TabPanel>
           <TabPanel>
             <AccountListCard
               balances={flattenedAccounts.filter(
-                (account) => account.type === "loan"
+                (account) => account.type === "loan",
               )}
             />
           </TabPanel>
           <TabPanel>
             <AccountListCard
               balances={flattenedAccounts.filter(
-                (account) => account.type === "other"
+                (account) => account.type === "other",
               )}
             />
           </TabPanel>

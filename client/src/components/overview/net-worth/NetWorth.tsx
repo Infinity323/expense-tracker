@@ -24,7 +24,7 @@ import { formatCurrency } from "../../../utils/CurrencyUtil";
 
 interface NetWorthProps {}
 
-const NetWorth: React.FC<NetWorthProps> = (props) => {
+const NetWorth = (props: NetWorthProps) => {
   const { accounts, flattenedAccounts } = useAccounts();
 
   if (!accounts) {

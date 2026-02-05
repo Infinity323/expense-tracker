@@ -10,7 +10,7 @@ import {
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
-import React, { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect } from "react";
 import { ErrorBoundary as ReactErrorBoundary } from "react-error-boundary";
 
 interface ErrorBoundaryProps {
@@ -48,7 +48,7 @@ const ErrorModal = ({ error, resetErrorBoundary }) => {
   );
 };
 
-const ErrorBoundary: React.FC<ErrorBoundaryProps> = (props) => {
+const ErrorBoundary = (props: ErrorBoundaryProps) => {
   const { children } = props;
 
   const log = (error: Error) => console.error(error);

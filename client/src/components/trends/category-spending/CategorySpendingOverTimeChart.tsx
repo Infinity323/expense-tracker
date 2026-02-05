@@ -8,7 +8,7 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import {
   Bar,
@@ -27,7 +27,7 @@ import { COLOR_MAP } from "../../../utils/ColorUtil";
 import { formatCurrency } from "../../../utils/CurrencyUtil";
 import { dateToMMMYYYY, dateToString } from "../../../utils/DateUtil";
 
-const CategorySpendingOverTimeChart: React.FC = () => {
+const CategorySpendingOverTimeChart = () => {
   const { data: categoryData, isLoading: categoryIsLoading } = useQuery({
     queryKey: ["sortedBudgets"],
     queryFn: getSortedBudgets,
@@ -50,15 +50,15 @@ const CategorySpendingOverTimeChart: React.FC = () => {
       categories
         ?.filter((category) =>
           spendingData?.some(
-            (d) => typeof d[category] === "number" && d[category] !== 0
-          )
+            (d) => typeof d[category] === "number" && d[category] !== 0,
+          ),
         )
         .map((category) => ({
           value: category,
           color: COLOR_MAP[category],
           type: "square",
         })),
-    [categories, spendingData]
+    [categories, spendingData],
   );
 
   const handleLegendMouseEnter = (e: Payload) => {

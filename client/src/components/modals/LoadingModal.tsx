@@ -10,7 +10,6 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
-import React from "react";
 import { useModal } from "../../context/GlobalModalProvider";
 import { ModalProps } from "../../types/modalProps";
 
@@ -18,7 +17,7 @@ export interface LoadingModalProps {
   body: string;
 }
 
-const LoadingModal: React.FC<ModalProps> = (props) => {
+const LoadingModal = (props: ModalProps) => {
   const { isOpen, onClose } = props;
 
   const { props: modalProps } = useModal() as {

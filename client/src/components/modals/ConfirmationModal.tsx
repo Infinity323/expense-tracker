@@ -8,9 +8,9 @@ import {
   AlertDialogOverlay,
   Button,
 } from "@chakra-ui/react";
-import React, { useRef } from "react";
-import { ModalProps } from "../../types/modalProps";
+import { useRef } from "react";
 import { useModal } from "../../context/GlobalModalProvider";
+import { ModalProps } from "../../types/modalProps";
 
 export interface ConfirmationModalProps {
   header: string;
@@ -21,7 +21,7 @@ export interface ConfirmationModalProps {
   };
 }
 
-const ConfirmationModal: React.FC<ModalProps> = (props) => {
+const ConfirmationModal = (props: ModalProps) => {
   const { isOpen, onClose } = props;
 
   const cancelRef = useRef();

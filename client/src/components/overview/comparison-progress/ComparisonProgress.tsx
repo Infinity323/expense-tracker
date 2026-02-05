@@ -7,7 +7,7 @@ interface ComparisonProgressProps {
   type: "income" | "expense";
 }
 
-const ComparisonProgress: React.FC<ComparisonProgressProps> = (props) => {
+const ComparisonProgress = (props: ComparisonProgressProps) => {
   const { comparison, type } = props;
 
   const multiplier = type === "income" ? -1 : 1;
@@ -34,7 +34,7 @@ const ComparisonProgress: React.FC<ComparisonProgressProps> = (props) => {
         size="md"
         value={calculateProgress(
           comparison.expectedAmount,
-          comparison.actualAmount
+          comparison.actualAmount,
         )}
       />
       <Flex>

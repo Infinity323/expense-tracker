@@ -1,18 +1,18 @@
 import { Button } from "@chakra-ui/react";
-import React, { ReactNode, useCallback } from "react";
+import { ReactNode, useCallback } from "react";
 import {
   PlaidLinkOnEvent,
   PlaidLinkOnExit,
   PlaidLinkOnSuccess,
   usePlaidLink,
 } from "react-plaid-link";
+import { useModal } from "../../context/GlobalModalProvider";
 import { useUserContext } from "../../context/UserProvider";
 import { useAccounts } from "../../hooks/useAccounts";
+import { useLinkedInstitutions } from "../../hooks/useLinkedInstitutions";
 import { updateItem } from "../../services/itemService";
 import { postAccessToken } from "../../services/linkService";
 import { AccessToken } from "../../types/accessToken";
-import { useModal } from "../../context/GlobalModalProvider";
-import { useLinkedInstitutions } from "../../hooks/useLinkedInstitutions";
 
 interface LaunchLinkProps {
   children: ReactNode;
@@ -21,7 +21,7 @@ interface LaunchLinkProps {
   colorScheme?: string;
 }
 
-const LaunchLink: React.FC<LaunchLinkProps> = (props) => {
+const LaunchLink = (props: LaunchLinkProps) => {
   const { linkToken, children, itemId, colorScheme } = props;
   const { setAccessTokens } = useUserContext();
   const { refetch: refetchAccounts } = useAccounts();
@@ -34,7 +34,7 @@ const LaunchLink: React.FC<LaunchLinkProps> = (props) => {
         try {
           const accessTokenResponse = await postAccessToken(
             publicToken,
-            metadata
+            metadata,
           );
           setAccessTokens((prev: AccessToken[]) => [
             ...prev,
@@ -53,7 +53,7 @@ const LaunchLink: React.FC<LaunchLinkProps> = (props) => {
       refetchAccounts();
       refetchInstitutions();
     },
-    [itemId, openModal, refetchAccounts, refetchInstitutions, setAccessTokens]
+    [itemId, openModal, refetchAccounts, refetchInstitutions, setAccessTokens],
   );
 
   const onExit = useCallback<PlaidLinkOnExit>(
@@ -72,7 +72,7 @@ const LaunchLink: React.FC<LaunchLinkProps> = (props) => {
         });
       }
     },
-    [openModal]
+    [openModal],
   );
 
   const onEvent = useCallback<PlaidLinkOnEvent>(
@@ -85,7 +85,7 @@ const LaunchLink: React.FC<LaunchLinkProps> = (props) => {
           status: "error",
         });
     },
-    [openModal]
+    [openModal],
   );
 
   const { open, ready } = usePlaidLink({

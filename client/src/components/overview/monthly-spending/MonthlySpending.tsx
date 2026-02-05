@@ -19,7 +19,7 @@ import { formatCurrency } from "../../../utils/CurrencyUtil";
 
 interface MonthlySpendingProps {}
 
-const MonthlySpending: React.FC<MonthlySpendingProps> = (props) => {
+const MonthlySpending = (props: MonthlySpendingProps) => {
   const { data: expenses, isLoading } = useQuery({
     queryKey: ["currentMonthSpending"],
     queryFn: getCurrentMonthSpending,
@@ -30,33 +30,39 @@ const MonthlySpending: React.FC<MonthlySpendingProps> = (props) => {
     () =>
       expenses
         ? Object.entries(
-            expenses?.reduce((acc, expense) => {
-              acc[expense.category] = acc[expense.category] || 0;
-              acc[expense.category] += expense.amount;
-              return acc;
-            }, {} as Record<string, number>)
+            expenses?.reduce(
+              (acc, expense) => {
+                acc[expense.category] = acc[expense.category] || 0;
+                acc[expense.category] += expense.amount;
+                return acc;
+              },
+              {} as Record<string, number>,
+            ),
           )
             .map(([name, value]) => ({ name, value }))
             .filter((entry) => entry.value > 0)
         : undefined,
-    [expenses]
+    [expenses],
   );
 
   const subcategoryData = useMemo(
     () =>
       expenses
         ? Object.entries(
-            expenses?.reduce((acc, expense) => {
-              const key = `${expense.category}|${expense.subcategory}`;
-              acc[key] = acc[key] || 0;
-              acc[key] += expense.amount;
-              return acc;
-            }, {} as Record<string, number>)
+            expenses?.reduce(
+              (acc, expense) => {
+                const key = `${expense.category}|${expense.subcategory}`;
+                acc[key] = acc[key] || 0;
+                acc[key] += expense.amount;
+                return acc;
+              },
+              {} as Record<string, number>,
+            ),
           )
             .map(([name, value]) => ({ name, value }))
             .filter((entry) => entry.value > 0)
         : undefined,
-    [expenses]
+    [expenses],
   );
 
   const renderLabel = ({ value }) => formatCurrency(value);

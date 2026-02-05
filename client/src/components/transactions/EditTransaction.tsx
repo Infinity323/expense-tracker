@@ -1,3 +1,4 @@
+import { TransactionDoc } from "@backend/db/types/transactionDoc";
 import {
   Button,
   Icon,
@@ -15,18 +16,17 @@ import {
   Stack,
   useDisclosure,
 } from "@chakra-ui/react";
-import React, { useState } from "react";
+import { useState } from "react";
 import { FaPencil } from "react-icons/fa6";
 import { putTransaction } from "../../services/transactionService";
 import BudgetsSelect from "../budgets/BudgetsSelect";
-import { TransactionDoc } from "@backend/db/types/transactionDoc";
 
 interface EditTransactionProps {
   transactionDoc: TransactionDoc;
   refetch: () => void;
 }
 
-const EditTransaction: React.FC<EditTransactionProps> = (props) => {
+const EditTransaction = (props: EditTransactionProps) => {
   const { transactionDoc, refetch } = props;
 
   const { isOpen, onOpen, onClose } = useDisclosure();

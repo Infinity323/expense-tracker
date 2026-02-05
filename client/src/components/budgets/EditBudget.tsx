@@ -1,3 +1,4 @@
+import { BudgetDoc } from "@backend/db/types/budgetDoc";
 import {
   Button,
   Icon,
@@ -15,17 +16,16 @@ import {
   Stack,
   useDisclosure,
 } from "@chakra-ui/react";
-import React, { useState } from "react";
+import { useState } from "react";
 import { FaPencil } from "react-icons/fa6";
 import { putBudget } from "../../services/budgetService";
-import { BudgetDoc } from "@backend/db/types/budgetDoc";
 
 interface EditBudgetProps {
   budgetDoc: BudgetDoc;
   refetch: () => void;
 }
 
-const EditBudget: React.FC<EditBudgetProps> = (props) => {
+const EditBudget = (props: EditBudgetProps) => {
   const { budgetDoc, refetch } = props;
   const { isOpen, onOpen, onClose } = useDisclosure();
 
