@@ -22,6 +22,7 @@
     "@swc/cli": "^0.7.7",
     "@swc/core": "^1.12.6",
     "@swc/plugin-transform-imports": "^8.0.3",
+    "@types/aws-lambda": "^8.10.160",
     "@types/node": "^24.0.0",
     "esbuild": "^0.25.5",
     "tsx": "^4.19.4"

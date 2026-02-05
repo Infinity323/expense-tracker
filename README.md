@@ -8,27 +8,37 @@ Account transaction data provided by the [Plaid API](https://plaid.com/docs/).
 
 ### Development
 
+To run the UI locally, run:
+
 ```bash
 # ./client
 npm start
-
-# ./server
-tsx server.ts
 ```
 
-App will be available at http://localhost:3000.
+The UI will be available at http://localhost:3000.
 
-### Production
+To run the server locally, run:
 
 ```bash
-# ./client
-npm run build
-
 # ./server
 tsx server.ts
 ```
 
-App will be available at http://localhost:8080.
+The server will be available at http://localhost:8080
+
+### Deploying
+
+The client directory is synced with Vercel to automatically deploy `master`.
+
+To compile the server to deploy to AWS Lambda, run:
+
+```bash
+# ./server
+npx esbuild lambda.ts --bundle --platform=node --format=cjs --outfile=index.js
+zip server.zip index.js
+```
+
+Then upload the `server.zip` to Lambda.
 
 ## Screenshots
 
