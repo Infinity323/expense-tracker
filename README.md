@@ -21,7 +21,7 @@ To run the server locally, run:
 
 ```bash
 # ./server
-tsx server.ts
+tsx index.ts
 ```
 
 The server will be available at http://localhost:8080
@@ -34,11 +34,11 @@ To compile the server to deploy to AWS Lambda, run:
 
 ```bash
 # ./server
-npx esbuild lambda.ts --bundle --platform=node --format=cjs --outfile=index.js
-zip server.zip index.js
+npx esbuild lambda.ts --bundle --platform=node --format=cjs --outfile=dist/index.js
+zip dist/server.zip dist/index.js
 ```
 
-Then upload the `server.zip` to Lambda.
+Then upload the `dist/server.zip` to Lambda.
 
 ## Screenshots
 
