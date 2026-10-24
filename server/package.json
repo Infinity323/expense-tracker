@@ -25,7 +25,7 @@
     "@types/aws-lambda": "^8.10.160",
     "@types/node": "^24.0.0",
     "esbuild": "^0.25.5",
-    "tsx": "^4.19.4"
+    "tsx": "^4.23.15"
   },
   "scripts": {
     "start": "tsx index.ts",
