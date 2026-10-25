@@ -7,6 +7,7 @@ import {
   updateAccounts,
 } from "../db/repositories/item.repository";
 import { getUserId } from "../utils/authUtil";
+import { logPlaidApiError } from "../utils/plaidLogging";
 
 export const getAllItems = async (req, res, next) => {
   try {
@@ -64,6 +65,10 @@ export const deleteItem = async (
       if (err.response?.data?.error_code !== "ITEM_NOT_FOUND") {
         throw err;
       }
+      logPlaidApiError(err, {
+        operation: "itemRemove",
+        item_id: req.params.id,
+      });
     }
 
     await deleteById(req.params.id, userId);

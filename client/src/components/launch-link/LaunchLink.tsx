@@ -53,6 +53,15 @@ const LaunchLink = (props: LaunchLinkProps) => {
         }
         await Promise.all([refetchAccounts(), refetchInstitutions()]);
       } catch (error) {
+        console.error(
+          "[Plaid Link] backend completion failed",
+          JSON.stringify({
+            link_session_id: metadata.link_session_id,
+            institution_id: metadata.institution?.institution_id,
+            account_ids: metadata.accounts?.map((account) => account.id),
+            error_name: error instanceof Error ? error.name : "UnknownError",
+          }),
+        );
         toast({
           title: "Could not link account",
           description: getErrorMessage(error, "Please try again."),
@@ -69,6 +78,20 @@ const LaunchLink = (props: LaunchLinkProps) => {
   const onExit = useCallback<PlaidLinkOnExit>(
     (error, metadata) => {
       void refreshLinkToken();
+      if (error) {
+        console.error(
+          "[Plaid Link] exit error",
+          JSON.stringify({
+            error_type: error.error_type,
+            error_code: error.error_code,
+            request_id: metadata.request_id,
+            link_session_id: metadata.link_session_id,
+            institution_id: metadata.institution?.institution_id,
+            account_ids: metadata.accounts?.map((account) => account.id),
+            exit_status: metadata.status,
+          }),
+        );
+      }
       if (error?.error_code === "INVALID_LINK_TOKEN") {
         toast({
           title: "Link session expired",
@@ -90,13 +113,25 @@ const LaunchLink = (props: LaunchLinkProps) => {
 
   const onEvent = useCallback<PlaidLinkOnEvent>(
     (eventName, metadata) => {
-      if (eventName === "ERROR")
+      if (eventName === "ERROR") {
+        console.error(
+          "[Plaid Link] event error",
+          JSON.stringify({
+            error_type: metadata.error_type,
+            error_code: metadata.error_code,
+            request_id: metadata.request_id,
+            link_session_id: metadata.link_session_id,
+            institution_id: metadata.institution_id,
+            account_id: metadata.account_id,
+          }),
+        );
         toast({
           title: "Could not link account",
           description: metadata.error_message || "Please try again.",
           status: "error",
           isClosable: true,
         });
+      }
     },
     [toast],
   );

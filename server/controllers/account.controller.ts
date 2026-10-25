@@ -5,6 +5,7 @@ import {
 } from "../db/repositories/item.repository";
 import { AccountResponse } from "../types/accountResponse";
 import { getUserId } from "../utils/authUtil";
+import { logPlaidApiError } from "../utils/plaidLogging";
 
 export const getAllAccounts = async (req, res, next) => {
   try {
@@ -33,6 +34,10 @@ export const getAllAccounts = async (req, res, next) => {
             throw error;
           }
 
+          logPlaidApiError(error, {
+            operation: "accountsGet",
+            item_id: doc.itemId,
+          });
           await updateNeedsAttentionById(doc.itemId, userId, true);
           return {
             created_timestamp: doc.createdTimestamp,
