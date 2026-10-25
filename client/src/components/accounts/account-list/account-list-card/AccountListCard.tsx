@@ -69,7 +69,6 @@ const AccountListCard = (props: AccountListCardProps) => {
                     <Text>
                       {account.official_name} (...{account.mask})
                     </Text>
-                    <Text>{account.balances.last_updated_datetime}</Text>
                   </Box>
                   <Spacer />
                   <Text>{formatCurrency(account.balances.current)}</Text>
