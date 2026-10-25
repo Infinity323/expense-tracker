@@ -27,7 +27,7 @@ import { formatCurrency } from "../../../utils/CurrencyUtil";
 interface NetWorthProps {}
 
 const NetWorth = (props: NetWorthProps) => {
-  const { accounts, flattenedAccounts, isLoading, isError } = useAccounts();
+  const { flattenedAccounts, isLoading, isError } = useAccounts();
 
   if (isLoading) {
     return <Skeleton height="200px" />;
