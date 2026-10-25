@@ -6,17 +6,16 @@ import {
   Th,
   Thead,
   Tr,
+  Skeleton,
 } from "@chakra-ui/react";
 import { useEffect } from "react";
 import { useBudgets } from "../../hooks/useBudgets";
-import { useLoadingModal } from "../../hooks/useLoadingModal";
 import { formatCurrency } from "../../utils/CurrencyUtil";
 import DeleteBudget from "./DeleteBudget";
 import EditBudget from "./EditBudget";
 
 function BudgetsTable({ reload, setReload }) {
   const { budgets, isLoading, refetch } = useBudgets();
-  useLoadingModal({ isLoading });
 
   useEffect(() => {
     if (reload) {
@@ -40,7 +39,17 @@ function BudgetsTable({ reload, setReload }) {
           </Tr>
         </Thead>
         <Tbody>
-          {displayedBudgets?.length ? (
+          {isLoading ? (
+            Array.from({ length: 5 }, (_, rowIndex) => (
+              <Tr key={`budget-skeleton-${rowIndex}`}>
+                {Array.from({ length: 4 }, (_, columnIndex) => (
+                  <Td key={`budget-skeleton-${rowIndex}-${columnIndex}`}>
+                    <Skeleton height="14px" />
+                  </Td>
+                ))}
+              </Tr>
+            ))
+          ) : displayedBudgets?.length ? (
             displayedBudgets.map((budget) => (
               <Tr key={budget.budgetId}>
                 <Td>{budget.category}</Td>

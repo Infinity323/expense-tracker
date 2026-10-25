@@ -8,13 +8,13 @@ import {
   Tr,
   Alert,
   AlertIcon,
+  Skeleton,
   Spinner,
   Text,
 } from "@chakra-ui/react";
 import { Dispatch, SetStateAction, useEffect, useRef } from "react";
 import { useInfiniteQuery } from "react-query";
 import { useAccounts } from "../../hooks/useAccounts";
-import { useLoadingModal } from "../../hooks/useLoadingModal";
 import { getTransactions } from "../../services/transactionService";
 import { formatCurrency } from "../../utils/CurrencyUtil";
 import DeleteTransaction from "./DeleteTransaction";
@@ -57,7 +57,6 @@ function TransactionsTable({
     if (accountId === "manual") return !transaction.accountId;
     return transaction.accountId === accountId;
   });
-  useLoadingModal({ isLoading });
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
@@ -96,7 +95,17 @@ function TransactionsTable({
           </Tr>
         </Thead>
         <Tbody>
-          {isError && transactions.length === 0 ? (
+          {isLoading ? (
+            Array.from({ length: 5 }, (_, rowIndex) => (
+              <Tr key={`transaction-skeleton-${rowIndex}`}>
+                {Array.from({ length: 8 }, (_, columnIndex) => (
+                  <Td key={`transaction-skeleton-${rowIndex}-${columnIndex}`}>
+                    <Skeleton height="14px" />
+                  </Td>
+                ))}
+              </Tr>
+            ))
+          ) : isError && transactions.length === 0 ? (
             <Tr>
               <Td colSpan={8}>
                 <Alert status="error">

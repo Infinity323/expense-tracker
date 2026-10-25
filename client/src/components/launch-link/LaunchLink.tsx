@@ -87,7 +87,6 @@ const LaunchLink = (props: LaunchLinkProps) => {
             request_id: metadata.request_id,
             link_session_id: metadata.link_session_id,
             institution_id: metadata.institution?.institution_id,
-            account_ids: metadata.accounts?.map((account) => account.id),
             exit_status: metadata.status,
           }),
         );
@@ -122,7 +121,6 @@ const LaunchLink = (props: LaunchLinkProps) => {
             request_id: metadata.request_id,
             link_session_id: metadata.link_session_id,
             institution_id: metadata.institution_id,
-            account_id: metadata.account_id,
           }),
         );
         toast({
