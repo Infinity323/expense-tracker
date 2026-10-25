@@ -1,13 +1,10 @@
-import { Box, Button, Heading, Stack, Text } from "@chakra-ui/react";
+import { Box, Heading, Stack, Text } from "@chakra-ui/react";
 import InstitutionGroups from "../components/accounts/institution-groups/InstitutionGroups";
 import LaunchLink from "../components/launch-link/LaunchLink";
-import { useCreateLinkToken } from "../hooks/useCreateLinkToken";
 
 interface AccountManagementProps {}
 
 const AccountManagement = (props: AccountManagementProps) => {
-  const linkToken = useCreateLinkToken({});
-
   return (
     <Stack spacing="2rem">
       <Box>
@@ -18,15 +15,7 @@ const AccountManagement = (props: AccountManagementProps) => {
       </Box>
       <InstitutionGroups />
       <Box>
-        {linkToken ? (
-          <LaunchLink linkToken={linkToken} colorScheme="teal">
-            Link Account
-          </LaunchLink>
-        ) : (
-          <Button disabled isLoading colorScheme="teal">
-            Link Account
-          </Button>
-        )}
+        <LaunchLink colorScheme="teal">Link Account</LaunchLink>
       </Box>
     </Stack>
   );

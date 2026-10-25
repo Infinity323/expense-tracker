@@ -3,11 +3,16 @@ import { delete_, get, post, put } from "./httpService";
 
 const TRANSACTION_API = "/api/transaction";
 
-export const getTransactions = async ({ queryKey }) => {
-  const [, { month }] = queryKey;
-  return await get<TransactionDoc[]>({
+export interface TransactionPage {
+  items: TransactionDoc[];
+  nextCursor: string | null;
+}
+
+export const getTransactions = async ({ queryKey, pageParam }: any) => {
+  const [, { month, accountId }] = queryKey;
+  return await get<TransactionPage>({
     uri: TRANSACTION_API,
-    params: { month },
+    params: { month, accountId, cursor: pageParam },
   });
 };
 
@@ -19,10 +24,9 @@ export const putTransaction = async (transactionDoc) => {
   return await put({ uri: TRANSACTION_API, data: transactionDoc });
 };
 
-export const syncTransactions = async (itemId, accessToken) =>
+export const syncTransactions = async (itemId: string) =>
   await put({
     uri: `${TRANSACTION_API}/sync/${itemId}`,
-    data: { access_token: accessToken },
   });
 
 export const deleteTransaction = async (id) =>

@@ -64,10 +64,29 @@ const seedBudgets = async (userId: string) => {
 
 export const addBudget = async (req, res, next) => {
   try {
-    const response = await create(req.body);
-    console.log(
-      `Successfully added new budget document ID [${response.budgetId}]`
-    );
+    const { primary, detailed, description, category, subcategory } = req.body;
+    const amount = Number(req.body.amount);
+    if (
+      typeof category !== "string" ||
+      !category.trim() ||
+      typeof subcategory !== "string" ||
+      !subcategory.trim() ||
+      !Number.isFinite(amount) ||
+      amount < 0
+    ) {
+      return res.status(400).json({ error: "Invalid budget details" });
+    }
+
+    const response = await create({
+      primary,
+      detailed,
+      description,
+      category: category.trim(),
+      subcategory: subcategory.trim(),
+      amount,
+      isMaster: false,
+      userId: getUserId(req),
+    });
     res.status(201).json(response);
   } catch (err) {
     next(err);
@@ -76,9 +95,24 @@ export const addBudget = async (req, res, next) => {
 
 export const putBudget = async (req, res, next) => {
   try {
-    const response = await update(req.body);
-    console.log(
-      `Successfully updated budget document ID [${response.budgetId}]`
+    const { budgetId, category, subcategory } = req.body;
+    const amount = Number(req.body.amount);
+    if (
+      typeof budgetId !== "string" ||
+      !budgetId ||
+      typeof category !== "string" ||
+      !category.trim() ||
+      typeof subcategory !== "string" ||
+      !subcategory.trim() ||
+      !Number.isFinite(amount) ||
+      amount < 0
+    ) {
+      return res.status(400).json({ error: "Invalid budget details" });
+    }
+
+    await update(
+      { budgetId, category: category.trim(), subcategory: subcategory.trim(), amount },
+      getUserId(req),
     );
     res.status(204).send();
   } catch (err) {
@@ -88,10 +122,7 @@ export const putBudget = async (req, res, next) => {
 
 export const deleteBudget = async (req, res, next) => {
   try {
-    await deleteById(req.params.id);
-    console.log(
-      `Successfully deleted budget document with ID ${req.params.id} and rev ${req.params.rev}`
-    );
+    await deleteById(req.params.id, getUserId(req));
     res.status(204).send();
   } catch (err) {
     next(err);

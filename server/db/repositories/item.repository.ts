@@ -85,49 +85,79 @@ export const findByUserId = async (userId: string) => {
   return result.Items;
 };
 
-export const updateAccounts = async (itemId: string, accounts: any) => {
+export const findByIdAndUserId = async (itemId: string, userId: string) => {
+  const result = (await db.send(
+    new GetCommand({
+      TableName,
+      Key: { itemId },
+    })
+  )) as IGetCommandOutput<ItemDoc>;
+  return result.Item?.userId === userId ? result.Item : undefined;
+};
+
+export const updateAccounts = async (
+  itemId: string,
+  userId: string,
+  accounts: any,
+) => {
   return await db.send(
     new UpdateCommand({
       TableName,
       Key: { itemId },
       UpdateExpression:
-        "SET accounts = :accounts, NeedsAttention = :needsAttention, updatedTimestamp = :updatedTimestamp",
+        "SET accounts = :accounts, needsAttention = :needsAttention, updatedTimestamp = :updatedTimestamp",
+      ConditionExpression: "userId = :userId",
       ExpressionAttributeValues: {
         ":accounts": accounts,
         ":needsAttention": false,
         ":updatedTimestamp": new Date().toISOString(),
+        ":userId": userId,
       },
     })
   );
 };
 
-export const deleteById = async (itemId: string) => {
+export const deleteById = async (itemId: string, userId: string) => {
   return await db.send(
     new DeleteCommand({
       TableName,
       Key: {
         itemId,
       },
+      ConditionExpression: "userId = :userId",
+      ExpressionAttributeValues: {
+        ":userId": userId,
+      },
     })
   );
 };
 
-export const findTransactionCursorById = async (itemId: string) => {
+export const findTransactionCursorById = async (
+  itemId: string,
+  userId: string,
+) => {
   const result = (await db.send(
     new GetCommand({
       TableName,
       Key: { itemId },
-      ProjectionExpression: "transactionCursor",
+      ProjectionExpression: "transactionCursor, userId",
     })
   )) as IGetCommandOutput<ItemDoc>;
+  if (result.Item?.userId !== userId) {
+    const error = new Error("Item not found");
+    Object.assign(error, { status: 404 });
+    throw error;
+  }
   return result.Item.transactionCursor;
 };
 
 export const updateItemTransactionCursor = async ({
   itemId,
+  userId,
   transactionCursor,
 }: {
   itemId: string;
+  userId: string;
   transactionCursor: string;
 }) => {
   return await db.send(
@@ -136,9 +166,11 @@ export const updateItemTransactionCursor = async ({
       Key: { itemId },
       UpdateExpression:
         "SET transactionCursor = :transactionCursor, updatedTimestamp = :updatedTimestamp",
+      ConditionExpression: "userId = :userId",
       ExpressionAttributeValues: {
         ":transactionCursor": transactionCursor,
         ":updatedTimestamp": new Date().toISOString(),
+        ":userId": userId,
       },
     })
   );
@@ -146,6 +178,7 @@ export const updateItemTransactionCursor = async ({
 
 export const updateNeedsAttentionById = async (
   itemId: string,
+  userId: string,
   needsAttention: boolean
 ) => {
   return await db.send(
@@ -153,10 +186,12 @@ export const updateNeedsAttentionById = async (
       TableName,
       Key: { itemId },
       UpdateExpression:
-        "SET NeedsAttention = :needsAttention, updatedTimestamp = :updatedTimestamp",
+        "SET needsAttention = :needsAttention, updatedTimestamp = :updatedTimestamp",
+      ConditionExpression: "userId = :userId",
       ExpressionAttributeValues: {
         ":needsAttention": needsAttention,
         ":updatedTimestamp": new Date().toISOString(),
+        ":userId": userId,
       },
     })
   );

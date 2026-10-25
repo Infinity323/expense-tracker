@@ -1,4 +1,6 @@
 import {
+  Alert,
+  AlertIcon,
   Icon,
   Skeleton,
   Stack,
@@ -17,15 +19,26 @@ import {
   FaSackDollar,
 } from "react-icons/fa6";
 import { useAccounts } from "../../../hooks/useAccounts";
+import { useLinkedInstitutions } from "../../../hooks/useLinkedInstitutions";
 import AccountListCard from "./account-list-card/AccountListCard";
 
 interface AccountListProps {}
 
 const AccountList = (props: AccountListProps) => {
-  const { flattenedAccounts, isLoading } = useAccounts();
+  const { flattenedAccounts, isLoading, isError } = useAccounts();
+  const { isError: isInstitutionsError } = useLinkedInstitutions();
 
   if (isLoading) {
     return <Skeleton height="200px" />;
+  }
+
+  if (isError || isInstitutionsError) {
+    return (
+      <Alert status="error">
+        <AlertIcon />
+        Could not load account details. Please try again.
+      </Alert>
+    );
   }
 
   if (!flattenedAccounts) {

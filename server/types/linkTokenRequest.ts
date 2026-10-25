@@ -1,3 +1,3 @@
 export interface LinkTokenRequest {
-  accessToken?: string;
+  itemId?: string;
 }

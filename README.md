@@ -21,7 +21,8 @@ To run the server locally, run:
 
 ```bash
 # ./server
-tsx index.ts
+aws login --profile expense-tracker
+npm start
 ```
 
 The server will be available at http://localhost:8080
@@ -30,15 +31,22 @@ The server will be available at http://localhost:8080
 
 The client directory is synced with Vercel to automatically deploy `master`.
 
-To compile the server to deploy to AWS Lambda, run:
+To deploy the server to an existing AWS Lambda function, run these commands from `server`:
 
 ```bash
-# ./server
-npx esbuild lambda.ts --bundle --platform=node --format=cjs --outfile=dist/index.js
-zip dist/server.zip dist/index.js
+npm run clean
+mkdir -p dist/db
+npx esbuild lambda.ts --bundle --platform=node --format=cjs --outfile=dist/index.cjs
+cp db/budget-seed-data.csv dist/db/budget-seed-data.csv
+(cd dist && zip -r ../server.zip .)
+aws lambda update-function-code \
+  --function-name expense-tracker \
+  --zip-file fileb://server.zip \
+  --region us-east-2 \
+  --profile expense-tracker
 ```
 
-Then upload the `dist/server.zip` to Lambda.
+The Lambda runtime handler must be `index.handler`, and the function must already have its execution role, environment variables, and API Gateway integration configured. This command updates `$LATEST`; if API Gateway invokes a published version through an alias, publish a new version and move the alias after the update.
 
 ## Screenshots
 

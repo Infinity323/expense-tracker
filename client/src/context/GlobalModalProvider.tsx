@@ -1,6 +1,5 @@
 import { useDisclosure } from "@chakra-ui/react";
 import { createContext, ReactNode, useContext, useState } from "react";
-import AlertModal, { AlertModalProps } from "../components/modals/AlertModal";
 import ConfirmationModal, {
   ConfirmationModalProps,
 } from "../components/modals/ConfirmationModal";
@@ -8,15 +7,11 @@ import LoadingModal, {
   LoadingModalProps,
 } from "../components/modals/LoadingModal";
 
-type GlobalModalType = "alert" | "loading" | "confirmation";
+type GlobalModalType = "loading" | "confirmation";
 
-type GlobalModalProps<T extends GlobalModalType> = T extends "alert"
-  ? AlertModalProps
-  : T extends "loading"
-    ? LoadingModalProps
-    : T extends "confirmation"
-      ? ConfirmationModalProps
-      : never;
+type GlobalModalProps<T extends GlobalModalType> = T extends "loading"
+  ? LoadingModalProps
+  : ConfirmationModalProps;
 
 type GlobalModalContextType = {
   openModal: <T extends GlobalModalType>(
@@ -24,23 +19,26 @@ type GlobalModalContextType = {
     props: GlobalModalProps<T>,
   ) => void;
   closeModal: (type: GlobalModalType) => void;
-  props: any;
+  props?: LoadingModalProps | ConfirmationModalProps;
 };
 
-const GlobalModalContext = createContext<GlobalModalContextType>(undefined);
+const GlobalModalContext = createContext<GlobalModalContextType | undefined>(
+  undefined,
+);
 
-export const useModal = () => useContext(GlobalModalContext);
+export const useModal = () => {
+  const context = useContext(GlobalModalContext);
+  if (!context) {
+    throw new Error("useModal must be used within GlobalModalProvider");
+  }
+  return context;
+};
 
 type GlobalModalProviderProps = {
   children: ReactNode;
 };
 
 export const GlobalModalProvider = ({ children }: GlobalModalProviderProps) => {
-  const {
-    isOpen: isAlertOpen,
-    onOpen: onAlertOpen,
-    onClose: onAlertClose,
-  } = useDisclosure();
   const {
     isOpen: isLoadingOpen,
     onOpen: onLoadingOpen,
@@ -57,29 +55,24 @@ export const GlobalModalProvider = ({ children }: GlobalModalProviderProps) => {
     type: T,
     props: GlobalModalProps<T>,
   ) => {
-    if (type === "alert") {
-      onAlertOpen();
-    } else if (type === "loading") {
+    if (type === "loading") {
       onLoadingOpen();
-    } else if (type === "confirmation") {
+    } else {
       onConfirmationOpen();
     }
     setProps(props);
   };
 
   const closeModal = (type: GlobalModalType) => {
-    if (type === "alert") {
-      onAlertOpen();
-    } else if (type === "loading") {
+    if (type === "loading") {
       onLoadingClose();
-    } else if (type === "confirmation") {
-      onConfirmationOpen();
+    } else {
+      onConfirmationClose();
     }
   };
 
   return (
     <GlobalModalContext.Provider value={{ openModal, closeModal, props }}>
-      <AlertModal isOpen={isAlertOpen} onClose={onAlertClose} />
       <ConfirmationModal
         isOpen={isConfirmationOpen}
         onClose={onConfirmationClose}

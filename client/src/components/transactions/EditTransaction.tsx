@@ -15,11 +15,13 @@ import {
   ModalOverlay,
   Stack,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { FaPencil } from "react-icons/fa6";
 import { putTransaction } from "../../services/transactionService";
 import BudgetsSelect from "../budgets/BudgetsSelect";
+import { getErrorMessage } from "../../utils/getErrorMessage";
 
 interface EditTransactionProps {
   transactionDoc: TransactionDoc;
@@ -30,6 +32,8 @@ const EditTransaction = (props: EditTransactionProps) => {
   const { transactionDoc, refetch } = props;
 
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const toast = useToast();
 
   const [date, setDate] = useState(transactionDoc.date);
   const [name, setName] = useState(transactionDoc.name);
@@ -40,17 +44,29 @@ const EditTransaction = (props: EditTransactionProps) => {
 
   const editTransaction = async (event) => {
     event.preventDefault();
-    await putTransaction({
-      transactionId: transactionDoc.transactionId,
-      date,
-      name,
-      description,
-      category,
-      subcategory,
-      amount: parseFloat(amount),
-    });
-    refetch();
-    onClose();
+    setIsSubmitting(true);
+    try {
+      await putTransaction({
+        transactionId: transactionDoc.transactionId,
+        date,
+        name,
+        description,
+        category,
+        subcategory,
+        amount: parseFloat(amount),
+      });
+      await refetch();
+      onClose();
+    } catch (error) {
+      toast({
+        title: "Could not update transaction",
+        description: getErrorMessage(error, "Please check your details and try again."),
+        status: "error",
+        isClosable: true,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -109,6 +125,7 @@ const EditTransaction = (props: EditTransactionProps) => {
             <Button
               colorScheme="teal"
               onClick={editTransaction}
+              isLoading={isSubmitting}
               isDisabled={
                 !date || !name || !category || !subcategory || !amount
               }

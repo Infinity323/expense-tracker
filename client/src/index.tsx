@@ -10,6 +10,7 @@ const cognitoAuthConfig = {
   redirect_uri: window.location.origin,
   response_type: "code",
   scope: "email openid phone",
+  automaticSilentRenew: true,
   onSigninCallback: () => {
     // clean up URL
     window.history.replaceState({}, document.title, window.location.pathname);

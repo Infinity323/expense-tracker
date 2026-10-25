@@ -12,13 +12,17 @@ import {
   ModalOverlay,
   Stack,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { postTransaction } from "../../services/transactionService";
 import BudgetsSelect from "../budgets/BudgetsSelect";
+import { getErrorMessage } from "../../utils/getErrorMessage";
 
 function AddTransaction({ setReload }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const toast = useToast();
 
   const [date, setDate] = useState<string>();
   const [name, setName] = useState<string>();
@@ -29,25 +33,34 @@ function AddTransaction({ setReload }) {
 
   const addTransaction = async (event) => {
     event.preventDefault();
-    await postTransaction({
-      date,
-      name,
-      description,
-      category,
-      subcategory,
-      amount,
-    });
-    onClose();
-  };
-
-  const resetFields = () => {
-    setDate(undefined);
-    setName(undefined);
-    setDescription(undefined);
-    setCategory(undefined);
-    setSubcategory(undefined);
-    setAmount(undefined);
-    setReload(true);
+    setIsSubmitting(true);
+    try {
+      await postTransaction({
+        date,
+        name,
+        description,
+        category,
+        subcategory,
+        amount: Number(amount),
+      });
+      setDate(undefined);
+      setName(undefined);
+      setDescription(undefined);
+      setCategory(undefined);
+      setSubcategory(undefined);
+      setAmount(undefined);
+      onClose();
+      setReload(true);
+    } catch (error) {
+      toast({
+        title: "Could not add transaction",
+        description: getErrorMessage(error, "Please check your details and try again."),
+        status: "error",
+        isClosable: true,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -101,10 +114,8 @@ function AddTransaction({ setReload }) {
           <ModalFooter>
             <Button
               colorScheme="teal"
-              onClick={(event) => {
-                addTransaction(event);
-                resetFields();
-              }}
+              onClick={addTransaction}
+              isLoading={isSubmitting}
               isDisabled={
                 !date || !name || !category || !subcategory || !amount
               }

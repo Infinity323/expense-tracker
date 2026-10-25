@@ -1,14 +1,9 @@
 import { Request } from "express";
 
-export const getUserId = (req: Request): string | null => {
-  const authHeader =
-    req.headers["authorization"] || (req.headers["Authorization"] as string);
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return null;
+export const getUserId = (req: Request): string => {
+  const userId = req.verifiedCognitoJWT?.sub;
+  if (!userId) {
+    throw new Error("Verified Cognito subject is missing");
   }
-  const token = authHeader.split(" ")[1];
-  const payload = JSON.parse(
-    Buffer.from(token.split(".")[1], "base64").toString()
-  );
-  return payload.sub;
+  return userId;
 };

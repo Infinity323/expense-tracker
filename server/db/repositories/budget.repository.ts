@@ -16,32 +16,38 @@ import {
 import { sleep } from "../../utils/dataUtil";
 const TableName = "Budgets";
 
-// Find all budgets
-export const findByUserId = async (userId: string) => {
-  const result = await db.send(
-    new QueryCommand({
-      TableName,
-      IndexName: "userId-index",
-      KeyConditionExpression: "userId = :userId",
-      ExpressionAttributeValues: { ":userId": userId },
-    })
-  );
-  return result.Items as BudgetDoc[];
+const queryBudgetsByUserId = async (
+  userId: string,
+  filterExpression?: string,
+) => {
+  const items: BudgetDoc[] = [];
+  let lastEvaluatedKey: Record<string, unknown> | undefined;
+
+  do {
+    const result = await db.send(
+      new QueryCommand({
+        TableName,
+        IndexName: "userId-index",
+        KeyConditionExpression: "userId = :userId",
+        ...(filterExpression ? { FilterExpression: filterExpression } : {}),
+        ExpressionAttributeValues: { ":userId": userId },
+        ExclusiveStartKey: lastEvaluatedKey,
+      }),
+    );
+    items.push(...((result.Items ?? []) as BudgetDoc[]));
+    lastEvaluatedKey = result.LastEvaluatedKey;
+  } while (lastEvaluatedKey);
+
+  return items;
 };
 
+// Find all budgets
+export const findByUserId = async (userId: string) =>
+  queryBudgetsByUserId(userId);
+
 // Find all Plaid budgets
-export const findAllPlaidBudgetsByUserId = async (userId: string) => {
-  const result = await db.send(
-    new QueryCommand({
-      TableName,
-      IndexName: "userId-index",
-      KeyConditionExpression: "userId = :userId",
-      FilterExpression: "attribute_exists(detailed)",
-      ExpressionAttributeValues: { ":userId": userId },
-    })
-  );
-  return result.Items as BudgetDoc[];
-};
+export const findAllPlaidBudgetsByUserId = async (userId: string) =>
+  queryBudgetsByUserId(userId, "attribute_exists(detailed)");
 
 // Create a new budget
 export const create = async ({
@@ -140,54 +146,57 @@ export const update = async ({
   category,
   subcategory,
   amount,
-}: Partial<BudgetDoc>) => {
+}: Partial<BudgetDoc>, userId: string) => {
   const result = (await db.send(
     new UpdateCommand({
       TableName,
       Key: { budgetId },
-      UpdateExpression:
-        "set category = :category, subcategory = :subcategory, amount = :amount",
+      UpdateExpression: "SET category = :category, subcategory = :subcategory, amount = :amount",
+      ConditionExpression: "userId = :userId",
       ExpressionAttributeValues: {
         ":category": category,
         ":subcategory": subcategory,
         ":amount": amount,
+        ":userId": userId,
       },
+      ReturnValues: "ALL_NEW",
     })
   )) as IUpdateCommandOutput<BudgetDoc>;
   return result.Attributes;
 };
 
 // Delete a budget by budgetId
-export const deleteById = async (budgetId: string) => {
+export const deleteById = async (budgetId: string, userId: string) => {
   return await db.send(
     new DeleteCommand({
       TableName,
       Key: { budgetId },
+      ConditionExpression:
+        "userId = :userId AND (attribute_not_exists(isMaster) OR isMaster = :isMaster)",
+      ExpressionAttributeValues: {
+        ":userId": userId,
+        ":isMaster": false,
+      },
     })
   );
 };
 
 // Delete all budgets
 export const deleteByUserId = async (userId: string) => {
-  const result = await db.send(
-    new QueryCommand({
-      TableName,
-      IndexName: "userId-index",
-      KeyConditionExpression: "userId = :userId",
-      ExpressionAttributeValues: { ":userId": userId },
-    })
-  );
-  if (result.Items && result.Items.length > 0) {
+  const budgetDocs = await queryBudgetsByUserId(userId);
+  for (let index = 0; index < budgetDocs.length; index += 25) {
     await Promise.all(
-      result.Items.map((doc) =>
+      budgetDocs.slice(index, index + 25).map((doc) =>
         db.send(
           new DeleteCommand({
             TableName,
             Key: { budgetId: doc.budgetId },
-          })
-        )
-      )
+            ConditionExpression: "userId = :userId",
+            ExpressionAttributeValues: { ":userId": userId },
+          }),
+        ),
+      ),
     );
   }
-  return result.Items as BudgetDoc[];
+  return budgetDocs;
 };

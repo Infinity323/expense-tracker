@@ -6,26 +6,72 @@ import {
   Th,
   Thead,
   Tr,
+  Alert,
+  AlertIcon,
+  Spinner,
+  Text,
 } from "@chakra-ui/react";
-import { useEffect } from "react";
-import { useQuery } from "react-query";
+import { Dispatch, SetStateAction, useEffect, useRef } from "react";
+import { useInfiniteQuery } from "react-query";
+import { useAccounts } from "../../hooks/useAccounts";
 import { useLoadingModal } from "../../hooks/useLoadingModal";
 import { getTransactions } from "../../services/transactionService";
 import { formatCurrency } from "../../utils/CurrencyUtil";
 import DeleteTransaction from "./DeleteTransaction";
 import EditTransaction from "./EditTransaction";
 
-function TransactionsTable({ reload, setReload, month }) {
+interface TransactionsTableProps {
+  reload: boolean;
+  setReload: Dispatch<SetStateAction<boolean>>;
+  month?: string;
+  accountId: string;
+}
+
+function TransactionsTable({
+  reload,
+  setReload,
+  month,
+  accountId,
+}: TransactionsTableProps) {
   const {
-    data: transactions,
+    data,
     isLoading,
+    isError,
     refetch,
-    isRefetching,
-  } = useQuery({
-    queryKey: ["transactions", { month }],
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = useInfiniteQuery({
+    queryKey: ["transactions", { month, accountId }],
     queryFn: getTransactions,
+    getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
   });
-  useLoadingModal({ isLoading: isLoading || isRefetching });
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const transactions = data?.pages.flatMap((page) => page.items) ?? [];
+  const { flattenedAccounts } = useAccounts();
+  const accountNames = new Map(
+    flattenedAccounts.map((account) => [account.account_id, account.name]),
+  );
+  const visibleTransactions = transactions?.filter((transaction) => {
+    if (accountId === "all") return true;
+    if (accountId === "manual") return !transaction.accountId;
+    return transaction.accountId === accountId;
+  });
+  useLoadingModal({ isLoading });
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel || !hasNextPage || isFetchingNextPage) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) void fetchNextPage();
+      },
+      { rootMargin: "300px" },
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   useEffect(() => {
     if (reload) {
@@ -41,6 +87,7 @@ function TransactionsTable({ reload, setReload, month }) {
           <Tr>
             <Th>Date</Th>
             <Th>Name</Th>
+            <Th>Account</Th>
             <Th>Description</Th>
             <Th>Category</Th>
             <Th>Subcategory</Th>
@@ -49,11 +96,31 @@ function TransactionsTable({ reload, setReload, month }) {
           </Tr>
         </Thead>
         <Tbody>
-          {transactions && transactions.length ? (
-            transactions.map((transaction) => (
+          {isError && transactions.length === 0 ? (
+            <Tr>
+              <Td colSpan={8}>
+                <Alert status="error">
+                  <AlertIcon />
+                  Could not load transactions. Please try again.
+                </Alert>
+              </Td>
+            </Tr>
+          ) : visibleTransactions.length ? (
+            visibleTransactions.map((transaction) => (
               <Tr key={transaction.transactionId}>
                 <Td>{transaction.date}</Td>
                 <Td>{transaction.name}</Td>
+                <Td
+                  maxWidth="12rem"
+                  overflow="hidden"
+                  textOverflow="ellipsis"
+                  whiteSpace="nowrap"
+                >
+                  {transaction.accountId
+                    ? accountNames.get(transaction.accountId) ??
+                      "Linked account"
+                    : "Manual"}
+                </Td>
                 <Td>{transaction.description}</Td>
                 <Td maxWidth="5" overflowX="hidden">
                   {transaction.category}
@@ -74,6 +141,10 @@ function TransactionsTable({ reload, setReload, month }) {
                 </Td>
               </Tr>
             ))
+          ) : hasNextPage ? (
+            <Tr>
+              <Td colSpan={100}>Loading transactions...</Td>
+            </Tr>
           ) : (
             <Tr>
               <Td colSpan={100}>No transactions found.</Td>
@@ -81,6 +152,19 @@ function TransactionsTable({ reload, setReload, month }) {
           )}
         </Tbody>
       </Table>
+      {isError && transactions.length > 0 && (
+        <Alert status="error" mt={2}>
+          <AlertIcon />
+          Could not load more transactions.
+        </Alert>
+      )}
+      {isFetchingNextPage && (
+        <Text py={3} textAlign="center">
+          <Spinner size="sm" mr={2} />
+          Loading more transactions...
+        </Text>
+      )}
+      <div ref={sentinelRef} aria-hidden="true" style={{ height: 1 }} />
     </TableContainer>
   );
 }

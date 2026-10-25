@@ -20,7 +20,7 @@ export const useAccounts = () => {
       itemId: item.item_id,
     }));
     return updated;
-  });
+  }) ?? [];
 
   return { accounts, flattenedAccounts, isLoading, isError, refetch };
 };

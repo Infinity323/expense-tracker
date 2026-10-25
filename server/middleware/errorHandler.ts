@@ -25,6 +25,9 @@ const clientErrorHandler = (err, req, res, next) => {
 };
 
 const defaultErrorHandler = (err, req, res, next) => {
+  if (err?.name === "ConditionalCheckFailedException") {
+    return res.status(404).json({ error: "Resource not found" });
+  }
   console.error(
     `Error while handling ${req.method} request for ${req.url}`,
     err.stack

@@ -1,24 +1,20 @@
 import { LinkTokenCreateResponse } from "plaid";
-import { AccessToken } from "../types/accessToken";
-import { get, post } from "./httpService";
+import { post } from "./httpService";
 
 const LINK_API = "/api/link";
 
 export const createLinkToken = async ({ queryKey }: any) => {
-  const [, { accessToken }] = queryKey;
+  const [, { itemId }] = queryKey;
   return await post<LinkTokenCreateResponse>({
     uri: `${LINK_API}/link-token`,
     data: {
-      accessToken,
+      itemId,
     },
   });
 };
 
-export const getAccessTokens = async () =>
-  await get<AccessToken[]>({ uri: `${LINK_API}/access-token` });
-
 export const postAccessToken = async (publicToken, metadata) =>
-  await post<AccessToken>({
+  await post<{ itemId: string }>({
     uri: `${LINK_API}/access-token`,
     data: { publicToken, metadata },
   });

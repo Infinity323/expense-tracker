@@ -11,6 +11,20 @@
 			"problemMatcher": [],
 			"label": "npm: build",
 			"detail": "craco build"
+		},
+		{
+			"label": "Deploy server to AWS Lambda",
+			"type": "shell",
+			"command": "npm run clean && mkdir -p dist/db && npx esbuild lambda.ts --bundle --platform=node --format=cjs --outfile=dist/index.cjs && cp db/budget-seed-data.csv dist/db/budget-seed-data.csv && (cd dist && zip -r ../server.zip .) && aws lambda update-function-code --function-name expense-tracker --zip-file fileb://server.zip --region us-east-2 --profile expense-tracker",
+			"options": {
+				"cwd": "${workspaceFolder}/server"
+			},
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared",
+				"clear": true
+			}
 		}
 	]
 }

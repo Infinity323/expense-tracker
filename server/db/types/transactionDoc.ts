@@ -1,7 +1,7 @@
 export interface TransactionDoc {
   transactionId: string;
   date: string;
-  accountId: string;
+  accountId?: string;
   name: string;
   description: string;
   merchantName: string;

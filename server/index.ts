@@ -21,19 +21,17 @@ dotenv.config();
 
 const app = express();
 
+const corsOptions = {
+  origin: process.env.CLIENT_URL,
+  methods: ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Authorization", "Content-Type"],
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-
-// cors
-app.use(
-  "*",
-  cors({
-    origin: process.env.CLIENT_URL,
-  }),
-  (req, res, next) => {
-    next();
-  }
-);
 
 app.use((req, res, next) => {
   const stagePrefix = /^\/[^/]+\/expense-tracker/;

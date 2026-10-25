@@ -10,17 +10,34 @@ import {
   ModalHeader,
   ModalOverlay,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
+import { useState } from "react";
 import { FaRegTrashCan } from "react-icons/fa6";
 import { deleteTransaction } from "../../services/transactionService";
+import { getErrorMessage } from "../../utils/getErrorMessage";
 
 function DeleteTransaction({ transactionDoc: transaction, refetch }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isDeleting, setIsDeleting] = useState(false);
+  const toast = useToast();
 
-  const removeTransaction = async (event) => {
-    event.preventDefault();
-    await deleteTransaction(transaction._id);
-    refetch();
+  const removeTransaction = async () => {
+    setIsDeleting(true);
+    try {
+      await deleteTransaction(transaction.transactionId);
+      await refetch();
+      onClose();
+    } catch (error) {
+      toast({
+        title: "Could not delete transaction",
+        description: getErrorMessage(error, "Please try again."),
+        status: "error",
+        isClosable: true,
+      });
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   return (
@@ -41,10 +58,8 @@ function DeleteTransaction({ transactionDoc: transaction, refetch }) {
           <ModalFooter>
             <Button
               colorScheme="red"
-              onClick={(event) => {
-                removeTransaction(event);
-                onClose();
-              }}
+              onClick={removeTransaction}
+              isLoading={isDeleting}
             >
               Delete
             </Button>

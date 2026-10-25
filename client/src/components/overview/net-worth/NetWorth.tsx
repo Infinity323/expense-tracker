@@ -1,4 +1,6 @@
 import {
+  Alert,
+  AlertIcon,
   Box,
   Card,
   CardBody,
@@ -25,10 +27,19 @@ import { formatCurrency } from "../../../utils/CurrencyUtil";
 interface NetWorthProps {}
 
 const NetWorth = (props: NetWorthProps) => {
-  const { accounts, flattenedAccounts } = useAccounts();
+  const { accounts, flattenedAccounts, isLoading, isError } = useAccounts();
 
-  if (!accounts) {
+  if (isLoading) {
     return <Skeleton height="200px" />;
+  }
+
+  if (isError) {
+    return (
+      <Alert status="error">
+        <AlertIcon />
+        Could not load account balances. Please try again.
+      </Alert>
+    );
   }
 
   const cash = getBalance(flattenedAccounts, "depository");

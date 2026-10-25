@@ -19,7 +19,7 @@ function DeleteBudget({ budgetDoc: budget, onDelete }) {
 
   const removeBudget = async (event) => {
     event.preventDefault();
-    await deleteBudget(budget._id);
+    await deleteBudget(budget.budgetId);
     onDelete();
   };
 

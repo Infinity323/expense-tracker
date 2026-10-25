@@ -5,13 +5,12 @@ import { PlaidLinkOnSuccessMetadata } from "react-plaid-link";
 import plaidClient from "../clients/plaidClient";
 import {
   createItem,
-  findAccessTokensByUserId,
+  findByIdAndUserId,
   findByInstitutionIdAndUserId,
 } from "../db/repositories/item.repository";
 import { LinkTokenRequest } from "../types/linkTokenRequest";
 import { getUserId } from "../utils/authUtil";
 
-/** Creates a Link token. */
 export const createLinkToken = async (
   req: Request<{}, {}, LinkTokenRequest>,
   res: Response,
@@ -19,38 +18,31 @@ export const createLinkToken = async (
 ) => {
   try {
     const userId = getUserId(req);
+    const item = req.body.itemId
+      ? await findByIdAndUserId(req.body.itemId, userId)
+      : undefined;
+    if (req.body.itemId && !item) {
+      return res.status(404).json({ error: "Linked item not found" });
+    }
+
     const tokenResponse = await plaidClient.linkTokenCreate({
       user: { client_user_id: userId },
       client_name: "Expense Tracker",
       language: "en",
-      products: [Products.Transactions],
       country_codes: [CountryCode.Us],
-      access_token: req.body.accessToken,
+      ...(item
+        ? {
+            access_token: item.accessToken,
+            update: { account_selection_enabled: true },
+          }
+        : { products: [Products.Transactions] }),
     });
-    console.log(`Successfully created link token for user ${userId}`);
     res.json(tokenResponse.data);
   } catch (err) {
     next(err);
   }
 };
 
-/** Get all access tokens. */
-export const getAllAccessTokens = async (req, res, next) => {
-  try {
-    const userId = getUserId(req);
-    const itemDocs = await findAccessTokensByUserId(userId);
-    console.log(`Retrieved ${itemDocs.length} access tokens from the database`);
-    let accessTokens = itemDocs.map((doc) => ({
-      itemId: doc.itemId,
-      accessToken: doc.accessToken,
-    }));
-    res.json(accessTokens);
-  } catch (err) {
-    next(err);
-  }
-};
-
-/** Exchanges the public token from Plaid Link for an access token */
 export const createAccessToken = async (
   req: Request<
     {},
@@ -62,30 +54,28 @@ export const createAccessToken = async (
 ) => {
   try {
     const userId = getUserId(req);
-    const institutionId = req.body.metadata.institution.institution_id;
+    const institution = req.body.metadata?.institution;
+    if (!req.body.publicToken || !institution?.institution_id) {
+      return res.status(400).json({ error: "Invalid Plaid Link response" });
+    }
+
+    const institutionId = institution.institution_id;
     if ((await findByInstitutionIdAndUserId(institutionId, userId)).length) {
-      const error = new Error(`Institution [${institutionId}] already linked`);
-      error.name = "DuplicateInstitutionError";
-      throw error;
+      return res.status(409).json({ error: "Institution is already linked" });
     }
     const exchangeResponse = await plaidClient.itemPublicTokenExchange({
       public_token: req.body.publicToken,
     });
     const exchangeResponseData = exchangeResponse.data;
-    console.log(
-      `Successfully exchanged public token [${req.body.publicToken}] for access token`
-    );
     await createItem({
       itemId: exchangeResponseData.item_id,
       accessToken: exchangeResponseData.access_token,
       institutionId: req.body.metadata.institution.institution_id,
-      institutionName: req.body.metadata.institution.name,
+      institutionName: institution.name,
       userId,
     });
-    console.log(`Saved new item [${exchangeResponseData.item_id}] to database`);
     res.status(201).json({
       itemId: exchangeResponseData.item_id,
-      accessToken: exchangeResponseData.access_token,
     });
   } catch (err) {
     next(err);

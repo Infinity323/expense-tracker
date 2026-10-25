@@ -2,10 +2,18 @@ import { useQuery } from "react-query";
 import { createLinkToken } from "../services/linkService";
 
 export const useCreateLinkToken = ({
-  accessToken,
+  itemId,
 }: {
-  accessToken?: string;
+  itemId?: string;
 }) => {
-  const { data } = useQuery(["linkToken", { accessToken }], createLinkToken);
-  return data?.link_token;
+  const { data, isLoading, isFetching, isError, refetch } = useQuery(
+    ["linkToken", { itemId }],
+    createLinkToken,
+  );
+  return {
+    linkToken: data?.link_token,
+    isLoading: isLoading || isFetching,
+    isError,
+    refreshLinkToken: refetch,
+  };
 };

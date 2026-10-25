@@ -1,91 +1,104 @@
-import { Button } from "@chakra-ui/react";
-import { ReactNode, useCallback } from "react";
+import { Button, useToast } from "@chakra-ui/react";
+import { ReactNode, useCallback, useEffect } from "react";
 import {
   PlaidLinkOnEvent,
   PlaidLinkOnExit,
   PlaidLinkOnSuccess,
   usePlaidLink,
 } from "react-plaid-link";
-import { useModal } from "../../context/GlobalModalProvider";
-import { useUserContext } from "../../context/UserProvider";
 import { useAccounts } from "../../hooks/useAccounts";
 import { useLinkedInstitutions } from "../../hooks/useLinkedInstitutions";
+import { useCreateLinkToken } from "../../hooks/useCreateLinkToken";
 import { updateItem } from "../../services/itemService";
 import { postAccessToken } from "../../services/linkService";
-import { AccessToken } from "../../types/accessToken";
+import { getErrorMessage } from "../../utils/getErrorMessage";
 
 interface LaunchLinkProps {
   children: ReactNode;
-  linkToken: string;
   itemId?: string;
   colorScheme?: string;
 }
 
 const LaunchLink = (props: LaunchLinkProps) => {
-  const { linkToken, children, itemId, colorScheme } = props;
-  const { setAccessTokens } = useUserContext();
+  const { children, itemId, colorScheme } = props;
+  const {
+    linkToken,
+    isLoading: isLinkTokenLoading,
+    isError: isLinkTokenError,
+    refreshLinkToken,
+  } = useCreateLinkToken({ itemId });
   const { refetch: refetchAccounts } = useAccounts();
   const { refetch: refetchInstitutions } = useLinkedInstitutions();
-  const { openModal } = useModal();
+  const toast = useToast();
+
+  useEffect(() => {
+    if (isLinkTokenError) {
+      toast({
+        id: `link-token-error-${itemId ?? "new"}`,
+        title: "Could not start account linking",
+        description: "Please try again in a moment.",
+        status: "error",
+        isClosable: true,
+      });
+    }
+  }, [isLinkTokenError, itemId, toast]);
 
   const onSuccess = useCallback<PlaidLinkOnSuccess>(
     async (publicToken, metadata) => {
-      if (!itemId) {
-        try {
-          const accessTokenResponse = await postAccessToken(
-            publicToken,
-            metadata,
-          );
-          setAccessTokens((prev: AccessToken[]) => [
-            ...prev,
-            accessTokenResponse,
-          ]);
-        } catch {
-          openModal("alert", {
-            header: "Error",
-            body: "The same institution cannot be linked more than once. Please update the existing institution link instead.",
-            status: "error",
-          });
+      try {
+        if (!itemId) {
+          await postAccessToken(publicToken, metadata);
+        } else {
+          await updateItem(itemId);
         }
-      } else {
-        await updateItem(itemId, metadata);
+        await Promise.all([refetchAccounts(), refetchInstitutions()]);
+      } catch (error) {
+        toast({
+          title: "Could not link account",
+          description: getErrorMessage(error, "Please try again."),
+          status: "error",
+          isClosable: true,
+        });
+      } finally {
+        await refreshLinkToken();
       }
-      refetchAccounts();
-      refetchInstitutions();
     },
-    [itemId, openModal, refetchAccounts, refetchInstitutions, setAccessTokens],
+    [itemId, refetchAccounts, refetchInstitutions, refreshLinkToken, toast],
   );
 
   const onExit = useCallback<PlaidLinkOnExit>(
     (error, metadata) => {
+      void refreshLinkToken();
       if (error?.error_code === "INVALID_LINK_TOKEN") {
-        openModal("alert", {
-          header: "Error",
-          body: "Something went wrong. Please reload the page and try again.",
+        toast({
+          title: "Link session expired",
+          description: "Reload the page and try again.",
           status: "error",
+          isClosable: true,
         });
       } else if (error) {
-        openModal("alert", {
-          header: "Error",
-          body: `An error occurred while linking your account(s): ${error.display_message}`,
+        toast({
+          title: "Could not link account",
+          description: error.display_message || "Please try again.",
           status: "error",
+          isClosable: true,
         });
       }
     },
-    [openModal],
+    [refreshLinkToken, toast],
   );
 
   const onEvent = useCallback<PlaidLinkOnEvent>(
     (eventName, metadata) => {
-      console.log(`Plaid Link event: ${eventName}`, metadata);
       if (eventName === "ERROR")
-        openModal("alert", {
-          header: "Error",
-          body: `An error occurred while linking your account(s): ${metadata.error_message}`,
+        toast({
+          title: "Could not link account",
+          description: metadata.error_message || "Please try again.",
           status: "error",
+          isClosable: true,
         });
     },
-    [openModal],
+    [toast],
   );
 
   const { open, ready } = usePlaidLink({
@@ -98,7 +111,11 @@ const LaunchLink = (props: LaunchLinkProps) => {
   const onClick = () => open();
 
   return (
-    <Button colorScheme={colorScheme} onClick={onClick} disabled={!ready}>
+    <Button
+      colorScheme={colorScheme}
+      onClick={onClick}
+      isDisabled={!ready || isLinkTokenLoading}
+    >
       {children}
     </Button>
   );

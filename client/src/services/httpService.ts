@@ -13,7 +13,7 @@ export const get = async <T extends any>({
   (
     await axios.get<T>(uri, {
       headers: {
-        Authorization: "Bearer " + getToken(),
+        ...getAuthorizationHeaders(),
       },
       params,
     })
@@ -29,7 +29,7 @@ export const post = async <T extends any>({
   (
     await axios.post<T>(uri, data, {
       headers: {
-        Authorization: "Bearer " + getToken(),
+        ...getAuthorizationHeaders(),
       },
     })
   ).data;
@@ -44,7 +44,7 @@ export const put = async <T extends any>({
   (
     await axios.put<T>(uri, data, {
       headers: {
-        Authorization: "Bearer " + getToken(),
+        ...getAuthorizationHeaders(),
       },
     })
   ).data;
@@ -59,19 +59,26 @@ export const delete_ = async <T extends any>({
   (
     await axios.delete<T>(uri, {
       headers: {
-        Authorization: "Bearer " + getToken(),
+        ...getAuthorizationHeaders(),
       },
       params,
     })
   ).data;
 
 const getToken = () => {
-  const oidcStorageKey = `oidc.user:${process.env.REACT_APP_COGNITO_AUTHORITY}:${process.env.REACT_APP_COGNITO_CLIENT_ID}`;
-  const oidcStorage = sessionStorage.getItem(oidcStorageKey);
+  try {
+    const oidcStorageKey = `oidc.user:${process.env.REACT_APP_COGNITO_AUTHORITY}:${process.env.REACT_APP_COGNITO_CLIENT_ID}`;
+    const oidcStorage = sessionStorage.getItem(oidcStorageKey);
+    if (!oidcStorage) return null;
 
-  if (!oidcStorage) {
+    const user = User.fromStorageString(oidcStorage);
+    return user.expired ? null : user.access_token;
+  } catch {
     return null;
   }
+};
 
-  return User.fromStorageString(oidcStorage).access_token;
+const getAuthorizationHeaders = () => {
+  const token = getToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
 };

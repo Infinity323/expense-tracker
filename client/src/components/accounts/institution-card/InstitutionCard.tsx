@@ -21,32 +21,37 @@ import {
   Stack,
   StackDivider,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 import { format } from "date-fns";
 import { Institution } from "plaid";
 import { FaCircleExclamation } from "react-icons/fa6";
 import { useMutation } from "react-query";
 import { useModal } from "../../../context/GlobalModalProvider";
-import { useCreateLinkToken } from "../../../hooks/useCreateLinkToken";
 import { deleteItem } from "../../../services/itemService";
 import { formatCurrency } from "../../../utils/CurrencyUtil";
+import { getErrorMessage } from "../../../utils/getErrorMessage";
 import LaunchLink from "../../launch-link/LaunchLink";
 
 interface InstitutionCardProps {
   group: AccountResponse;
   institution: Institution;
-  accessToken: string;
   refetch: () => void;
 }
 
 const InstitutionCard = (props: InstitutionCardProps) => {
-  const { group, institution, accessToken, refetch } = props;
-  const linkToken = useCreateLinkToken({
-    accessToken,
-  });
-  const { mutate, isLoading } = useMutation({
-    mutationFn: deleteItem,
+  const { group, institution, refetch } = props;
+  const toast = useToast();
+  const { mutate, isLoading } = useMutation(deleteItem, {
     onSuccess: refetch,
+    onError: (error) => {
+      toast({
+        title: "Could not unlink institution",
+        description: getErrorMessage(error, "Please try again."),
+        status: "error",
+        isClosable: true,
+      });
+    },
   });
   const { openModal } = useModal();
 
@@ -143,18 +148,9 @@ const InstitutionCard = (props: InstitutionCardProps) => {
       </CardBody>
       <CardFooter>
         <ButtonGroup spacing={2}>
-          {linkToken ? (
-            <LaunchLink linkToken={linkToken} itemId={group.item_id}>
-              Update
-            </LaunchLink>
-          ) : (
-            <Button isLoading disabled>
-              Update
-            </Button>
-          )}
+          <LaunchLink itemId={group.item_id}>Update</LaunchLink>
           <Button
             colorScheme="red"
-            disabled={isLoading}
             isLoading={isLoading}
             onClick={onUnlink}
           >

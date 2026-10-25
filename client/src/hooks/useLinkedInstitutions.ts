@@ -5,11 +5,12 @@ export const useLinkedInstitutions = () => {
   const {
     data: institutions,
     isLoading,
+    isError,
     refetch,
   } = useQuery({
     queryKey: ["linkedInstitutions"],
     queryFn: getLinkedInstitutions,
   });
 
-  return { institutions, isLoading, refetch };
+  return { institutions, isLoading, isError, refetch };
 };

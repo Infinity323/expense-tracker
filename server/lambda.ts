@@ -9,11 +9,11 @@ export const handler = (
   context: Context,
   callback: Callback,
 ) => {
-  // Strips stage path prefix (e.g. '/default' path segment) so that the request path
-  // is valid when using custom domains with API Gateway V2 event source
-  event.rawPath = event.rawPath.substring(
-    `/${event.requestContext.stage}`.length,
-  );
-  console.log(JSON.stringify(event));
+  const stagePrefix = `/${event.requestContext.stage}`;
+  if (event.rawPath === stagePrefix) {
+    event.rawPath = "/";
+  } else if (event.rawPath.startsWith(`${stagePrefix}/`)) {
+    event.rawPath = event.rawPath.slice(stagePrefix.length);
+  }
   return handlerFunction(event, context, callback);
 };

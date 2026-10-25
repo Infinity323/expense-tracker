@@ -1,16 +1,11 @@
-import { PlaidLinkOnSuccessMetadata } from "react-plaid-link";
 import { get, put, delete_ } from "./httpService";
 import { AccountBase } from "plaid";
 
 const ITEM_API = "/api/item";
 
-export const updateItem = async (
-  itemId: string,
-  metadata: PlaidLinkOnSuccessMetadata
-) =>
-  await put<PlaidLinkOnSuccessMetadata>({
+export const updateItem = async (itemId: string) =>
+  await put<void>({
     uri: `${ITEM_API}/${itemId}`,
-    data: metadata,
   });
 
 export const getBalances = async () =>
