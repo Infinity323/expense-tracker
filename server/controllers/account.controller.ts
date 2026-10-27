@@ -30,7 +30,11 @@ export const getAllAccounts = async (req, res, next) => {
           const plaidError = error as {
             response?: { data?: { error_code?: string } };
           };
-          if (plaidError.response?.data?.error_code !== "NO_ACCOUNTS") {
+          const errorCode = plaidError.response?.data?.error_code;
+          if (
+            errorCode !== "NO_ACCOUNTS" &&
+            errorCode !== "ITEM_LOGIN_REQUIRED"
+          ) {
             throw error;
           }
 

@@ -25,8 +25,9 @@ import AccountListCard from "./account-list-card/AccountListCard";
 interface AccountListProps {}
 
 const AccountList = (props: AccountListProps) => {
-  const { flattenedAccounts, isLoading, isError } = useAccounts();
+  const { accounts, flattenedAccounts, isLoading, isError } = useAccounts();
   const { isError: isInstitutionsError } = useLinkedInstitutions();
+  const needsAttention = accounts?.some((item) => item.needs_attention);
 
   if (isLoading) {
     return <Skeleton height="200px" />;
@@ -41,12 +42,34 @@ const AccountList = (props: AccountListProps) => {
     );
   }
 
-  if (!flattenedAccounts) {
-    return <Text>No accounts linked.</Text>;
+  if (!flattenedAccounts.length) {
+    return (
+      <Stack>
+        {needsAttention && (
+          <Alert status="warning">
+            <AlertIcon />
+            One or more linked institutions need attention. Visit Manage Accounts
+            to reconnect them.
+          </Alert>
+        )}
+        <Text>
+          {needsAttention
+            ? "No account details are available for the items needing attention."
+            : "No accounts linked."}
+        </Text>
+      </Stack>
+    );
   }
 
   return (
     <Stack>
+      {needsAttention && (
+        <Alert status="warning">
+          <AlertIcon />
+          One or more linked institutions need attention. Visit Manage Accounts
+          to reconnect them.
+        </Alert>
+      )}
       <Tabs>
         <TabList>
           <Tab>
