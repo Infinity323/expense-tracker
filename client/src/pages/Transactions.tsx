@@ -33,13 +33,13 @@ function Transactions() {
       <Flex gap={4} align="flex-end" wrap="wrap">
         <Box width="266px">
           <FormControl>
-          <FormLabel>Filter by Month</FormLabel>
-          <Input
-            type="month"
-            value={month}
-            onChange={(e) => setMonth(e.target.value)}
-            placeholder="Month"
-          />
+            <FormLabel>Filter by Month</FormLabel>
+            <Input
+              type="month"
+              value={month}
+              onChange={(e) => setMonth(e.target.value)}
+              placeholder="Month"
+            />
           </FormControl>
         </Box>
         <Box width="266px">
@@ -59,6 +59,10 @@ function Transactions() {
             </Select>
           </FormControl>
         </Box>
+        <ButtonGroup spacing={4} marginLeft="auto">
+          <AddTransaction setReload={setReload} />
+          <SyncTransactions setReload={setReload} />
+        </ButtonGroup>
       </Flex>
       <TransactionsTable
         reload={reload}
@@ -66,10 +70,6 @@ function Transactions() {
         month={month}
         accountId={accountId}
       />
-      <ButtonGroup spacing={4}>
-        <AddTransaction setReload={setReload} />
-        <SyncTransactions setReload={setReload} />
-      </ButtonGroup>
     </Stack>
   );
 }
