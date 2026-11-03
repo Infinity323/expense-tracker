@@ -71,12 +71,12 @@ const InstitutionCard = (props: InstitutionCardProps) => {
   };
 
   return (
-    <Card p="1.5rem" variant="outline">
+    <Card p={{ base: "1rem", sm: "1.5rem" }} variant="outline">
       <span style={{ backgroundColor: color, height: "5px" }} />
       <CardHeader>
-        <Flex alignItems="center">
-          <Box>
-            <Heading as="h2" size="lg">
+        <Flex alignItems="center" gap={3}>
+          <Box minWidth={0}>
+            <Heading as="h2" size={{ base: "md", sm: "lg" }}>
               {institutionName}
             </Heading>
             <Text fontSize="sm">
@@ -98,12 +98,12 @@ const InstitutionCard = (props: InstitutionCardProps) => {
           <Spacer />
           {logo ? (
             <Image
-              boxSize="75px"
+              boxSize={{ base: "56px", sm: "75px" }}
               src={`data:image/png;base64,${logo}`}
               alt="logo"
             />
           ) : (
-            <Circle size="75px" />
+            <Circle size={{ base: "56px", sm: "75px" }} />
           )}
         </Flex>
       </CardHeader>
@@ -123,12 +123,17 @@ const InstitutionCard = (props: InstitutionCardProps) => {
                 {group.accounts.map((account) => (
                   <Box>
                     <Text fontWeight="semibold">{account.name}</Text>
-                    <Flex>
-                      <Text>
+                    <Flex
+                      direction={{ base: "column", sm: "row" }}
+                      align={{ base: "flex-start", sm: "center" }}
+                    >
+                      <Text minWidth={0}>
                         {account.official_name} (...{account.mask})
                       </Text>
                       <Spacer />
-                      <Text>{formatCurrency(account.balances.current)}</Text>
+                      <Text whiteSpace="nowrap">
+                        {formatCurrency(account.balances.current)}
+                      </Text>
                     </Flex>
                     {account.balances.last_updated_datetime && (
                       <Text fontSize="sm">

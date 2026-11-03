@@ -15,14 +15,18 @@ function Accounts() {
 
   return (
     <Stack spacing="2rem">
-      <Flex>
+      <Flex
+        direction={{ base: "column", sm: "row" }}
+        align={{ base: "stretch", sm: "center" }}
+        gap={4}
+      >
         <Box>
           <Heading as="h1" size="xl">
             Accounts
           </Heading>
           <Text>An overview of all linked accounts</Text>
         </Box>
-        <Spacer />
+        <Spacer display={{ base: "none", sm: "block" }} />
         <Button
           colorScheme="teal"
           onClick={() => navigate("/account-management")}

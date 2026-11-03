@@ -16,7 +16,13 @@ import {
   Spacer,
   useColorMode,
 } from "@chakra-ui/react";
-import { FaChartLine, FaGithub, FaMoon, FaSun } from "react-icons/fa6";
+import {
+  FaBars,
+  FaChartLine,
+  FaGithub,
+  FaMoon,
+  FaSun,
+} from "react-icons/fa6";
 import { useAuth } from "react-oidc-context";
 import { Link } from "react-router-dom";
 
@@ -36,56 +42,82 @@ function Navbar() {
     )}`;
   };
 
+  const navLinks = [
+    { to: "/overview", label: "Overview" },
+    { to: "/insights", label: "Insights" },
+    { to: "/transactions", label: "Transactions" },
+    { to: "/budgets", label: "Budgets" },
+    { to: "/accounts", label: "Accounts" },
+  ];
+
   return (
     <Box>
-      <Flex minWidth="max-content" p="2" alignItems="center" gap="2">
-        <Box p="2" justifyContent="center">
+      <Flex
+        width="100%"
+        minWidth={0}
+        p={{ base: 1, md: 2 }}
+        alignItems="center"
+        gap={{ base: 1, md: 2 }}
+      >
+        <Box p={{ base: 1, md: 2 }} flexShrink={0}>
           <Link to="/">
             <HStack>
               <Circle bg="teal" size="30px" marginRight={1}>
                 <Icon as={FaChartLine} color="white" boxSize={4} />
               </Circle>
-              <Heading size="md" as="span">
+              <Heading size={{ base: "sm", sm: "md" }} as="span">
                 Expense Tracker
               </Heading>
             </HStack>
           </Link>
         </Box>
         {isAuthenticated && (
-          <Box p="2">
-            <ButtonGroup gap="2">
-              <Link to="/overview">
-                <Button variant="link">Overview</Button>
-              </Link>
-              <Link to="/insights">
-                <Button variant="link">Insights</Button>
-              </Link>
-              <Link to="/transactions">
-                <Button variant="link">Transactions</Button>
-              </Link>
-              <Link to="/budgets">
-                <Button variant="link">Budgets</Button>
-              </Link>
-              <Link to="/accounts">
-                <Button variant="link">Accounts</Button>
-              </Link>
-            </ButtonGroup>
-          </Box>
+          <>
+            <Box p="2" display={{ base: "none", lg: "block" }}>
+              <ButtonGroup gap="2">
+                {navLinks.map(({ to, label }) => (
+                  <Link key={to} to={to}>
+                    <Button variant="link">{label}</Button>
+                  </Link>
+                ))}
+              </ButtonGroup>
+            </Box>
+            <Menu>
+              <MenuButton
+                as={IconButton}
+                aria-label="Open navigation menu"
+                icon={<FaBars />}
+                variant="ghost"
+                display={{ base: "inline-flex", lg: "none" }}
+              />
+              <MenuList>
+                {navLinks.map(({ to, label }) => (
+                  <MenuItem key={to} as={Link} to={to}>
+                    {label}
+                  </MenuItem>
+                ))}
+              </MenuList>
+            </Menu>
+          </>
         )}
         <Spacer />
         <ButtonGroup
-          gap={2}
+          gap={{ base: 0, sm: 2 }}
           alignItems="center"
           variant="ghost"
           colorScheme="grayAlpha" // TODO
-          marginRight={5}
+          marginRight={{ base: 0, md: 5 }}
         >
           <Link
             to="https://github.com/Infinity323/expense-tracker"
             target="_blank"
             rel="noopener noreferrer"
           >
-            <IconButton aria-label="GitHub" icon={<FaGithub />} />
+            <IconButton
+              aria-label="GitHub"
+              icon={<FaGithub />}
+              display={{ base: "none", sm: "inline-flex" }}
+            />
           </Link>
           <IconButton
             aria-label="toggle mode"
@@ -95,7 +127,7 @@ function Navbar() {
         </ButtonGroup>
         {isAuthenticated && user ? (
           <Menu>
-            <MenuButton>
+            <MenuButton aria-label="Open account menu">
               <Avatar
                 bg="teal"
                 size="sm"

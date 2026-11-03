@@ -19,7 +19,7 @@ function Overview() {
         </Heading>
         <Text>A summary of this month's income and expenses</Text>
       </Box>
-      <Grid templateColumns="repeat(2, 1fr)" gap="2rem">
+      <Grid templateColumns={{ base: "1fr", lg: "repeat(2, 1fr)" }} gap="2rem">
         <GridItem colSpan={1}>
           <CurrentMonthBudgetComparison />
         </GridItem>

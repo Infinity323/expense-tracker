@@ -14,19 +14,23 @@ import {
 
 function Home() {
   return (
-    <VStack spacing={20}>
-      <Center height="50vh">
-        <VStack>
+    <VStack spacing={{ base: 12, md: 20 }}>
+      <Center minHeight={{ base: "40vh", md: "50vh" }} py={8}>
+        <VStack spacing={4}>
           <Box textAlign="center" maxWidth="60em">
-            <Heading size="4xl">
+            <Heading fontSize={{ base: "4xl" }}>
               Take command of your spending
-              <Heading size="4xl" color="teal" as="span">
+              <Heading
+                fontSize={{ base: "4xl" }}
+                color="teal"
+                as="span"
+              >
                 {" "}
                 today
               </Heading>
             </Heading>
           </Box>
-          <Box textAlign="center" marginTop="2rem" maxWidth="50em">
+          <Box textAlign="center" marginTop={{ base: 4, md: 8 }} maxWidth="50em">
             <Text fontSize="lg">
               Expense Tracker empowers users with the freedom to spend and save.
             </Text>
@@ -36,7 +40,7 @@ function Home() {
       </Center>
       <Divider />
       <Heading size="2xl">Features</Heading>
-      <Grid templateColumns="repeat(2, 1fr)" gap={6}>
+      <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={6}>
         <GridItem>
           <Card variant="outline" size="sm">
             <Image

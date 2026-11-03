@@ -9,6 +9,7 @@ import {
   Skeleton,
   Switch,
   Text,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
@@ -25,6 +26,9 @@ const MonthlySpending = (props: MonthlySpendingProps) => {
     queryFn: getCurrentMonthSpending,
   });
   const [showSubcategories, setShowSubcategories] = useState<boolean>(false);
+  const chartHeight = useBreakpointValue({ base: 360, md: 500 }) ?? 360;
+  const outerRadius = useBreakpointValue({ base: 90, md: 150 }) ?? 90;
+  const innerRadius = useBreakpointValue({ base: 65, md: 130 }) ?? 65;
 
   const categoryData = useMemo(
     () =>
@@ -107,7 +111,7 @@ const MonthlySpending = (props: MonthlySpendingProps) => {
           <FormLabel mb="0">Show by Subcategory</FormLabel>
           <Switch onChange={() => setShowSubcategories((prev) => !prev)} />
         </FormControl>
-        <Center width="100%" height="500px">
+        <Center width="100%" height={`${chartHeight}px`}>
           <ResponsiveContainer width="100%" height="100%">
             <PieChart key={showSubcategories.toString()}>
               <Pie
@@ -116,8 +120,8 @@ const MonthlySpending = (props: MonthlySpendingProps) => {
                 data={data}
                 cx="50%"
                 cy="50%"
-                innerRadius={130}
-                outerRadius={150}
+                innerRadius={innerRadius}
+                outerRadius={outerRadius}
                 paddingAngle={10}
                 labelLine
                 label={renderLabel}

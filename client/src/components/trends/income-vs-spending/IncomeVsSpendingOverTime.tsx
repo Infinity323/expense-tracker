@@ -6,6 +6,7 @@ import {
   Skeleton,
   Spacer,
   Text,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import { useQuery } from "react-query";
 import {
@@ -23,6 +24,7 @@ import { formatCurrency } from "../../../utils/CurrencyUtil";
 import { dateToMMMYYYY, dateToString } from "../../../utils/DateUtil";
 
 function IncomeVsSpendingOverTime() {
+  const chartHeight = useBreakpointValue({ base: 360, md: 500 }) ?? 360;
   const { data, isLoading } = useQuery({
     queryKey: ["incomeVsExpenses"],
     queryFn: getIncomeVsExpenses,
@@ -45,10 +47,15 @@ function IncomeVsSpendingOverTime() {
   }
 
   return (
-    <ResponsiveContainer width="100%" height={500}>
+    <ResponsiveContainer width="100%" height={chartHeight}>
       <BarChart
         data={data}
-        margin={{ top: 50, left: 50, right: 50, bottom: 50 }}
+        margin={{
+          top: 30,
+          left: chartHeight === 360 ? 10 : 50,
+          right: chartHeight === 360 ? 10 : 50,
+          bottom: 30,
+        }}
       >
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="date" tickFormatter={dateToMMMYYYY} />

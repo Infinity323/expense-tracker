@@ -50,7 +50,7 @@ const AccountListCard = (props: AccountListCardProps) => {
               const logo = institution?.logo;
 
               return (
-                <Flex gap={5}>
+                <Flex gap={{ base: 3, sm: 5 }} align="center" minWidth={0}>
                   <Center>
                     {logo === undefined ? (
                       <Skeleton boxSize="50px" />
@@ -64,14 +64,16 @@ const AccountListCard = (props: AccountListCardProps) => {
                       />
                     )}
                   </Center>
-                  <Box>
-                    <Text fontWeight="semibold">{account.name}</Text>
-                    <Text>
+                  <Box minWidth={0}>
+                    <Text fontWeight="semibold" noOfLines={1}>{account.name}</Text>
+                    <Text noOfLines={1}>
                       {account.official_name} (...{account.mask})
                     </Text>
                   </Box>
                   <Spacer />
-                  <Text>{formatCurrency(account.balances.current)}</Text>
+                  <Text whiteSpace="nowrap">
+                    {formatCurrency(account.balances.current)}
+                  </Text>
                 </Flex>
               );
             })

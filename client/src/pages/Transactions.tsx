@@ -31,7 +31,7 @@ function Transactions() {
         <Text>All transactions across all linked accounts</Text>
       </Box>
       <Flex gap={4} align="flex-end" wrap="wrap">
-        <Box width="266px">
+        <Box width={{ base: "100%", sm: "266px" }}>
           <FormControl>
             <FormLabel>Filter by Month</FormLabel>
             <Input
@@ -42,7 +42,7 @@ function Transactions() {
             />
           </FormControl>
         </Box>
-        <Box width="266px">
+        <Box width={{ base: "100%", sm: "266px" }}>
           <FormControl>
             <FormLabel>Filter by Account</FormLabel>
             <Select
@@ -59,7 +59,12 @@ function Transactions() {
             </Select>
           </FormControl>
         </Box>
-        <ButtonGroup spacing={4} marginLeft="auto">
+        <ButtonGroup
+          spacing={4}
+          marginLeft={{ base: 0, lg: "auto" }}
+          width={{ base: "100%", sm: "auto" }}
+          justifyContent="flex-end"
+        >
           <AddTransaction setReload={setReload} />
           <SyncTransactions setReload={setReload} />
         </ButtonGroup>

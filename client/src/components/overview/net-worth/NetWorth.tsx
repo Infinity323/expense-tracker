@@ -60,8 +60,8 @@ const NetWorth = (props: NetWorthProps) => {
         </Heading>
         <Text>Total Net Worth</Text>
       </Box>
-      <HStack spacing="2rem">
-        <Card width="50%" p="1.5rem" variant="outline">
+      <HStack spacing="2rem" align="stretch" flexDirection={{ base: "column", md: "row" }}>
+        <Card width={{ base: "100%", md: "50%" }} p="1.5rem" variant="outline">
           <CardHeader>
             <Heading as="h3" size="md">
               {formatCurrency(assetWorth)}
@@ -91,7 +91,7 @@ const NetWorth = (props: NetWorthProps) => {
             </Grid>
           </CardBody>
         </Card>
-        <Card width="50%" p="1.5rem" variant="outline">
+        <Card width={{ base: "100%", md: "50%" }} p="1.5rem" variant="outline">
           <CardHeader>
             <Heading as="h3" size="md">
               {formatCurrency(liabilityWorth)}

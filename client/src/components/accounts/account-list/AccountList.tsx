@@ -71,7 +71,7 @@ const AccountList = (props: AccountListProps) => {
         </Alert>
       )}
       <Tabs>
-        <TabList>
+        <TabList flexWrap="wrap">
           <Tab>
             <Icon as={FaMoneyBill} marginRight={1} />
             Cash

@@ -10,9 +10,9 @@ import { Link } from "react-router-dom";
 
 function Footer() {
   return (
-    <Center padding="2rem">
+    <Center padding={{ base: "1.5rem 1rem", md: "2rem" }}>
       <VStack spacing={1.5}>
-        <Text fontSize="sm">
+        <Text fontSize="sm" textAlign="center">
           Developed by Paul Lee. Made with Chakra UI. Powered by Plaid.
         </Text>
         <ButtonGroup spacing={0.5} variant="transparent" color="gray.400">

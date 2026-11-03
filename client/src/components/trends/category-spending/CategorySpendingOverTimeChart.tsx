@@ -7,6 +7,7 @@ import {
   Spacer,
   Stack,
   Text,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
@@ -28,6 +29,8 @@ import { formatCurrency } from "../../../utils/CurrencyUtil";
 import { dateToMMMYYYY, dateToString } from "../../../utils/DateUtil";
 
 const CategorySpendingOverTimeChart = () => {
+  const chartHeight = useBreakpointValue({ base: 560, lg: 800 }) ?? 560;
+  const chartMargin = chartHeight === 560 ? 15 : 50;
   const { data: categoryData, isLoading: categoryIsLoading } = useQuery({
     queryKey: ["sortedBudgets"],
     queryFn: getSortedBudgets,
@@ -85,13 +88,18 @@ const CategorySpendingOverTimeChart = () => {
     );
   }
   return (
-    <ResponsiveContainer width="100%" height={800}>
+    <ResponsiveContainer width="100%" height={chartHeight}>
       {categoryIsLoading || spendingIsLoading ? (
         <Skeleton />
       ) : (
         <BarChart
           data={spendingData}
-          margin={{ top: 50, left: 50, right: 50, bottom: 50 }}
+          margin={{
+            top: chartMargin,
+            left: chartMargin,
+            right: chartMargin,
+            bottom: chartMargin,
+          }}
           stackOffset="sign"
         >
           <CartesianGrid strokeDasharray="3 3" />
