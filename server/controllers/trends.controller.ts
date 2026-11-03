@@ -3,6 +3,7 @@ import {
   findExpensesByUserId,
   findIncomeByUserId,
 } from "../db/repositories/transaction.repository";
+import { findNetWorthSnapshotsByUserId } from "../db/repositories/netWorthSnapshot.repository";
 import { CurrentMonthExpense } from "../types/currentMonthExpense";
 import { getUserId } from "../utils/authUtil";
 import { round } from "../utils/dataUtil";
@@ -226,6 +227,20 @@ export const getCurrentMonthSpending = async (req, res, next) => {
         amount: doc.amount,
       }));
     res.json(expenses);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getNetWorthHistory = async (req, res, next) => {
+  try {
+    const snapshots = await findNetWorthSnapshotsByUserId(getUserId(req));
+    res.json(
+      snapshots.map(({ snapshotDate, netWorth }) => ({
+        date: snapshotDate,
+        netWorth,
+      })),
+    );
   } catch (err) {
     next(err);
   }

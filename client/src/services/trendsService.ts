@@ -1,5 +1,6 @@
 import { CurrentMonthExpense } from "@backend/types/currentMonthExpense";
 import { IncomeVsExpenses } from "@backend/types/incomeVsExpenses";
+import { NetWorthHistoryPoint } from "@backend/types/netWorthHistoryPoint";
 import { SpendingOverTime } from "@backend/types/spendingOverTime";
 import { get } from "./httpService";
 
@@ -33,4 +34,9 @@ export const getIncomeVsExpenses = async () =>
 export const getCurrentMonthSpending = async () =>
   await get<CurrentMonthExpense[]>({
     uri: `${TRENDS_API}/spending/current-month`,
+  });
+
+export const getNetWorthHistory = async () =>
+  await get<NetWorthHistoryPoint[]>({
+    uri: `${TRENDS_API}/net-worth`,
   });

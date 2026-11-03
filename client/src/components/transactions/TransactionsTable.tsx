@@ -210,7 +210,14 @@ function TransactionsTable({
       <Table
         size="sm"
         variant="striped"
-        sx={{ tableLayout: "fixed" }}
+        sx={{
+          tableLayout: "fixed",
+          "& tbody td": {
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          },
+        }}
         width={`${tableWidth}px`}
         minWidth={`${tableWidth}px`}
       >

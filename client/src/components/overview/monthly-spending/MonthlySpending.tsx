@@ -9,11 +9,20 @@ import {
   Skeleton,
   Switch,
   Text,
+  Box,
+  Wrap,
+  WrapItem,
   useBreakpointValue,
 } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
-import { Cell, Legend, Pie, PieChart, ResponsiveContainer } from "recharts";
+import {
+  Cell,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+} from "recharts";
 import { getCurrentMonthSpending } from "../../../services/trendsService";
 import { COLOR_MAP } from "../../../utils/ColorUtil";
 import { formatCurrency } from "../../../utils/CurrencyUtil";
@@ -69,7 +78,6 @@ const MonthlySpending = (props: MonthlySpendingProps) => {
     [expenses],
   );
 
-  const renderLabel = ({ value }) => formatCurrency(value);
   const renderLegendText = (value: string) =>
     showSubcategories ? value.split("|")[1] : value;
 
@@ -111,31 +119,51 @@ const MonthlySpending = (props: MonthlySpendingProps) => {
           <FormLabel mb="0">Show by Subcategory</FormLabel>
           <Switch onChange={() => setShowSubcategories((prev) => !prev)} />
         </FormControl>
-        <Center width="100%" height={`${chartHeight}px`}>
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart key={showSubcategories.toString()}>
-              <Pie
-                dataKey="value"
-                isAnimationActive
-                data={data}
-                cx="50%"
-                cy="50%"
-                innerRadius={innerRadius}
-                outerRadius={outerRadius}
-                paddingAngle={10}
-                labelLine
-                label={renderLabel}
-                animationBegin={50}
-                animationDuration={500}
-              >
-                {data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLOR_MAP[entry.name]} />
-                ))}
-              </Pie>
-              <Legend verticalAlign="bottom" formatter={renderLegendText} />
-            </PieChart>
-          </ResponsiveContainer>
-        </Center>
+        <Box width="100%">
+          <Center width="100%" height={`${chartHeight}px`}>
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart key={showSubcategories.toString()}>
+                <Pie
+                  dataKey="value"
+                  isAnimationActive
+                  data={data}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={innerRadius}
+                  outerRadius={outerRadius}
+                  paddingAngle={10}
+                  animationBegin={50}
+                  animationDuration={500}
+                >
+                  {data.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLOR_MAP[entry.name]} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  formatter={(value) => formatCurrency(Number(value))}
+                  labelFormatter={renderLegendText}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          </Center>
+          <Wrap justify="center" spacingX={4} spacingY={2} mt={2}>
+            {data.map((entry) => (
+              <WrapItem key={entry.name}>
+                <Box display="inline-flex" alignItems="center" gap={2}>
+                  <Box
+                    aria-hidden="true"
+                    width="10px"
+                    height="10px"
+                    flexShrink={0}
+                    borderRadius="sm"
+                    backgroundColor={COLOR_MAP[entry.name]}
+                  />
+                  <Text fontSize="sm">{renderLegendText(entry.name)}</Text>
+                </Box>
+              </WrapItem>
+            ))}
+          </Wrap>
+        </Box>
       </CardBody>
     </Card>
   );

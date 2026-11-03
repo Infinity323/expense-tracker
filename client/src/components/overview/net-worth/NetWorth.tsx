@@ -23,6 +23,7 @@ import {
 import { useAccounts } from "../../../hooks/useAccounts";
 import { getBalance } from "../../../utils/BalanceUtil";
 import { formatCurrency } from "../../../utils/CurrencyUtil";
+import NetWorthOverTime from "./NetWorthOverTime";
 
 interface NetWorthProps {}
 
@@ -60,6 +61,7 @@ const NetWorth = (props: NetWorthProps) => {
         </Heading>
         <Text>Total Net Worth</Text>
       </Box>
+      <NetWorthOverTime />
       <HStack spacing="2rem" align="stretch" flexDirection={{ base: "column", md: "row" }}>
         <Card width={{ base: "100%", md: "50%" }} p="1.5rem" variant="outline">
           <CardHeader>

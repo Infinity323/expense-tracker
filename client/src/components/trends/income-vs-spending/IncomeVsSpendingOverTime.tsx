@@ -52,18 +52,28 @@ function IncomeVsSpendingOverTime() {
         data={data}
         margin={{
           top: 30,
-          left: chartHeight === 360 ? 10 : 50,
-          right: chartHeight === 360 ? 10 : 50,
-          bottom: 30,
+          left: 8,
+          right: 24,
+          bottom: chartHeight === 360 ? 48 : 32,
         }}
       >
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="date" tickFormatter={dateToMMMYYYY} />
+        <XAxis
+          dataKey="date"
+          tickFormatter={dateToMMMYYYY}
+          interval="preserveStartEnd"
+          angle={chartHeight === 360 ? -35 : 0}
+          textAnchor={chartHeight === 360 ? "end" : "middle"}
+          height={chartHeight === 360 ? 58 : 30}
+          tick={{ fontSize: 11 }}
+        />
         <YAxis
           domain={["auto", "auto"]}
           tickFormatter={(value, _) => formatCurrency(value)}
+          width={88}
+          tick={{ fontSize: 11 }}
         />
-        <Legend />
+        <Legend height={36} wrapperStyle={{ paddingTop: 8 }} />
         <Tooltip
           content={<CustomTooltip />}
           cursor={{ fill: "black", opacity: 0.2 }}
