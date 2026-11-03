@@ -12,6 +12,7 @@ import { useQuery } from "react-query";
 import {
   Bar,
   BarChart,
+  Brush,
   CartesianGrid,
   Legend,
   ResponsiveContainer,
@@ -54,7 +55,7 @@ function IncomeVsSpendingOverTime() {
           top: 30,
           left: 8,
           right: 24,
-          bottom: chartHeight === 360 ? 48 : 32,
+          bottom: chartHeight === 360 ? 40 : 24,
         }}
       >
         <CartesianGrid strokeDasharray="3 3" />
@@ -80,6 +81,12 @@ function IncomeVsSpendingOverTime() {
         />
         <Bar dataKey="Income" stroke="green" fill="green" />
         <Bar dataKey="Expenses" stroke="red" fill="red" />
+        <Brush
+          dataKey="date"
+          height={24}
+          travellerWidth={10}
+          tickFormatter={dateToMMMYYYY}
+        />
       </BarChart>
     </ResponsiveContainer>
   );

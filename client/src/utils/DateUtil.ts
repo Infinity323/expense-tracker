@@ -8,7 +8,6 @@ export const dateToString = (value) => {
 };
 
 export const dateToMMMYYYY = (value: string): string => {
-  console.log(value);
   const date = fromUnixTime(parseInt(value) / 1000);
   return format(date, 'MMM yyyy');
 }

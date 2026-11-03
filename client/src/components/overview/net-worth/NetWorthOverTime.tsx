@@ -14,6 +14,7 @@ import { format } from "date-fns";
 import { useQuery } from "react-query";
 import {
   CartesianGrid,
+  Brush,
   Line,
   LineChart,
   ResponsiveContainer,
@@ -25,7 +26,7 @@ import { getNetWorthHistory } from "../../../services/trendsService";
 import { formatCurrency } from "../../../utils/CurrencyUtil";
 
 function NetWorthOverTime() {
-  const chartHeight = useBreakpointValue({ base: 280, md: 360 }) ?? 280;
+  const chartHeight = useBreakpointValue({ base: 340, md: 420 }) ?? 340;
   const { data, isLoading, isError } = useQuery({
     queryKey: ["netWorthHistory"],
     queryFn: getNetWorthHistory,
@@ -54,7 +55,7 @@ function NetWorthOverTime() {
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
                   data={data}
-                  margin={{ top: 12, right: 24, bottom: 32, left: 8 }}
+                  margin={{ top: 12, right: 24, bottom: 8, left: 8 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis
@@ -87,14 +88,17 @@ function NetWorthOverTime() {
                     dot={data.length === 1}
                     activeDot={{ r: 5 }}
                   />
+                  <Brush
+                    dataKey="date"
+                    height={24}
+                    travellerWidth={10}
+                    tickFormatter={(date) =>
+                      format(new Date(`${date}T00:00:00`), "MMM d")
+                    }
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </Box>
-            {data.length === 1 && (
-              <Text fontSize="sm" color="gray.500" textAlign="center">
-                Daily history will build as you use the app.
-              </Text>
-            )}
           </>
         )}
       </CardBody>

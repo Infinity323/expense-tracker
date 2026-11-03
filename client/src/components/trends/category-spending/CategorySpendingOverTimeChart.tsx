@@ -16,6 +16,7 @@ import { useQuery } from "react-query";
 import {
   Bar,
   BarChart,
+  Brush,
   CartesianGrid,
   ResponsiveContainer,
   Tooltip,
@@ -90,7 +91,7 @@ const CategorySpendingOverTimeChart = () => {
               top: 24,
               left: 8,
               right: 24,
-              bottom: isMobile ? 48 : 32,
+              bottom: isMobile ? 40 : 24,
             }}
             stackOffset="sign"
           >
@@ -125,6 +126,12 @@ const CategorySpendingOverTimeChart = () => {
                   fillOpacity={Number(hover === category || !hover ? 1 : 0.2)}
                 />
               ))}
+            <Brush
+              dataKey="date"
+              height={24}
+              travellerWidth={10}
+              tickFormatter={dateToMMMYYYY}
+            />
           </BarChart>
         </ResponsiveContainer>
       </Box>

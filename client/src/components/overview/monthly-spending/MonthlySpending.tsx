@@ -140,8 +140,10 @@ const MonthlySpending = (props: MonthlySpendingProps) => {
                   ))}
                 </Pie>
                 <Tooltip
-                  formatter={(value) => formatCurrency(Number(value))}
-                  labelFormatter={renderLegendText}
+                  formatter={(value, name) => [
+                    formatCurrency(Number(value)),
+                    renderLegendText(String(name)),
+                  ]}
                 />
               </PieChart>
             </ResponsiveContainer>

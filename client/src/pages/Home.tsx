@@ -18,10 +18,9 @@ function Home() {
       <Center minHeight={{ base: "40vh", md: "50vh" }} py={8}>
         <VStack spacing={4}>
           <Box textAlign="center" maxWidth="60em">
-            <Heading fontSize={{ base: "4xl" }}>
+            <Heading size="2xl">
               Take command of your spending
-              <Heading
-                fontSize={{ base: "4xl" }}
+              <Heading size="2xl"
                 color="teal"
                 as="span"
               >
