@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Card,
   CardBody,
   Flex,
@@ -16,7 +17,6 @@ import { useQuery } from "react-query";
 import {
   Bar,
   BarChart,
-  Brush,
   CartesianGrid,
   ResponsiveContainer,
   Tooltip,
@@ -26,6 +26,7 @@ import {
 import { Payload } from "recharts/types/component/DefaultLegendContent";
 import { getSortedBudgets } from "../../../services/budgetService";
 import { getSpendingOverTime } from "../../../services/trendsService";
+import { useTimeSeriesNavigation } from "../../../hooks/useTimeSeriesNavigation";
 import { COLOR_MAP } from "../../../utils/ColorUtil";
 import { formatCurrency } from "../../../utils/CurrencyUtil";
 import { dateToMMMYYYY, dateToString } from "../../../utils/DateUtil";
@@ -45,6 +46,12 @@ const CategorySpendingOverTimeChart = () => {
     queryFn: getSpendingOverTime,
   });
   const [hover, setHover] = useState<string>();
+  const {
+    visibleData,
+    reset,
+    isZoomed,
+    interactionProps,
+  } = useTimeSeriesNavigation(spendingData ?? []);
 
   const categories = categoryData
     ? Object.entries(categoryData).map((entry) => entry[0])
@@ -83,10 +90,26 @@ const CategorySpendingOverTimeChart = () => {
   }
   return (
     <Stack spacing={4}>
-      <Box width="100%" height={chartHeight}>
+      <Flex align="center" justify="space-between" mb={-2}>
+        <Text fontSize="sm" color="gray.500">
+          Scroll to zoom, drag to pan, double-click to reset
+        </Text>
+        {isZoomed && (
+          <Button size="xs" variant="ghost" onClick={reset}>
+            Reset
+          </Button>
+        )}
+      </Flex>
+      <Box
+        width="100%"
+        height={chartHeight}
+        aria-label="Category spending chart. Scroll to zoom, drag to pan, double-click to reset."
+        {...interactionProps}
+        sx={{ touchAction: "pan-y", userSelect: "none" }}
+      >
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
-            data={spendingData}
+            data={visibleData}
             margin={{
               top: 24,
               left: 8,
@@ -126,12 +149,6 @@ const CategorySpendingOverTimeChart = () => {
                   fillOpacity={Number(hover === category || !hover ? 1 : 0.2)}
                 />
               ))}
-            <Brush
-              dataKey="date"
-              height={24}
-              travellerWidth={10}
-              tickFormatter={dateToMMMYYYY}
-            />
           </BarChart>
         </ResponsiveContainer>
       </Box>

@@ -216,7 +216,7 @@ export const updateTransaction = async ({
       TableName,
       Key: { transactionId },
       UpdateExpression:
-        "SET #date = :date, #name = :name, #description = :description, #pending = :pending, #category = :category, #subcategory = :subcategory, #amount = :amount",
+        "SET #date = :date, #name = :name, #description = :description, #pending = :pending, #category = :category, #subcategory = :subcategory, #categoryManuallyOverridden = :categoryManuallyOverridden, #amount = :amount",
       ConditionExpression: "#userId = :userId",
       ExpressionAttributeNames: {
         "#date": "date",
@@ -225,6 +225,7 @@ export const updateTransaction = async ({
         "#pending": "pending",
         "#category": "category",
         "#subcategory": "subcategory",
+        "#categoryManuallyOverridden": "categoryManuallyOverridden",
         "#amount": "amount",
         "#userId": "userId",
       },
@@ -235,6 +236,7 @@ export const updateTransaction = async ({
         ":pending": pending ?? false,
         ":category": category,
         ":subcategory": subcategory,
+        ":categoryManuallyOverridden": true,
         ":amount": parseFloat(amount as any),
         ":userId": userId,
       },
@@ -242,6 +244,79 @@ export const updateTransaction = async ({
     })
   )) as IUpdateCommandOutput<TransactionDoc>;
   return result.Attributes;
+};
+
+export const updateSyncedTransaction = async ({
+  transactionId,
+  date,
+  name,
+  description,
+  category,
+  subcategory,
+  amount,
+  pending,
+  userId,
+}: Partial<TransactionDoc>) => {
+  const expressionAttributeNames = {
+    "#date": "date",
+    "#name": "name",
+    "#description": "description",
+    "#pending": "pending",
+    "#category": "category",
+    "#subcategory": "subcategory",
+    "#categoryManuallyOverridden": "categoryManuallyOverridden",
+    "#amount": "amount",
+    "#userId": "userId",
+  };
+  const expressionAttributeValues = {
+    ":date": date,
+    ":name": name,
+    ":description": description ?? "",
+    ":pending": pending ?? false,
+    ":category": category,
+    ":subcategory": subcategory,
+    ":false": false,
+    ":amount": parseFloat(amount as any),
+    ":userId": userId,
+  };
+
+  try {
+    const result = await db.send(
+      new UpdateCommand({
+        TableName,
+        Key: { transactionId },
+        UpdateExpression:
+          "SET #date = :date, #name = :name, #description = :description, #pending = :pending, #category = :category, #subcategory = :subcategory, #amount = :amount",
+        ConditionExpression:
+          "#userId = :userId AND (attribute_not_exists(#categoryManuallyOverridden) OR #categoryManuallyOverridden = :false)",
+        ExpressionAttributeNames: expressionAttributeNames,
+        ExpressionAttributeValues: expressionAttributeValues,
+        ReturnValues: "ALL_NEW",
+      }),
+    );
+    return result.Attributes as TransactionDoc | undefined;
+  } catch (error) {
+    if (
+      !(error instanceof Error) ||
+      error.name !== "ConditionalCheckFailedException"
+    ) {
+      throw error;
+    }
+
+    const result = await db.send(
+      new UpdateCommand({
+        TableName,
+        Key: { transactionId },
+        UpdateExpression:
+          "SET #date = :date, #name = :name, #description = :description, #pending = :pending, #amount = :amount",
+        ConditionExpression: "#userId = :userId",
+        ExpressionAttributeNames: expressionAttributeNames,
+        ExpressionAttributeValues: expressionAttributeValues,
+        ReturnValues: "ALL_NEW",
+      }),
+    );
+    return result.Attributes as TransactionDoc | undefined;
+  }
 };
 
 export const deleteById = async (

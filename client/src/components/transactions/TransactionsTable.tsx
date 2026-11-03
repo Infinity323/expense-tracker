@@ -108,8 +108,10 @@ function TransactionsTable({
     useState<ColumnWidths>(loadColumnWidths);
   const resizeRef = useRef<{
     columnId: ResizableColumnId;
+    adjacentColumnId: ResizableColumnId;
     startX: number;
     startWidth: number;
+    startAdjacentWidth: number;
   } | null>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const tableWidth =
@@ -153,45 +155,63 @@ function TransactionsTable({
   ) => {
     event.preventDefault();
     event.currentTarget.setPointerCapture(event.pointerId);
+    const columnIndex = TRANSACTION_COLUMNS.findIndex(
+      (column) => column.id === columnId,
+    );
+    const adjacentColumn =
+      TRANSACTION_COLUMNS[
+        columnIndex === TRANSACTION_COLUMNS.length - 1
+          ? columnIndex - 1
+          : columnIndex + 1
+      ];
     resizeRef.current = {
       columnId,
+      adjacentColumnId: adjacentColumn.id,
       startX: event.clientX,
       startWidth: columnWidths[columnId],
+      startAdjacentWidth: columnWidths[adjacentColumn.id],
+    };
+  };
+
+  const getResizedWidths = (clientX: number) => {
+    const resize = resizeRef.current;
+    if (!resize) return undefined;
+
+    const column = TRANSACTION_COLUMNS.find(
+      (candidate) => candidate.id === resize.columnId,
+    );
+    const adjacentColumn = TRANSACTION_COLUMNS.find(
+      (candidate) => candidate.id === resize.adjacentColumnId,
+    );
+    if (!column || !adjacentColumn) return undefined;
+
+    const delta = clientX - resize.startX;
+    const minDelta = Math.max(
+      column.minWidth - resize.startWidth,
+      resize.startAdjacentWidth - 800,
+    );
+    const maxDelta = Math.min(
+      800 - resize.startWidth,
+      resize.startAdjacentWidth - adjacentColumn.minWidth,
+    );
+    const clampedDelta = Math.max(minDelta, Math.min(delta, maxDelta));
+
+    return {
+      ...columnWidths,
+      [resize.columnId]: resize.startWidth + clampedDelta,
+      [resize.adjacentColumnId]: resize.startAdjacentWidth - clampedDelta,
     };
   };
 
   const resizeColumn = (event: ReactPointerEvent<HTMLButtonElement>) => {
-    const resize = resizeRef.current;
-    if (!resize) return;
-
-    const column = TRANSACTION_COLUMNS.find(
-      (candidate) => candidate.id === resize.columnId,
-    );
-    if (!column) return;
-
-    setColumnWidths((widths) => ({
-      ...widths,
-      [resize.columnId]: Math.max(
-        column.minWidth,
-        Math.min(resize.startWidth + event.clientX - resize.startX, 800),
-      ),
-    }));
+    const nextWidths = getResizedWidths(event.clientX);
+    if (nextWidths) setColumnWidths(nextWidths);
   };
 
   const finishResize = (event: ReactPointerEvent<HTMLButtonElement>) => {
-    const resize = resizeRef.current;
-    if (!resize) return;
+    const nextWidths = getResizedWidths(event.clientX);
+    if (!nextWidths) return;
 
-    const column = TRANSACTION_COLUMNS.find(
-      (candidate) => candidate.id === resize.columnId,
-    );
-    if (!column) return;
-
-    const width = Math.max(
-      column.minWidth,
-      Math.min(resize.startWidth + event.clientX - resize.startX, 800),
-    );
-    const nextWidths = { ...columnWidths, [resize.columnId]: width };
     setColumnWidths(nextWidths);
     resizeRef.current = null;
 

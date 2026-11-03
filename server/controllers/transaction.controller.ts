@@ -15,6 +15,7 @@ import {
   deleteById,
   deleteByUserId,
   findTransactionPage,
+  updateSyncedTransaction,
   updateTransaction,
 } from "../db/repositories/transaction.repository";
 import { getUserId } from "../utils/authUtil";
@@ -254,7 +255,7 @@ export const syncTransactions = async (
     console.log(`Added ${added.length} transactions for item ${itemId}`);
     for (const transaction of modified) {
       const budget = getBudget(transaction);
-      await updateTransaction({
+      await updateSyncedTransaction({
         transactionId: transaction.transaction_id,
         date: transaction.date,
         name: transaction.name,
