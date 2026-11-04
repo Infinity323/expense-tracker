@@ -80,7 +80,7 @@ export const getAllTransactions = async (
     const accountId =
       typeof req.query.accountId === "string" ? req.query.accountId : "all";
     const rawTag = typeof req.query.tag === "string" ? req.query.tag : undefined;
-    const tag = rawTag?.trim().replace(/\s+/g, " ").toLowerCase();
+    const tag = rawTag?.trim().replace(/\s+/g, " ");
     if (tag && tag.length > 50) {
       return res
         .status(400)

@@ -1,5 +1,7 @@
 import { TransactionDoc } from "@backend/db/types/transactionDoc";
 import {
+  Alert,
+  AlertIcon,
   Button,
   Icon,
   IconButton,
@@ -35,6 +37,7 @@ const EditTransaction = (props: EditTransactionProps) => {
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string>();
   const toast = useToast();
   const queryClient = useQueryClient();
 
@@ -48,6 +51,7 @@ const EditTransaction = (props: EditTransactionProps) => {
 
   const editTransaction = async (event) => {
     event.preventDefault();
+    setSubmitError(undefined);
     setIsSubmitting(true);
     try {
       await putTransaction({
@@ -64,9 +68,14 @@ const EditTransaction = (props: EditTransactionProps) => {
       await refetch();
       onClose();
     } catch (error) {
+      const message = getErrorMessage(
+        error,
+        "Please check your details and try again.",
+      );
+      setSubmitError(message);
       toast({
         title: "Could not update transaction",
-        description: getErrorMessage(error, "Please check your details and try again."),
+        description: message,
         status: "error",
         isClosable: true,
       });
@@ -91,6 +100,12 @@ const EditTransaction = (props: EditTransactionProps) => {
           <ModalCloseButton />
           <ModalBody>
             <Stack>
+              {submitError && (
+                <Alert status="error" role="alert">
+                  <AlertIcon />
+                  {submitError}
+                </Alert>
+              )}
               <Input
                 value={date}
                 onChange={(event) => setDate(event.target.value)}
