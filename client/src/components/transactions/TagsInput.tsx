@@ -1,15 +1,11 @@
 import {
   Box,
   Button,
-  FormControl,
-  FormLabel,
   Input,
   InputGroup,
-  InputRightElement,
   Tag,
-  TagCloseButton,
-  TagLabel,
   Wrap,
+  Field,
 } from "@chakra-ui/react";
 import { KeyboardEvent, useId, useMemo, useState } from "react";
 import { useQuery } from "react-query";
@@ -29,6 +25,7 @@ function TagsInput({ tags, setTags }: TagsInputProps) {
   );
   const [value, setValue] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  // Use React.useId instead (available in React 18+)
   const listId = useId();
   const suggestions = useMemo(() => {
     const search = value.trim().toLowerCase();
@@ -44,9 +41,8 @@ function TagsInput({ tags, setTags }: TagsInputProps) {
   const addTag = () => {
     const normalizedValue = normalizeTag(value);
     const tag =
-      existingTags.find(
-        (existingTag) => existingTag === normalizedValue,
-      ) ?? normalizedValue;
+      existingTags.find((existingTag) => existingTag === normalizedValue) ??
+      normalizedValue;
     if (!tag || tags.length >= 20) return;
     if (!tags.includes(tag)) {
       setTags([...tags, tag]);
@@ -71,7 +67,7 @@ function TagsInput({ tags, setTags }: TagsInputProps) {
   };
 
   return (
-    <FormControl
+    <Field.Root
       position="relative"
       onBlur={(event) => {
         if (
@@ -82,8 +78,19 @@ function TagsInput({ tags, setTags }: TagsInputProps) {
         }
       }}
     >
-      <FormLabel>Tags</FormLabel>
-      <InputGroup>
+      <Field.Label>Tags</Field.Label>
+      <InputGroup
+        endElement={
+          <Button
+            type="button"
+            size="sm"
+            onClick={addTag}
+            disabled={tags.length >= 20}
+          >
+            Add
+          </Button>
+        }
+      >
         <Input
           value={value}
           onChange={(event) => setValue(event.target.value)}
@@ -91,22 +98,12 @@ function TagsInput({ tags, setTags }: TagsInputProps) {
           onKeyDown={handleKeyDown}
           placeholder="Type a tag and press Enter"
           maxLength={50}
-          isDisabled={tags.length >= 20}
+          disabled={tags.length >= 20}
           role="combobox"
           aria-autocomplete="list"
           aria-expanded={isOpen && suggestions.length > 0}
           aria-controls={listId}
         />
-        <InputRightElement width="3.5rem">
-          <Button
-            type="button"
-            size="sm"
-            onClick={addTag}
-            isDisabled={tags.length >= 20}
-          >
-            Add
-          </Button>
-        </InputRightElement>
       </InputGroup>
       {isOpen && suggestions.length > 0 && (
         <Box
@@ -121,7 +118,7 @@ function TagsInput({ tags, setTags }: TagsInputProps) {
           overflowY="auto"
           borderWidth="1px"
           borderRadius="md"
-          bg="chakra-body-bg"
+          bg="bg"
           boxShadow="md"
           py={1}
         >
@@ -147,19 +144,19 @@ function TagsInput({ tags, setTags }: TagsInputProps) {
       {tags.length > 0 && (
         <Wrap mt={2}>
           {tags.map((tag) => (
-            <Tag key={tag} size="md" colorScheme="teal" variant="solid">
-              <TagLabel>{tag}</TagLabel>
-              <TagCloseButton
+            <Tag.Root key={tag} size="md" colorPalette="teal" variant="solid">
+              <Tag.Label>{tag}</Tag.Label>
+              <Tag.CloseTrigger
                 aria-label={`Remove ${tag} tag`}
                 onClick={() =>
                   setTags(tags.filter((current) => current !== tag))
                 }
               />
-            </Tag>
+            </Tag.Root>
           ))}
         </Wrap>
       )}
-    </FormControl>
+    </Field.Root>
   );
 }
 

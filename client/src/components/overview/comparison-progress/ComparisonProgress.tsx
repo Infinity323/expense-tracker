@@ -29,14 +29,18 @@ const ComparisonProgress = (props: ComparisonProgressProps) => {
         <Spacer />
         <Text>{formatCurrency(comparison.expectedAmount)}</Text>
       </Flex>
-      <Progress
-        colorScheme={getStatusColor(multiplier * comparison.difference)}
+      <Progress.Root
+        colorPalette={getStatusColor(multiplier * comparison.difference)}
         size="md"
         value={calculateProgress(
           comparison.expectedAmount,
           comparison.actualAmount,
         )}
-      />
+      >
+        <Progress.Track>
+          <Progress.Range />
+        </Progress.Track>
+      </Progress.Root>
       <Flex>
         <Text as="span" fontSize="md">
           {formatCurrency(comparison.actualAmount)} this month

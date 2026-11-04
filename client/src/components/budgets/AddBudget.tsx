@@ -1,94 +1,89 @@
 import {
   Button,
+  CloseButton,
+  Dialog,
   Input,
   InputGroup,
-  InputLeftElement,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
+  Portal,
   Stack,
-  useDisclosure,
 } from "@chakra-ui/react";
 import { useState } from "react";
+import { useBudgets } from "../../hooks/useBudgets";
 import { putBudget } from "../../services/budgetService";
 import BudgetsSelect from "./BudgetsSelect";
-import { useBudgets } from "../../hooks/useBudgets";
 
 function AddBudget({ setReload }) {
   const { budgets } = useBudgets();
-  const { isOpen, onOpen, onClose } = useDisclosure();
-
+  const [isOpen, setIsOpen] = useState(false);
   const [category, setCategory] = useState<string>();
   const [subcategory, setSubcategory] = useState<string>();
   const [amount, setAmount] = useState<string>();
-
-  const addBudget = async (event) => {
-    event.preventDefault();
-    const budgetId = budgets.find(
-      (budget) =>
-        budget.category === category && budget.subcategory === subcategory
-    ).budgetId;
-    await putBudget({ budgetId, category, subcategory, amount });
-    onClose();
-    setReload(true);
-  };
 
   const resetFields = () => {
     setCategory(undefined);
     setSubcategory(undefined);
     setAmount(undefined);
+  };
+
+  const addBudget = async (event) => {
+    event.preventDefault();
+    const budget = budgets.find(
+      (item) =>
+        item.category === category && item.subcategory === subcategory,
+    );
+    if (!budget) return;
+
+    await putBudget({ budgetId: budget.budgetId, category, subcategory, amount });
+    setIsOpen(false);
+    resetFields();
     setReload(true);
   };
 
   return (
     <>
-      <Button colorScheme="teal" onClick={onOpen}>
+      <Button colorPalette="teal" onClick={() => setIsOpen(true)}>
         Add Budget
       </Button>
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Add New Budget</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Stack>
-              <BudgetsSelect
-                selectedCategory={category}
-                selectedSubcategory={subcategory}
-                setCategory={setCategory}
-                setSubcategory={setSubcategory}
-              />
-              <InputGroup>
-                <InputLeftElement pointerEvents="none" color="gray.300">
-                  $
-                </InputLeftElement>
-                <Input
-                  value={amount}
-                  onChange={(event) => setAmount(event.target.value)}
-                  placeholder="Monthly Amount"
-                  isInvalid={amount === ""}
-                ></Input>
-              </InputGroup>
-            </Stack>
-          </ModalBody>
-          <ModalFooter>
-            <Button
-              colorScheme="teal"
-              onClick={(event) => {
-                addBudget(event);
-                resetFields();
-              }}
-              isDisabled={!category || !subcategory || !amount}
-            >
-              Submit
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+      <Dialog.Root open={isOpen} onOpenChange={(event) => setIsOpen(event.open)}>
+        <Portal>
+          <Dialog.Backdrop />
+          <Dialog.Positioner>
+            <Dialog.Content>
+              <Dialog.Header>Add New Budget</Dialog.Header>
+              <Dialog.CloseTrigger asChild>
+                <CloseButton size="sm" />
+              </Dialog.CloseTrigger>
+              <Dialog.Body>
+                <Stack>
+                  <BudgetsSelect
+                    selectedCategory={category}
+                    selectedSubcategory={subcategory}
+                    setCategory={setCategory}
+                    setSubcategory={setSubcategory}
+                  />
+                  <InputGroup startElement="$">
+                    <Input
+                      value={amount ?? ""}
+                      onChange={(event) => setAmount(event.target.value)}
+                      placeholder="Monthly Amount"
+                      aria-invalid={amount === ""}
+                    />
+                  </InputGroup>
+                </Stack>
+              </Dialog.Body>
+              <Dialog.Footer>
+                <Button
+                  colorPalette="teal"
+                  onClick={addBudget}
+                  disabled={!category || !subcategory || !amount}
+                >
+                  Submit
+                </Button>
+              </Dialog.Footer>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Portal>
+      </Dialog.Root>
     </>
   );
 }

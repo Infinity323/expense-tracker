@@ -12,9 +12,9 @@ const cognitoAuthConfig = {
   scope: "email openid phone profile",
   automaticSilentRenew: true,
   onSigninCallback: () => {
-    // clean up URL
-    window.history.replaceState({}, document.title, window.location.pathname);
-  },
+            // clean up URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+          },
 };
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -23,5 +23,5 @@ root.render(
     <AuthProvider {...cognitoAuthConfig}>
       <App />
     </AuthProvider>
-  </StrictMode>
+  </StrictMode>,
 );

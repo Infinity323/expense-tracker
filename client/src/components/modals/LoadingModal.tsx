@@ -1,14 +1,10 @@
 import {
   Center,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Spinner,
   Text,
   VStack,
+  Dialog,
+  Portal,
 } from "@chakra-ui/react";
 import { useModal } from "../../context/GlobalModalProvider";
 import { ModalProps } from "../../types/modalProps";
@@ -25,21 +21,33 @@ const LoadingModal = (props: ModalProps) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} isCentered>
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader />
-        <ModalBody>
-          <Center>
-            <VStack>
-              <Spinner color="teal" size="lg" />
-              <Text fontWeight="semibold">{modalProps?.body}</Text>
-            </VStack>
-          </Center>
-        </ModalBody>
-        <ModalFooter />
-      </ModalContent>
-    </Modal>
+    <Dialog.Root
+      open={isOpen}
+      placement="center"
+      onOpenChange={(e) => {
+        if (!e.open) {
+          onClose();
+        }
+      }}
+    >
+      <Portal>
+        <Dialog.Backdrop />
+        <Dialog.Positioner>
+          <Dialog.Content>
+            <Dialog.Header />
+            <Dialog.Body>
+              <Center>
+                <VStack>
+                  <Spinner color="teal" size="lg" />
+                  <Text fontWeight="semibold">{modalProps?.body}</Text>
+                </VStack>
+              </Center>
+            </Dialog.Body>
+            <Dialog.Footer />
+          </Dialog.Content>
+        </Dialog.Positioner>
+      </Portal>
+    </Dialog.Root>
   );
 };
 

@@ -7,24 +7,16 @@ import {
   Flex,
   Heading,
   HStack,
-  Icon,
   IconButton,
   Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
   Spacer,
-  useColorMode,
+  Portal,
 } from "@chakra-ui/react";
-import {
-  FaBars,
-  FaChartLine,
-  FaGithub,
-  FaMoon,
-  FaSun,
-} from "react-icons/fa6";
+import { useColorMode } from "./ui/ColorMode";
+import { FaBars, FaChartLine, FaGithub, FaMoon, FaSun } from "react-icons/fa6";
 import { useAuth } from "react-oidc-context";
 import { Link } from "react-router-dom";
+import { ReactIcon } from "./ui/ReactIcon";
 
 function Navbar() {
   const { colorMode, toggleColorMode } = useColorMode();
@@ -38,7 +30,7 @@ function Navbar() {
     const logoutUri = window.location.origin;
     const cognitoDomain = process.env.REACT_APP_COGNITO_DOMAIN;
     window.location.href = `${cognitoDomain}/logout?client_id=${clientId}&logout_uri=${encodeURIComponent(
-      logoutUri
+      logoutUri,
     )}`;
   };
 
@@ -63,9 +55,12 @@ function Navbar() {
           <Link to="/">
             <HStack>
               <Circle bg="teal" size="30px" marginRight={1}>
-                <Icon as={FaChartLine} color="white" boxSize={4} />
+                <ReactIcon icon={FaChartLine} color="white" boxSize={4} />
               </Circle>
-              <Heading size={{ base: "sm", sm: "md" }} as="span">
+              <Heading
+                size={{ base: "sm", sm: "md" }}
+                as="span"
+              >
                 Expense Tracker
               </Heading>
             </HStack>
@@ -73,31 +68,45 @@ function Navbar() {
         </Box>
         {isAuthenticated && (
           <>
-            <Box p="2" display={{ base: "none", lg: "block" }}>
+            <Box
+              p="2"
+              display={{ base: "none", lg: "block" }}
+            >
               <ButtonGroup gap="2">
                 {navLinks.map(({ to, label }) => (
                   <Link key={to} to={to}>
-                    <Button variant="link">{label}</Button>
+                    <Button variant="plain">{label}</Button>
                   </Link>
                 ))}
               </ButtonGroup>
             </Box>
-            <Menu>
-              <MenuButton
-                as={IconButton}
-                aria-label="Open navigation menu"
-                icon={<FaBars />}
-                variant="ghost"
-                display={{ base: "inline-flex", lg: "none" }}
-              />
-              <MenuList>
-                {navLinks.map(({ to, label }) => (
-                  <MenuItem key={to} as={Link} to={to}>
-                    {label}
-                  </MenuItem>
-                ))}
-              </MenuList>
-            </Menu>
+            <Menu.Root>
+              <Menu.Trigger asChild>
+                <IconButton
+                  aria-label="Open navigation menu"
+                  variant="ghost"
+                  display={{
+                    base: "inline-flex",
+                    lg: "none",
+                  }}
+                >
+                  <ReactIcon icon={FaBars} />
+                </IconButton>
+              </Menu.Trigger>
+              <Portal>
+                <Menu.Positioner>
+                  <Menu.Content>
+                    {navLinks.map(({ to, label }) => (
+                      <Menu.Item key={to} value={to} asChild>
+                        <Link to={to}>
+                          {label}
+                        </Link>
+                      </Menu.Item>
+                    ))}
+                  </Menu.Content>
+                </Menu.Positioner>
+              </Portal>
+            </Menu.Root>
           </>
         )}
         <Spacer />
@@ -105,7 +114,7 @@ function Navbar() {
           gap={{ base: 0, sm: 2 }}
           alignItems="center"
           variant="ghost"
-          colorScheme="grayAlpha" // TODO
+          colorPalette="gray"
           marginRight={{ base: 0, md: 5 }}
         >
           <Link
@@ -115,34 +124,42 @@ function Navbar() {
           >
             <IconButton
               aria-label="GitHub"
-              icon={<FaGithub />}
-              display={{ base: "none", sm: "inline-flex" }}
-            />
+              display={{
+                base: "none",
+                sm: "inline-flex",
+              }}
+            >
+              <ReactIcon icon={FaGithub} />
+            </IconButton>
           </Link>
-          <IconButton
-            aria-label="toggle mode"
-            icon={colorMode === "light" ? <FaMoon /> : <FaSun />}
-            onClick={toggleColorMode}
-          />
+          <IconButton aria-label="toggle mode" onClick={toggleColorMode}>
+            <ReactIcon icon={colorMode === "light" ? FaMoon : FaSun} />
+          </IconButton>
         </ButtonGroup>
         {isAuthenticated && user ? (
-          <Menu>
-            <MenuButton aria-label="Open account menu">
-              <Avatar
-                bg="teal"
-                size="sm"
-                name={`${user.profile.given_name} ${user.profile.family_name}`}
-              />
-            </MenuButton>
-            <MenuList>
-              <MenuItem>
-                <Link to="/account-management">Manage Accounts</Link>
-              </MenuItem>
-              <MenuItem onClick={onSignout}>Sign out</MenuItem>
-            </MenuList>
-          </Menu>
+          <Menu.Root>
+            <Menu.Trigger aria-label="Open account menu">
+              <Avatar.Root bg="teal" size="sm">
+                <Avatar.Fallback
+                  name={`${user.profile.given_name} ${user.profile.family_name}`}
+                />
+              </Avatar.Root>
+            </Menu.Trigger>
+            <Portal>
+              <Menu.Positioner>
+                <Menu.Content>
+                  <Menu.Item value="item-1">
+                    <Link to="/account-management">Manage Accounts</Link>
+                  </Menu.Item>
+                  <Menu.Item onSelect={onSignout} value="item-2">
+                    Sign out
+                  </Menu.Item>
+                </Menu.Content>
+              </Menu.Positioner>
+            </Portal>
+          </Menu.Root>
         ) : (
-          <Button colorScheme="teal" onClick={onSignin}>
+          <Button colorPalette="teal" onClick={onSignin}>
             Sign in
           </Button>
         )}

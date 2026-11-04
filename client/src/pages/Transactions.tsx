@@ -2,13 +2,12 @@ import {
   Box,
   ButtonGroup,
   Flex,
-  FormControl,
-  FormLabel,
   Heading,
   Input,
-  Select,
+  NativeSelect,
   Stack,
   Text,
+  Field,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import AddTransaction from "../components/transactions/AddTransaction";
@@ -28,45 +27,48 @@ function Transactions() {
   };
 
   return (
-    <Stack spacing="3rem">
+    <Stack gap="3rem">
       <Box>
-        <Heading as="h1" size="xl">
+        <Heading as="h1" size="3xl">
           Transactions
         </Heading>
         <Text>All transactions across all linked accounts</Text>
       </Box>
       <Flex gap={4} align="flex-end" wrap="wrap">
         <Box width={{ base: "100%", sm: "266px" }}>
-          <FormControl>
-            <FormLabel>Filter by Month</FormLabel>
+          <Field.Root>
+            <Field.Label>Filter by Month</Field.Label>
             <Input
               type="month"
               value={month}
               onChange={(e) => setMonth(e.target.value)}
               placeholder="Month"
             />
-          </FormControl>
+          </Field.Root>
         </Box>
         <TagFilterInput selectedTag={tag} onSelect={selectTag} />
         <Box width={{ base: "100%", sm: "266px" }}>
-          <FormControl>
-            <FormLabel>Filter by Account</FormLabel>
-            <Select
-              value={accountId}
-              onChange={(event) => setAccountId(event.target.value)}
-            >
-              <option value="all">All accounts</option>
-              <option value="manual">Manual transactions</option>
-              {flattenedAccounts.map((account) => (
-                <option key={account.account_id} value={account.account_id}>
-                  {account.name}
-                </option>
-              ))}
-            </Select>
-          </FormControl>
+          <Field.Root>
+            <Field.Label>Filter by Account</Field.Label>
+            <NativeSelect.Root>
+              <NativeSelect.Field
+                value={accountId}
+                onChange={(event) => setAccountId(event.target.value)}
+              >
+                <option value="all">All accounts</option>
+                <option value="manual">Manual transactions</option>
+                {flattenedAccounts.map((account) => (
+                  <option key={account.account_id} value={account.account_id}>
+                    {account.name}
+                  </option>
+                ))}
+              </NativeSelect.Field>
+              <NativeSelect.Indicator />
+            </NativeSelect.Root>
+          </Field.Root>
         </Box>
         <ButtonGroup
-          spacing={4}
+          gap={4}
           marginLeft={{ base: 0, lg: "auto" }}
           width={{ base: "100%", sm: "auto" }}
           justifyContent="flex-end"

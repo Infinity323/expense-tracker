@@ -4,9 +4,9 @@ import IncomeVsSpendingOverTime from "../components/trends/income-vs-spending/In
 
 function Insights() {
   return (
-    <Stack spacing="3rem">
+    <Stack gap="3rem">
       <Box>
-        <Heading as="h2" size="xl">
+        <Heading as="h2" size="3xl">
           Insights
         </Heading>
         <Text>A view of monthly cash flow and spending trends</Text>

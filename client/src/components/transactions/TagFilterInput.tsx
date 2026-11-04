@@ -1,20 +1,19 @@
 import {
   Alert,
-  AlertIcon,
   Box,
   Button,
-  FormControl,
-  FormLabel,
+  HStack,
   IconButton,
   Input,
   InputGroup,
-  InputRightElement,
   Spinner,
+  Field,
 } from "@chakra-ui/react";
 import { KeyboardEvent, useEffect, useId, useMemo, useState } from "react";
 import { FaXmark } from "react-icons/fa6";
 import { useQuery } from "react-query";
 import { getTransactionTags } from "../../services/transactionService";
+import { ReactIcon } from "../ui/ReactIcon";
 
 interface TagFilterInputProps {
   selectedTag: string;
@@ -22,13 +21,15 @@ interface TagFilterInputProps {
 }
 
 function TagFilterInput({ selectedTag, onSelect }: TagFilterInputProps) {
-  const { data: tags = [], isLoading, isError } = useQuery(
-    ["transactionTags"],
-    getTransactionTags,
-  );
+  const {
+    data: tags = [],
+    isLoading,
+    isError,
+  } = useQuery(["transactionTags"], getTransactionTags);
   const [value, setValue] = useState(selectedTag);
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
+  // Use React.useId instead (available in React 18+)
   const listId = useId();
 
   useEffect(() => {
@@ -44,9 +45,7 @@ function TagFilterInput({ selectedTag, onSelect }: TagFilterInputProps) {
 
   const applyTag = () => {
     const normalizedValue = value.trim().replace(/\s+/g, " ");
-    const existingTag = tags.find(
-      (tag) => tag === normalizedValue,
-    );
+    const existingTag = tags.find((tag) => tag === normalizedValue);
     const selectedTag = existingTag ?? normalizedValue;
     setValue(selectedTag);
     onSelect(selectedTag);
@@ -87,109 +86,117 @@ function TagFilterInput({ selectedTag, onSelect }: TagFilterInputProps) {
 
   return (
     <Box
-      as="form"
       position="relative"
       width={{ base: "100%", sm: "266px" }}
-      onSubmit={(event) => {
-        event.preventDefault();
-        applyTag();
-      }}
-      onBlur={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget)) {
-          setIsOpen(false);
-          setActiveIndex(-1);
-        }
-      }}
+      asChild
     >
-      <FormControl>
-        <FormLabel htmlFor="transaction-tag-filter">Filter by Tag</FormLabel>
-        <InputGroup>
-          <Input
-            id="transaction-tag-filter"
-            value={value}
-            onChange={(event) => {
-              setValue(event.target.value);
-              setIsOpen(true);
-              setActiveIndex(-1);
-            }}
-            onFocus={() => setIsOpen(true)}
-            onKeyDown={handleKeyDown}
-            placeholder="Search tags and press Enter"
-            maxLength={50}
-            role="combobox"
-            aria-autocomplete="list"
-            aria-expanded={isOpen && suggestions.length > 0}
-            aria-controls={listId}
-            aria-activedescendant={
-              activeIndex >= 0
-                ? `${listId}-option-${activeIndex}`
-                : undefined
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          applyTag();
+        }}
+        onBlur={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget)) {
+            setIsOpen(false);
+            setActiveIndex(-1);
+          }
+        }}
+      >
+        <Field.Root>
+          <Field.Label htmlFor="transaction-tag-filter">
+            Filter by Tag
+          </Field.Label>
+          <InputGroup
+            endElement={
+              <HStack gap={1}>
+                {isLoading && <Spinner size="sm" />}
+                {value && (
+                  <IconButton
+                    type="button"
+                    aria-label="Clear tag filter"
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => {
+                      setValue("");
+                      onSelect("");
+                      setIsOpen(false);
+                      setActiveIndex(-1);
+                    }}
+                  >
+                    <ReactIcon icon={FaXmark} />
+                  </IconButton>
+                )}
+              </HStack>
             }
-          />
-          <InputRightElement width="4.5rem">
-            {isLoading && <Spinner size="sm" mr={value ? 2 : 0} />}
-            {value && (
-              <IconButton
-                type="button"
-                aria-label="Clear tag filter"
-                icon={<FaXmark />}
-                size="sm"
-                variant="ghost"
-                onClick={() => {
-                  setValue("");
-                  onSelect("");
-                  setIsOpen(false);
-                  setActiveIndex(-1);
-                }}
-              />
-            )}
-          </InputRightElement>
-        </InputGroup>
-        {isOpen && suggestions.length > 0 && (
-          <Box
-            id={listId}
-            role="listbox"
-            aria-label="Matching tags"
-            position="absolute"
-            zIndex="dropdown"
-            mt={1}
-            width="100%"
-            maxHeight="15rem"
-            overflowY="auto"
-            borderWidth="1px"
-            borderRadius="md"
-            bg="chakra-body-bg"
-            boxShadow="md"
-            py={1}
           >
-            {suggestions.map((tag, index) => (
-              <Button
-                id={`${listId}-option-${index}`}
-                key={tag}
-                role="option"
-                aria-selected={index === activeIndex}
-                tabIndex={-1}
-                variant="ghost"
-                size="sm"
-                width="100%"
-                justifyContent="flex-start"
-                borderRadius={0}
-                onMouseDown={(event) => event.preventDefault()}
-                onMouseEnter={() => setActiveIndex(index)}
-                onClick={() => selectTag(tag)}
-              >
-                {tag}
-              </Button>
-            ))}
-          </Box>
-        )}
-        {isError && (
-          <Alert status="error" mt={2} size="sm">
-            <AlertIcon />
-            Could not load tag suggestions. Press Enter to filter by the typed tag.
-          </Alert>
-        )}
-      </FormControl>
+            <Input
+              id="transaction-tag-filter"
+              value={value}
+              onChange={(event) => {
+                setValue(event.target.value);
+                setIsOpen(true);
+                setActiveIndex(-1);
+              }}
+              onFocus={() => setIsOpen(true)}
+              onKeyDown={handleKeyDown}
+              placeholder="Search tags and press Enter"
+              maxLength={50}
+              role="combobox"
+              aria-autocomplete="list"
+              aria-expanded={isOpen && suggestions.length > 0}
+              aria-controls={listId}
+              aria-activedescendant={
+                activeIndex >= 0 ? `${listId}-option-${activeIndex}` : undefined
+              }
+            />
+          </InputGroup>
+          {isOpen && suggestions.length > 0 && (
+            <Box
+              id={listId}
+              role="listbox"
+              aria-label="Matching tags"
+              position="absolute"
+              zIndex="dropdown"
+              mt={1}
+              width="100%"
+              maxHeight="15rem"
+              overflowY="auto"
+              borderWidth="1px"
+              borderRadius="md"
+              bg="bg"
+              boxShadow="md"
+              py={1}
+            >
+              {suggestions.map((tag, index) => (
+                <Button
+                  id={`${listId}-option-${index}`}
+                  key={tag}
+                  role="option"
+                  aria-selected={index === activeIndex}
+                  tabIndex={-1}
+                  variant="ghost"
+                  size="sm"
+                  width="100%"
+                  justifyContent="flex-start"
+                  borderRadius={0}
+                  onMouseDown={(event) => event.preventDefault()}
+                  onMouseEnter={() => setActiveIndex(index)}
+                  onClick={() => selectTag(tag)}
+                >
+                  {tag}
+                </Button>
+              ))}
+            </Box>
+          )}
+          {isError && (
+            <Alert.Root status="error" mt={2} size="sm">
+              <Alert.Indicator />
+              Could not load tag suggestions. Press Enter to filter by the typed
+              tag.
+            </Alert.Root>
+          )}
+        </Field.Root>
+      </form>
     </Box>
   );
 }

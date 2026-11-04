@@ -1,27 +1,17 @@
 import { AccountResponse } from "@backend/types/accountResponse";
 import {
   Accordion,
-  AccordionButton,
-  AccordionIcon,
-  AccordionItem,
-  AccordionPanel,
   Box,
   Button,
   ButtonGroup,
   Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
   Circle,
   Flex,
   Heading,
-  Icon,
   Image,
   Spacer,
   Stack,
-  StackDivider,
   Text,
-  useToast,
 } from "@chakra-ui/react";
 import { format } from "date-fns";
 import { Institution } from "plaid";
@@ -32,6 +22,8 @@ import { deleteItem } from "../../../services/itemService";
 import { formatCurrency } from "../../../utils/CurrencyUtil";
 import { getErrorMessage } from "../../../utils/getErrorMessage";
 import LaunchLink from "../../launch-link/LaunchLink";
+import { useToast } from "../../ui/Toaster";
+import { ReactIcon } from "../../ui/ReactIcon";
 
 interface InstitutionCardProps {
   group: AccountResponse;
@@ -45,13 +37,13 @@ const InstitutionCard = (props: InstitutionCardProps) => {
   const { mutate, isLoading } = useMutation(deleteItem, {
     onSuccess: refetch,
     onError: (error) => {
-      toast({
-        title: "Could not unlink institution",
-        description: getErrorMessage(error, "Please try again."),
-        status: "error",
-        isClosable: true,
-      });
-    },
+                  toast({
+                    title: "Could not unlink institution",
+                    description: getErrorMessage(error, "Please try again."),
+                    status: "error",
+                    isClosable: true,
+                  });
+                },
   });
   const { openModal } = useModal();
 
@@ -71,12 +63,20 @@ const InstitutionCard = (props: InstitutionCardProps) => {
   };
 
   return (
-    <Card p={{ base: "1rem", sm: "1.5rem" }} variant="outline">
-      <span style={{ backgroundColor: color, height: "5px" }} />
-      <CardHeader>
+    <Card.Root
+      p={{ base: "1rem", sm: "1.5rem" }}
+      variant="outline"
+    >
+      <span
+        style={{ backgroundColor: color, height: "5px" }}
+      />
+      <Card.Header>
         <Flex alignItems="center" gap={3}>
           <Box minWidth={0}>
-            <Heading as="h2" size={{ base: "md", sm: "lg" }}>
+            <Heading
+              as="h2"
+              size={{ base: "md", sm: "lg" }}
+            >
               {institutionName}
             </Heading>
             <Text fontSize="sm">
@@ -84,8 +84,8 @@ const InstitutionCard = (props: InstitutionCardProps) => {
             </Text>
             {group.needs_attention && (
               <>
-                <Icon
-                  as={FaCircleExclamation}
+                <ReactIcon
+                  icon={FaCircleExclamation}
                   verticalAlign="center"
                   color="red"
                 />
@@ -106,64 +106,68 @@ const InstitutionCard = (props: InstitutionCardProps) => {
             <Circle size={{ base: "56px", sm: "75px" }} />
           )}
         </Flex>
-      </CardHeader>
-      <CardBody>
-        <Accordion allowToggle>
-          <AccordionItem>
-            <AccordionButton>
+      </Card.Header>
+      <Card.Body>
+        <Accordion.Root collapsible>
+          <Accordion.Item value="item-0">
+            <Accordion.ItemTrigger>
               <Box as="span" flex="1" textAlign="left">
                 <Text fontWeight="semibold">
                   View Accounts ({group.accounts.length})
                 </Text>
               </Box>
-              <AccordionIcon />
-            </AccordionButton>
-            <AccordionPanel>
-              <Stack divider={<StackDivider />}>
-                {group.accounts.map((account) => (
-                  <Box>
-                    <Text fontWeight="semibold">{account.name}</Text>
-                    <Flex
-                      direction={{ base: "column", sm: "row" }}
-                      align={{ base: "flex-start", sm: "center" }}
-                    >
-                      <Text minWidth={0}>
-                        {account.official_name} (...{account.mask})
-                      </Text>
-                      <Spacer />
-                      <Text whiteSpace="nowrap">
-                        {formatCurrency(account.balances.current)}
-                      </Text>
-                    </Flex>
-                    {account.balances.last_updated_datetime && (
-                      <Text fontSize="sm">
-                        Last updated{" "}
-                        {format(
-                          new Date(account.balances.last_updated_datetime),
-                          "MMMM dd, yyyy",
-                        )}
-                      </Text>
-                    )}
-                  </Box>
-                ))}
-              </Stack>
-            </AccordionPanel>
-          </AccordionItem>
-        </Accordion>
-      </CardBody>
-      <CardFooter>
-        <ButtonGroup spacing={2}>
+              <Accordion.ItemIndicator />
+            </Accordion.ItemTrigger>
+            <Accordion.ItemContent>
+              <Accordion.ItemBody>
+                <Stack>
+                  {group.accounts.map((account) => (
+                    <Box>
+                      <Text fontWeight="semibold">{account.name}</Text>
+                      <Flex
+                        direction={{
+                          base: "column",
+                          sm: "row",
+                        }}
+                        align={{
+                          base: "flex-start",
+                          sm: "center",
+                        }}
+                      >
+                        <Text minWidth={0}>
+                          {account.official_name} (...{account.mask})
+                        </Text>
+                        <Spacer />
+                        <Text whiteSpace="nowrap">
+                          {formatCurrency(account.balances.current)}
+                        </Text>
+                      </Flex>
+                      {account.balances.last_updated_datetime && (
+                        <Text fontSize="sm">
+                          Last updated{" "}
+                          {format(
+                            new Date(account.balances.last_updated_datetime),
+                            "MMMM dd, yyyy",
+                          )}
+                        </Text>
+                      )}
+                    </Box>
+                  ))}
+                </Stack>
+              </Accordion.ItemBody>
+            </Accordion.ItemContent>
+          </Accordion.Item>
+        </Accordion.Root>
+      </Card.Body>
+      <Card.Footer>
+        <ButtonGroup gap={2}>
           <LaunchLink itemId={group.item_id}>Update</LaunchLink>
-          <Button
-            colorScheme="red"
-            isLoading={isLoading}
-            onClick={onUnlink}
-          >
+          <Button colorPalette="red" loading={isLoading} onClick={onUnlink}>
             Unlink
           </Button>
         </ButtonGroup>
-      </CardFooter>
-    </Card>
+      </Card.Footer>
+    </Card.Root>
   );
 };
 

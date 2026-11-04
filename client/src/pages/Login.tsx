@@ -13,12 +13,12 @@ function Login() {
 
   return (
     <Center minHeight="60vh">
-      <Stack align="center" spacing={4}>
+      <Stack align="center" gap={4}>
         <Text>Sign in to access your expense tracker.</Text>
         <Button
-          colorScheme="teal"
+          colorPalette="teal"
           onClick={() => signinRedirect()}
-          isLoading={isLoading}
+          loading={isLoading}
         >
           Sign in
         </Button>

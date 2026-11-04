@@ -1,4 +1,5 @@
-import { Button, useToast } from "@chakra-ui/react";
+import { Button } from "@chakra-ui/react";
+import type { ButtonProps } from "@chakra-ui/react";
 import { ReactNode, useCallback, useEffect } from "react";
 import {
   PlaidLinkOnEvent,
@@ -12,15 +13,16 @@ import { useCreateLinkToken } from "../../hooks/useCreateLinkToken";
 import { updateItem } from "../../services/itemService";
 import { postAccessToken } from "../../services/linkService";
 import { getErrorMessage } from "../../utils/getErrorMessage";
+import { useToast } from "../ui/Toaster";
 
 interface LaunchLinkProps {
   children: ReactNode;
   itemId?: string;
-  colorScheme?: string;
+  colorPalette?: ButtonProps["colorPalette"];
 }
 
 const LaunchLink = (props: LaunchLinkProps) => {
-  const { children, itemId, colorScheme } = props;
+  const { children, itemId, colorPalette } = props;
   const {
     linkToken,
     isLoading: isLinkTokenLoading,
@@ -145,9 +147,9 @@ const LaunchLink = (props: LaunchLinkProps) => {
 
   return (
     <Button
-      colorScheme={colorScheme}
+      colorPalette={colorPalette}
       onClick={onClick}
-      isDisabled={!ready || isLinkTokenLoading}
+      disabled={!ready || isLinkTokenLoading}
     >
       {children}
     </Button>

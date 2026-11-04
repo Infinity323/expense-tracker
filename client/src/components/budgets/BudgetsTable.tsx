@@ -1,11 +1,6 @@
 import {
+  Alert,
   Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
   Skeleton,
 } from "@chakra-ui/react";
 import { useEffect } from "react";
@@ -15,7 +10,7 @@ import DeleteBudget from "./DeleteBudget";
 import EditBudget from "./EditBudget";
 
 function BudgetsTable({ reload, setReload }) {
-  const { budgets, isLoading, refetch } = useBudgets();
+  const { budgets, isLoading, isError, refetch } = useBudgets();
 
   useEffect(() => {
     if (reload) {
@@ -26,51 +21,68 @@ function BudgetsTable({ reload, setReload }) {
 
   const displayedBudgets = budgets?.filter((budget) => budget.amount);
 
+  if (isError) {
+    return (
+      <Alert.Root status="error">
+        <Alert.Indicator />
+        <Alert.Description>
+          Could not load budgets. Please try again.
+        </Alert.Description>
+      </Alert.Root>
+    );
+  }
+
   return (
-    <TableContainer>
-      <Table size="sm" variant="striped">
-        <Thead>
-          <Tr>
-            <Th>Category</Th>
-            <Th>Subcategory</Th>
-            <Th isNumeric>Monthly Amount</Th>
+    <Table.ScrollArea>
+      <Table.Root size="sm" variant="line" striped>
+        <Table.Header>
+          <Table.Row>
+            <Table.ColumnHeader>Category</Table.ColumnHeader>
+            <Table.ColumnHeader>Subcategory</Table.ColumnHeader>
+            <Table.ColumnHeader textAlign="end">
+              Monthly Amount
+            </Table.ColumnHeader>
             {/* 0% to make Actions column as small as possible */}
-            <Th width="0">Actions</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
+            <Table.ColumnHeader width="0">Actions</Table.ColumnHeader>
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
           {isLoading ? (
             Array.from({ length: 5 }, (_, rowIndex) => (
-              <Tr key={`budget-skeleton-${rowIndex}`}>
+              <Table.Row key={`budget-skeleton-${rowIndex}`}>
                 {Array.from({ length: 4 }, (_, columnIndex) => (
-                  <Td key={`budget-skeleton-${rowIndex}-${columnIndex}`}>
+                  <Table.Cell
+                    key={`budget-skeleton-${rowIndex}-${columnIndex}`}
+                  >
                     <Skeleton height="14px" />
-                  </Td>
+                  </Table.Cell>
                 ))}
-              </Tr>
+              </Table.Row>
             ))
           ) : displayedBudgets?.length ? (
             displayedBudgets.map((budget) => (
-              <Tr key={budget.budgetId}>
-                <Td>{budget.category}</Td>
-                <Td>{budget.subcategory}</Td>
-                <Td isNumeric>{formatCurrency(budget.amount)}</Td>
-                <Td padding="0" width="0">
+              <Table.Row key={budget.budgetId}>
+                <Table.Cell>{budget.category}</Table.Cell>
+                <Table.Cell>{budget.subcategory}</Table.Cell>
+                <Table.Cell textAlign="end">
+                  {formatCurrency(budget.amount)}
+                </Table.Cell>
+                <Table.Cell padding="0" width="0">
                   <EditBudget budgetDoc={budget} refetch={refetch} />
                   {!budget.isMaster && (
                     <DeleteBudget budgetDoc={budget} onDelete={refetch} />
                   )}
-                </Td>
-              </Tr>
+                </Table.Cell>
+              </Table.Row>
             ))
           ) : (
-            <Tr>
-              <Td colSpan={100}>No budgets found.</Td>
-            </Tr>
+            <Table.Row>
+              <Table.Cell colSpan={100}>No budgets found.</Table.Cell>
+            </Table.Row>
           )}
-        </Tbody>
-      </Table>
-    </TableContainer>
+        </Table.Body>
+      </Table.Root>
+    </Table.ScrollArea>
   );
 }
 

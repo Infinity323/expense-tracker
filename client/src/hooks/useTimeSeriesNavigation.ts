@@ -1,9 +1,4 @@
-import {
-  PointerEvent,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { PointerEvent, useEffect, useRef, useState } from "react";
 
 interface DragState {
   startX: number;
@@ -21,7 +16,10 @@ export function useTimeSeriesNavigation<T>(data: T[]) {
   const chartRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setRange({ startIndex: 0, endIndex: data.length - 1 });
+    setRange({
+      startIndex: 0,
+      endIndex: data.length - 1,
+    });
   }, [data.length]);
 
   const visibleData = data.slice(range.startIndex, range.endIndex + 1);
@@ -89,18 +87,21 @@ export function useTimeSeriesNavigation<T>(data: T[]) {
     );
     const startIndex = Math.max(
       0,
-      Math.min(
-        data.length - visibleCount,
-        drag.startIndex + indexShift,
-      ),
+      Math.min(data.length - visibleCount, drag.startIndex + indexShift),
     );
-    setRange({ startIndex, endIndex: startIndex + visibleCount - 1 });
+    setRange({
+      startIndex,
+      endIndex: startIndex + visibleCount - 1,
+    });
   };
 
   const endDrag = () => setDrag(undefined);
 
   const reset = () => {
-    setRange({ startIndex: 0, endIndex: data.length - 1 });
+    setRange({
+      startIndex: 0,
+      endIndex: data.length - 1,
+    });
     setDrag(undefined);
   };
 
@@ -108,8 +109,7 @@ export function useTimeSeriesNavigation<T>(data: T[]) {
     visibleData,
     reset,
     chartRef,
-    isZoomed:
-      range.startIndex !== 0 || range.endIndex !== data.length - 1,
+    isZoomed: range.startIndex !== 0 || range.endIndex !== data.length - 1,
     interactionProps: {
       onPointerDown,
       onPointerMove,

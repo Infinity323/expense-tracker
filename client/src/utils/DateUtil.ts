@@ -14,4 +14,4 @@ export const dateToMMMYYYY = (value: string): string => {
     year: "numeric",
     timeZone: "UTC",
   }).format(date);
-}
+};

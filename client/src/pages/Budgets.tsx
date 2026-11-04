@@ -7,9 +7,9 @@ function Budgets() {
   const [reload, setReload] = useState(false);
 
   return (
-    <Stack spacing="3rem">
+    <Stack gap="3rem">
       <Box>
-        <Heading as="h1" size="xl">
+        <Heading as="h1" size="3xl">
           Budgets
         </Heading>
         <Text>All configured income and expense budgets</Text>

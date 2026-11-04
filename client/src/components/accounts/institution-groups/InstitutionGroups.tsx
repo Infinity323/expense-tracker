@@ -1,4 +1,4 @@
-import { Alert, AlertIcon, Box, Skeleton } from "@chakra-ui/react";
+import { Alert, Box, Skeleton } from "@chakra-ui/react";
 import { useAccounts } from "../../../hooks/useAccounts";
 import { useLinkedInstitutions } from "../../../hooks/useLinkedInstitutions";
 import InstitutionCard from "../institution-card/InstitutionCard";
@@ -14,8 +14,7 @@ const InstitutionGroups = () => {
     institutions,
     isLoading: isInstitutionsLoading,
     isError: isInstitutionsError,
-  } =
-    useLinkedInstitutions();
+  } = useLinkedInstitutions();
 
   if (isAccountsLoading || isInstitutionsLoading) {
     return <Skeleton height="200px" />;
@@ -23,10 +22,10 @@ const InstitutionGroups = () => {
 
   if (isAccountsError || isInstitutionsError) {
     return (
-      <Alert status="error">
-        <AlertIcon />
+      <Alert.Root status="error">
+        <Alert.Indicator />
         Could not load linked accounts. Please retry or sign in again.
-      </Alert>
+      </Alert.Root>
     );
   }
 

@@ -1,14 +1,18 @@
-import { Button, useToast } from "@chakra-ui/react";
+import { Button } from "@chakra-ui/react";
 import { useState } from "react";
 import { useAccounts } from "../../hooks/useAccounts";
 import { useLoadingModal } from "../../hooks/useLoadingModal";
 import { syncTransactions } from "../../services/transactionService";
+import { useToast } from "../ui/Toaster";
 
 function SyncTransactions({ setReload }) {
   const { accounts } = useAccounts();
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const toast = useToast();
-  useLoadingModal({ isLoading: isSyncing, body: "Syncing transactions..." });
+  useLoadingModal({
+    isLoading: isSyncing,
+    body: "Syncing transactions...",
+  });
 
   const sync = async () => {
     setIsSyncing(true);
@@ -43,10 +47,10 @@ function SyncTransactions({ setReload }) {
 
   return (
     <Button
-      colorScheme="teal"
+      colorPalette="teal"
       onClick={sync}
-      isLoading={isSyncing}
-      isDisabled={isSyncing || !accounts?.length}
+      loading={isSyncing}
+      disabled={isSyncing || !accounts?.length}
     >
       Sync
     </Button>

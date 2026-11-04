@@ -1,46 +1,35 @@
 import { TransactionDoc } from "@backend/db/types/transactionDoc";
 import {
   Alert,
-  AlertIcon,
   Button,
-  Icon,
+  CloseButton,
+  Dialog,
   IconButton,
   Input,
   InputGroup,
-  InputLeftElement,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
+  Portal,
   Stack,
-  useDisclosure,
-  useToast,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { useQueryClient } from "react-query";
 import { FaPencil } from "react-icons/fa6";
-import { putTransaction } from "../../services/transactionService";
-import BudgetsSelect from "../budgets/BudgetsSelect";
 import { getErrorMessage } from "../../utils/getErrorMessage";
+import { putTransaction } from "../../services/transactionService";
+import { showToast } from "../ui/Toaster";
+import BudgetsSelect from "../budgets/BudgetsSelect";
 import TagsInput from "./TagsInput";
+import { ReactIcon } from "../ui/ReactIcon";
 
 interface EditTransactionProps {
   transactionDoc: TransactionDoc;
   refetch: () => void;
 }
 
-const EditTransaction = (props: EditTransactionProps) => {
-  const { transactionDoc, refetch } = props;
-
-  const { isOpen, onOpen, onClose } = useDisclosure();
+const EditTransaction = ({ transactionDoc, refetch }: EditTransactionProps) => {
+  const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string>();
-  const toast = useToast();
   const queryClient = useQueryClient();
-
   const [date, setDate] = useState(transactionDoc.date);
   const [name, setName] = useState(transactionDoc.name);
   const [description, setDescription] = useState(transactionDoc.description);
@@ -66,14 +55,14 @@ const EditTransaction = (props: EditTransactionProps) => {
       });
       await queryClient.invalidateQueries(["transactionTags"]);
       await refetch();
-      onClose();
+      setIsOpen(false);
     } catch (error) {
       const message = getErrorMessage(
         error,
         "Please check your details and try again.",
       );
       setSubmitError(message);
-      toast({
+      showToast({
         title: "Could not update transaction",
         description: message,
         status: "error",
@@ -89,74 +78,81 @@ const EditTransaction = (props: EditTransactionProps) => {
       <IconButton
         variant="ghost"
         size="sm"
-        onClick={onOpen}
-        icon={<Icon as={FaPencil} />}
-        aria-label=""
-      />
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Edit Transaction</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Stack>
-              {submitError && (
-                <Alert status="error" role="alert">
-                  <AlertIcon />
-                  {submitError}
-                </Alert>
-              )}
-              <Input
-                value={date}
-                onChange={(event) => setDate(event.target.value)}
-                placeholder="Date"
-                type="date"
-              />
-              <Input
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                placeholder="Name"
-                isInvalid={name === ""}
-              />
-              <Input
-                value={description}
-                onChange={(event) => setDescription(event.target.value)}
-                placeholder="Description"
-              />
-              <BudgetsSelect
-                selectedCategory={category}
-                selectedSubcategory={subcategory}
-                setCategory={setCategory}
-                setSubcategory={setSubcategory}
-              />
-              <TagsInput tags={tags} setTags={setTags} />
-              <InputGroup>
-                <InputLeftElement pointerEvents="none" color="gray.300">
-                  $
-                </InputLeftElement>
-                <Input
-                  value={amount}
-                  onChange={(event) => setAmount(event.target.value)}
-                  placeholder="Amount"
-                  isInvalid={amount === ""}
-                ></Input>
-              </InputGroup>
-            </Stack>
-          </ModalBody>
-          <ModalFooter>
-            <Button
-              colorScheme="teal"
-              onClick={editTransaction}
-              isLoading={isSubmitting}
-              isDisabled={
-                !date || !name || !category || !subcategory || !amount
-              }
-            >
-              Submit
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+        onClick={() => setIsOpen(true)}
+        aria-label="Edit transaction"
+      >
+        <ReactIcon icon={FaPencil} />
+      </IconButton>
+      <Dialog.Root
+        open={isOpen}
+        onOpenChange={(event) => setIsOpen(event.open)}
+      >
+        <Portal>
+          <Dialog.Backdrop />
+          <Dialog.Positioner>
+            <Dialog.Content>
+              <Dialog.Header>Edit Transaction</Dialog.Header>
+              <Dialog.CloseTrigger asChild>
+                <CloseButton size="sm" />
+              </Dialog.CloseTrigger>
+              <Dialog.Body>
+                <Stack>
+                  {submitError && (
+                    <Alert.Root status="error" role="alert">
+                      <Alert.Indicator />
+                      <Alert.Description>{submitError}</Alert.Description>
+                    </Alert.Root>
+                  )}
+                  <Input
+                    value={date}
+                    onChange={(event) => setDate(event.target.value)}
+                    placeholder="Date"
+                    type="date"
+                  />
+                  <Input
+                    value={name}
+                    onChange={(event) => setName(event.target.value)}
+                    placeholder="Name"
+                    aria-invalid={name === ""}
+                  />
+                  <Input
+                    value={description}
+                    onChange={(event) => setDescription(event.target.value)}
+                    placeholder="Description"
+                  />
+                  <BudgetsSelect
+                    selectedCategory={category}
+                    selectedSubcategory={subcategory}
+                    setCategory={setCategory}
+                    setSubcategory={setSubcategory}
+                  />
+                  <TagsInput tags={tags} setTags={setTags} />
+                  <InputGroup startElement="$">
+                    <Input
+                      value={amount}
+                      onChange={(event) => setAmount(event.target.value)}
+                      placeholder="Amount"
+                      aria-invalid={amount === ""}
+                    />
+                  </InputGroup>
+                </Stack>
+              </Dialog.Body>
+              <Dialog.Footer>
+                <Button
+                  colorPalette="teal"
+                  onClick={editTransaction}
+                  loading={isSubmitting}
+                  disabled={
+                    !date || !name || !category || !subcategory || !amount
+                  }
+                >
+                  Submit
+                </Button>
+              </Dialog.Footer>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Portal>
+      </Dialog.Root>
     </>
   );
 };

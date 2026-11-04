@@ -2,18 +2,10 @@ import {
   Box,
   Button,
   Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
   Alert,
-  AlertIcon,
   Skeleton,
   Spinner,
   Text,
-  useToast,
 } from "@chakra-ui/react";
 import {
   Dispatch,
@@ -30,16 +22,37 @@ import { getTransactions } from "../../services/transactionService";
 import { formatCurrency } from "../../utils/CurrencyUtil";
 import DeleteTransaction from "./DeleteTransaction";
 import EditTransaction from "./EditTransaction";
+import { useToast } from "../ui/Toaster";
 
 const TRANSACTION_COLUMNS = [
   { id: "date", label: "Date", minWidth: 88 },
   { id: "name", label: "Name", minWidth: 100 },
-  { id: "account", label: "Account", minWidth: 100 },
-  { id: "description", label: "Description", minWidth: 100 },
-  { id: "category", label: "Category", minWidth: 88 },
-  { id: "subcategory", label: "Subcategory", minWidth: 88 },
+  {
+    id: "account",
+    label: "Account",
+    minWidth: 100,
+  },
+  {
+    id: "description",
+    label: "Description",
+    minWidth: 100,
+  },
+  {
+    id: "category",
+    label: "Category",
+    minWidth: 88,
+  },
+  {
+    id: "subcategory",
+    label: "Subcategory",
+    minWidth: 88,
+  },
   { id: "tags", label: "Tags", minWidth: 88 },
-  { id: "amount", label: "Amount", minWidth: 88 },
+  {
+    id: "amount",
+    label: "Amount",
+    minWidth: 88,
+  },
 ] as const;
 
 type ResizableColumnId = (typeof TRANSACTION_COLUMNS)[number]["id"];
@@ -141,8 +154,7 @@ function TransactionsTable({
   const showRefetchError = useCallback(() => {
     toast({
       title: "Could not refresh transactions",
-      description:
-        "Your changes may have been saved, but the list could not be refreshed. Please try again.",
+      description: "Your changes may have been saved, but the list could not be refreshed. Please try again.",
       status: "error",
       isClosable: true,
     });
@@ -155,26 +167,29 @@ function TransactionsTable({
       showRefetchError();
     }
   }, [refetch, showRefetchError]);
-  const refetchTransactionPage = useCallback(async (transactionId: string) => {
-    const pageIndex =
-      data?.pages.findIndex((page) =>
-        page.items.some((item) => item.transactionId === transactionId),
-      ) ?? -1;
-    if (pageIndex < 0) {
-      await refetchTransactions();
-      return;
-    }
+  const refetchTransactionPage = useCallback(
+    async (transactionId: string) => {
+      const pageIndex =
+        data?.pages.findIndex((page) =>
+          page.items.some((item) => item.transactionId === transactionId),
+        ) ?? -1;
+      if (pageIndex < 0) {
+        await refetchTransactions();
+        return;
+      }
 
-    try {
-      const result = await refetch({
-        refetchPage: (_page, index) =>
-          index === pageIndex || (Boolean(tag) && index === 0),
-      });
-      if (result.isError) showRefetchError();
-    } catch {
-      showRefetchError();
-    }
-  }, [data?.pages, refetch, refetchTransactions, showRefetchError, tag]);
+      try {
+        const result = await refetch({
+          refetchPage: (_page, index) =>
+                              index === pageIndex || (Boolean(tag) && index === 0),
+        });
+        if (result.isError) showRefetchError();
+      } catch {
+        showRefetchError();
+      }
+    },
+    [data?.pages, refetch, refetchTransactions, showRefetchError, tag],
+  );
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
@@ -276,8 +291,8 @@ function TransactionsTable({
   return (
     <Box>
       {tag && (
-        <Alert status="info" mb={3}>
-          <AlertIcon />
+        <Alert.Root status="info" mb={3}>
+          <Alert.Indicator />
           {summary ? (
             <Text>
               <strong>{tag}</strong> · {summary.count} transactions · Net total{" "}
@@ -288,15 +303,16 @@ function TransactionsTable({
           ) : (
             <Text>Calculating the total for {tag}...</Text>
           )}
-        </Alert>
+        </Alert.Root>
       )}
-      <TableContainer width="100%" maxWidth="100%" overflowX="auto">
-        <Table
+      <Table.ScrollArea width="100%" maxWidth="100%" overflowX="auto">
+        <Table.Root
           size="sm"
-          variant="striped"
-          sx={{
-            tableLayout: "fixed",
-            "& tbody td": {
+          variant="line"
+          striped
+          css={{
+            "& tableLayout": "fixed",
+            "& & tbody td": {
               overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
@@ -314,10 +330,10 @@ function TransactionsTable({
             ))}
             <col style={{ width: `${ACTIONS_COLUMN_WIDTH}px` }} />
           </colgroup>
-          <Thead>
-            <Tr>
+          <Table.Header>
+            <Table.Row>
               {TRANSACTION_COLUMNS.map((column) => (
-                <Th key={column.id} position="relative">
+                <Table.ColumnHeader key={column.id} position="relative">
                   {column.label}
                   <Button
                     type="button"
@@ -331,77 +347,77 @@ function TransactionsTable({
                     minWidth={0}
                     padding={0}
                     cursor="col-resize"
-                    variant="unstyled"
                     borderLeftWidth="1px"
                     borderColor="gray.300"
-                    sx={{ touchAction: "none" }}
+                    css={{ "& touchAction": "none" }}
                     _hover={{ borderColor: "teal.400" }}
                     _dark={{ borderColor: "whiteAlpha.300" }}
                     onPointerDown={(event) => startResize(event, column.id)}
                     onPointerMove={resizeColumn}
                     onPointerUp={finishResize}
                     onPointerCancel={finishResize}
+                    unstyled
                   />
-                </Th>
+                </Table.ColumnHeader>
               ))}
-              <Th>Actions</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
+              <Table.ColumnHeader>Actions</Table.ColumnHeader>
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>
             {isLoading ? (
               Array.from({ length: 5 }, (_, rowIndex) => (
-                <Tr key={`transaction-skeleton-${rowIndex}`}>
+                <Table.Row key={`transaction-skeleton-${rowIndex}`}>
                   {Array.from(
                     { length: TRANSACTION_COLUMNS.length + 1 },
                     (_, columnIndex) => (
-                      <Td
+                      <Table.Cell
                         key={`transaction-skeleton-${rowIndex}-${columnIndex}`}
                       >
                         <Skeleton height="14px" />
-                      </Td>
+                      </Table.Cell>
                     ),
                   )}
-                </Tr>
+                </Table.Row>
               ))
             ) : isError && transactions.length === 0 ? (
-              <Tr>
-                <Td colSpan={TRANSACTION_COLUMNS.length + 1}>
-                  <Alert status="error">
-                    <AlertIcon />
+              <Table.Row>
+                <Table.Cell colSpan={TRANSACTION_COLUMNS.length + 1}>
+                  <Alert.Root status="error">
+                    <Alert.Indicator />
                     Could not load transactions. Please try again.
-                  </Alert>
-                </Td>
-              </Tr>
+                  </Alert.Root>
+                </Table.Cell>
+              </Table.Row>
             ) : visibleTransactions.length ? (
               visibleTransactions.map((transaction) => (
-                <Tr key={transaction.transactionId}>
-                  <Td>{transaction.date}</Td>
-                  <Td>{transaction.name}</Td>
-                  <Td
+                <Table.Row key={transaction.transactionId}>
+                  <Table.Cell>{transaction.date}</Table.Cell>
+                  <Table.Cell>{transaction.name}</Table.Cell>
+                  <Table.Cell
                     maxWidth="12rem"
                     overflow="hidden"
                     textOverflow="ellipsis"
                     whiteSpace="nowrap"
                   >
                     {transaction.accountId
-                      ? accountNames.get(transaction.accountId) ??
-                        "Linked account"
+                      ? (accountNames.get(transaction.accountId) ??
+                        "Linked account")
                       : "Manual"}
-                  </Td>
-                  <Td>{transaction.description}</Td>
-                  <Td maxWidth="5" overflowX="hidden">
+                  </Table.Cell>
+                  <Table.Cell>{transaction.description}</Table.Cell>
+                  <Table.Cell maxWidth="5" overflowX="hidden">
                     {transaction.category}
-                  </Td>
-                  <Td maxWidth="5" overflowX="hidden">
+                  </Table.Cell>
+                  <Table.Cell maxWidth="5" overflowX="hidden">
                     {transaction.subcategory}
-                  </Td>
-                  <Td>
+                  </Table.Cell>
+                  <Table.Cell>
                     {transaction.tags?.map((transactionTag) => (
                       <Button
                         key={transactionTag}
                         variant="solid"
                         size="xs"
-                        colorScheme="teal"
+                        colorPalette="teal"
                         borderRadius="full"
                         mr={2}
                         onClick={() => onTagSelect(transactionTag)}
@@ -409,9 +425,11 @@ function TransactionsTable({
                         {transactionTag}
                       </Button>
                     ))}
-                  </Td>
-                  <Td isNumeric>{formatCurrency(transaction.amount)}</Td>
-                  <Td padding="0">
+                  </Table.Cell>
+                  <Table.Cell textAlign="end">
+                    {formatCurrency(transaction.amount)}
+                  </Table.Cell>
+                  <Table.Cell padding="0">
                     <EditTransaction
                       transactionDoc={transaction}
                       refetch={() =>
@@ -422,25 +440,25 @@ function TransactionsTable({
                       transactionDoc={transaction}
                       refetch={refetch}
                     />
-                  </Td>
-                </Tr>
+                  </Table.Cell>
+                </Table.Row>
               ))
             ) : hasNextPage ? (
-              <Tr>
-                <Td colSpan={100}>Loading transactions...</Td>
-              </Tr>
+              <Table.Row>
+                <Table.Cell colSpan={100}>Loading transactions...</Table.Cell>
+              </Table.Row>
             ) : (
-              <Tr>
-                <Td colSpan={100}>No transactions found.</Td>
-              </Tr>
+              <Table.Row>
+                <Table.Cell colSpan={100}>No transactions found.</Table.Cell>
+              </Table.Row>
             )}
-          </Tbody>
-        </Table>
+          </Table.Body>
+        </Table.Root>
         {isError && transactions.length > 0 && (
-          <Alert status="error" mt={2}>
-            <AlertIcon />
+          <Alert.Root status="error" mt={2}>
+            <Alert.Indicator />
             Could not load more transactions.
-          </Alert>
+          </Alert.Root>
         )}
         {isFetchingNextPage && (
           <Text py={3} textAlign="center">
@@ -448,8 +466,12 @@ function TransactionsTable({
             Loading more transactions...
           </Text>
         )}
-        <div ref={sentinelRef} aria-hidden="true" style={{ height: 1 }} />
-      </TableContainer>
+        <div
+          ref={sentinelRef}
+          aria-hidden="true"
+          style={{ height: 1 }}
+        />
+      </Table.ScrollArea>
     </Box>
   );
 }

@@ -1,34 +1,26 @@
 import { BudgetDoc } from "@backend/db/types/budgetDoc";
 import {
   Button,
-  Icon,
+  CloseButton,
+  Dialog,
   IconButton,
   Input,
   InputGroup,
-  InputLeftElement,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
+  Portal,
   Stack,
-  useDisclosure,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { FaPencil } from "react-icons/fa6";
 import { putBudget } from "../../services/budgetService";
+import { ReactIcon } from "../ui/ReactIcon";
 
 interface EditBudgetProps {
   budgetDoc: BudgetDoc;
   refetch: () => void;
 }
 
-const EditBudget = (props: EditBudgetProps) => {
-  const { budgetDoc, refetch } = props;
-  const { isOpen, onOpen, onClose } = useDisclosure();
-
+const EditBudget = ({ budgetDoc, refetch }: EditBudgetProps) => {
+  const [isOpen, setIsOpen] = useState(false);
   const [category, setCategory] = useState(budgetDoc.category);
   const [subcategory, setSubcategory] = useState(budgetDoc.subcategory);
   const [amount, setAmount] = useState(budgetDoc.amount.toString());
@@ -41,7 +33,7 @@ const EditBudget = (props: EditBudgetProps) => {
       subcategory,
       amount: parseFloat(amount),
     });
-    onClose();
+    setIsOpen(false);
     refetch();
   };
 
@@ -50,53 +42,57 @@ const EditBudget = (props: EditBudgetProps) => {
       <IconButton
         variant="ghost"
         size="sm"
-        onClick={onOpen}
-        icon={<Icon as={FaPencil} />}
-        aria-label=""
-      />
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Edit Budget</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Stack>
-              <Input
-                value={category}
-                onChange={(event) => setCategory(event.target.value)}
-                placeholder="Category"
-                isInvalid={category === ""}
-              />
-              <Input
-                value={subcategory}
-                onChange={(event) => setSubcategory(event.target.value)}
-                placeholder="Subcategory"
-                isInvalid={subcategory === ""}
-              />
-              <InputGroup>
-                <InputLeftElement pointerEvents="none" color="gray.300">
-                  $
-                </InputLeftElement>
-                <Input
-                  value={amount}
-                  onChange={(event) => setAmount(event.target.value)}
-                  placeholder="Monthly Amount"
-                  isInvalid={amount === ""}
-                ></Input>
-              </InputGroup>
-            </Stack>
-          </ModalBody>
-          <ModalFooter>
-            <Button
-              colorScheme="teal"
-              onClick={editBudget}
-              isDisabled={!category || !subcategory || !amount}
-            >
-              Submit
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+        onClick={() => setIsOpen(true)}
+        aria-label="Edit budget"
+      >
+        <ReactIcon icon={FaPencil} />
+      </IconButton>
+      <Dialog.Root open={isOpen} onOpenChange={(event) => setIsOpen(event.open)}>
+        <Portal>
+          <Dialog.Backdrop />
+          <Dialog.Positioner>
+            <Dialog.Content>
+              <Dialog.Header>Edit Budget</Dialog.Header>
+              <Dialog.CloseTrigger asChild>
+                <CloseButton size="sm" />
+              </Dialog.CloseTrigger>
+              <Dialog.Body>
+                <Stack>
+                  <Input
+                    value={category}
+                    onChange={(event) => setCategory(event.target.value)}
+                    placeholder="Category"
+                    aria-invalid={category === ""}
+                  />
+                  <Input
+                    value={subcategory}
+                    onChange={(event) => setSubcategory(event.target.value)}
+                    placeholder="Subcategory"
+                    aria-invalid={subcategory === ""}
+                  />
+                  <InputGroup startElement="$">
+                    <Input
+                      value={amount}
+                      onChange={(event) => setAmount(event.target.value)}
+                      placeholder="Monthly Amount"
+                      aria-invalid={amount === ""}
+                    />
+                  </InputGroup>
+                </Stack>
+              </Dialog.Body>
+              <Dialog.Footer>
+                <Button
+                  colorPalette="teal"
+                  onClick={editBudget}
+                  disabled={!category || !subcategory || !amount}
+                >
+                  Submit
+                </Button>
+              </Dialog.Footer>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Portal>
+      </Dialog.Root>
     </>
   );
 };

@@ -6,16 +6,16 @@ interface AccountManagementProps {}
 
 const AccountManagement = (props: AccountManagementProps) => {
   return (
-    <Stack spacing="2rem">
+    <Stack gap="2rem">
       <Box>
-        <Heading as="h1" size="xl">
+        <Heading as="h1" size="3xl">
           Manage Accounts
         </Heading>
         <Text>Link, unlink, or repair linked accounts</Text>
       </Box>
       <InstitutionGroups />
       <Box>
-        <LaunchLink colorScheme="teal">Link Account</LaunchLink>
+        <LaunchLink colorPalette="teal">Link Account</LaunchLink>
       </Box>
     </Stack>
   );

@@ -1,7 +1,7 @@
 import {
   Box,
   Card,
-  CardBody,
+  Alert,
   Button,
   Flex,
   Skeleton,
@@ -26,8 +26,9 @@ import { formatCurrency } from "../../../utils/CurrencyUtil";
 import { dateToMMMYYYY, dateToString } from "../../../utils/DateUtil";
 
 function IncomeVsSpendingOverTime() {
-  const chartHeight = useBreakpointValue({ base: 360, md: 500 }) ?? 360;
-  const { data, isLoading } = useQuery({
+  const chartHeight =
+    useBreakpointValue({ base: 360, md: 500 }) ?? 360;
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["incomeVsExpenses"],
     queryFn: getIncomeVsExpenses,
   });
@@ -39,6 +40,17 @@ function IncomeVsSpendingOverTime() {
       <Box>
         <Skeleton height={300} />
       </Box>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Alert.Root status="error">
+        <Alert.Indicator />
+        <Alert.Description>
+          Could not load monthly cash flow. Please try again.
+        </Alert.Description>
+      </Alert.Root>
     );
   }
 
@@ -68,7 +80,10 @@ function IncomeVsSpendingOverTime() {
         ref={chartRef}
         aria-label="Income and expenses chart. Scroll to zoom, drag to pan, double-click to reset."
         {...interactionProps}
-        sx={{ touchAction: "pan-y", userSelect: "none" }}
+        css={{
+          "& touchAction": "pan-y",
+          "& userSelect": "none",
+        }}
       >
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
@@ -115,9 +130,11 @@ const CustomTooltip = (props) => {
 
   if (active && payload && payload.length) {
     return (
-      <Card>
-        <CardBody>
-          <Text as="b">{dateToString(Number(label))}</Text>
+      <Card.Root>
+        <Card.Body>
+          <Text asChild>
+            <b>{dateToString(Number(label))}</b>
+          </Text>
           <Flex color="green">
             <Text>Income</Text>
             <Spacer marginLeft={2} marginRight={2} />
@@ -128,8 +145,8 @@ const CustomTooltip = (props) => {
             <Spacer marginLeft={2} marginRight={2} />
             <Text>{formatCurrency(payload[1]?.value)}</Text>
           </Flex>
-        </CardBody>
-      </Card>
+        </Card.Body>
+      </Card.Root>
     );
   }
 };

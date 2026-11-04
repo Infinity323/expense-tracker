@@ -1,8 +1,6 @@
 import {
   Box,
   Card,
-  CardBody,
-  CardHeader,
   Center,
   Circle,
   Flex,
@@ -11,7 +9,6 @@ import {
   Skeleton,
   Spacer,
   Stack,
-  StackDivider,
   Text,
 } from "@chakra-ui/react";
 import { useLinkedInstitutions } from "../../../../hooks/useLinkedInstitutions";
@@ -31,15 +28,15 @@ const AccountListCard = (props: AccountListCardProps) => {
     .reduce((sum, current) => sum + current, 0);
 
   return (
-    <Card p="1.5rem" variant="outline">
-      <CardHeader>
+    <Card.Root p="1.5rem" variant="outline">
+      <Card.Header>
         <Box>
           <Heading size="lg">{formatCurrency(totalBalance)}</Heading>
           <Text>Total Balance</Text>
         </Box>
-      </CardHeader>
-      <CardBody>
-        <Stack divider={<StackDivider />}>
+      </Card.Header>
+      <Card.Body>
+        <Stack>
           {balances.length ? (
             balances.map((account) => {
               const institution = institutions?.find(
@@ -50,7 +47,11 @@ const AccountListCard = (props: AccountListCardProps) => {
               const logo = institution?.logo;
 
               return (
-                <Flex gap={{ base: 3, sm: 5 }} align="center" minWidth={0}>
+                <Flex
+                  gap={{ base: 3, sm: 5 }}
+                  align="center"
+                  minWidth={0}
+                >
                   <Center>
                     {logo === undefined ? (
                       <Skeleton boxSize="50px" />
@@ -65,8 +66,10 @@ const AccountListCard = (props: AccountListCardProps) => {
                     )}
                   </Center>
                   <Box minWidth={0}>
-                    <Text fontWeight="semibold" noOfLines={1}>{account.name}</Text>
-                    <Text noOfLines={1}>
+                    <Text fontWeight="semibold" lineClamp={1}>
+                      {account.name}
+                    </Text>
+                    <Text lineClamp={1}>
                       {account.official_name} (...{account.mask})
                     </Text>
                   </Box>
@@ -81,8 +84,8 @@ const AccountListCard = (props: AccountListCardProps) => {
             <Text>No accounts linked.</Text>
           )}
         </Stack>
-      </CardBody>
-    </Card>
+      </Card.Body>
+    </Card.Root>
   );
 };
 

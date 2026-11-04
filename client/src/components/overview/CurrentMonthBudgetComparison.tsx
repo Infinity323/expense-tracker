@@ -1,12 +1,10 @@
 import {
   Box,
   Card,
-  CardBody,
-  CardHeader,
-  Divider,
   Heading,
   Skeleton,
   Text,
+  Separator,
 } from "@chakra-ui/react";
 import { useBudgetComparison } from "../../hooks/useBudgetComparison";
 import ComparisonProgress from "./comparison-progress/ComparisonProgress";
@@ -17,27 +15,27 @@ function CurrentMonthBudgetComparison() {
 
   if (isLoading) {
     return (
-      <Card p="1.5rem" variant="outline">
-        <CardHeader>
+      <Card.Root p="1.5rem" variant="outline">
+        <Card.Header>
           <Heading size="lg">Budgets</Heading>
-        </CardHeader>
-        <CardBody>
+        </Card.Header>
+        <Card.Body>
           <Skeleton height={200} />
-        </CardBody>
-      </Card>
+        </Card.Body>
+      </Card.Root>
     );
   }
 
   if (!comparisons) {
     return (
-      <Card p="1.5rem" variant="outline">
-        <CardHeader>
+      <Card.Root p="1.5rem" variant="outline">
+        <Card.Header>
           <Heading size="lg">Budgets</Heading>
-        </CardHeader>
-        <CardBody>
+        </Card.Header>
+        <Card.Body>
           <Text>No budgets found.</Text>
-        </CardBody>
-      </Card>
+        </Card.Body>
+      </Card.Root>
     );
   }
 
@@ -55,16 +53,16 @@ function CurrentMonthBudgetComparison() {
     .reduce((sum, current) => sum + current, 0);
 
   return (
-    <Card p="1.5rem" variant="outline">
-      <CardHeader>
+    <Card.Root p="1.5rem" variant="outline">
+      <Card.Header>
         <Heading size="lg">Budgets</Heading>
-      </CardHeader>
-      <CardHeader>
+      </Card.Header>
+      <Card.Header>
         <Heading size="md">Income</Heading>
         <Text>Total Budgeted: {formatCurrency(totalIncomeBudget)}</Text>
         <Text>Total Earned: {formatCurrency(totalIncomeActual)}</Text>
-      </CardHeader>
-      <CardBody>
+      </Card.Header>
+      <Card.Body>
         {comparisons?.income?.length ? (
           comparisons.income.map((comparison) => (
             <ComparisonProgress comparison={comparison} type="income" />
@@ -74,16 +72,16 @@ function CurrentMonthBudgetComparison() {
             <Text>No income data to show.</Text>
           </Box>
         )}
-      </CardBody>
-      <Divider borderColor="gray.200" marginTop={5} marginBottom={5} />
-      <CardHeader>
+      </Card.Body>
+      <Separator borderColor="gray.200" marginTop={5} marginBottom={5} />
+      <Card.Header>
         <Heading as="h3" size="md">
           Spending
         </Heading>
         <Text>Total Budgeted: {formatCurrency(totalExpenseBudget)}</Text>
         <Text>Total Spent: {formatCurrency(totalExpenseActual)}</Text>
-      </CardHeader>
-      <CardBody>
+      </Card.Header>
+      <Card.Body>
         {comparisons?.expenses?.length ? (
           comparisons.expenses.map((comparison) => (
             <ComparisonProgress comparison={comparison} type="expense" />
@@ -93,8 +91,8 @@ function CurrentMonthBudgetComparison() {
             No spending data to show.
           </Box>
         )}
-      </CardBody>
-    </Card>
+      </Card.Body>
+    </Card.Root>
   );
 }
 

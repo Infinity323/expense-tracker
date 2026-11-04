@@ -1,15 +1,11 @@
 import {
   Alert,
-  AlertIcon,
   Box,
   Card,
-  CardBody,
-  CardHeader,
   Grid,
   GridItem,
   Heading,
   HStack,
-  Icon,
   Skeleton,
   Stack,
   Text,
@@ -24,6 +20,7 @@ import { useAccounts } from "../../../hooks/useAccounts";
 import { getBalance } from "../../../utils/BalanceUtil";
 import { formatCurrency } from "../../../utils/CurrencyUtil";
 import NetWorthOverTime from "./NetWorthOverTime";
+import { ReactIcon } from "../../ui/ReactIcon";
 
 interface NetWorthProps {}
 
@@ -36,10 +33,10 @@ const NetWorth = (props: NetWorthProps) => {
 
   if (isError) {
     return (
-      <Alert status="error">
-        <AlertIcon />
+      <Alert.Root status="error">
+        <Alert.Indicator />
         Could not load account balances. Please try again.
-      </Alert>
+      </Alert.Root>
     );
   }
 
@@ -54,7 +51,7 @@ const NetWorth = (props: NetWorthProps) => {
   const netWorth = assetWorth - liabilityWorth;
 
   return (
-    <Stack spacing="2rem">
+    <Stack gap="2rem">
       <Box p="1rem">
         <Heading as="h3" size="lg">
           {formatCurrency(netWorth)}
@@ -62,15 +59,23 @@ const NetWorth = (props: NetWorthProps) => {
         <Text>Total Net Worth</Text>
       </Box>
       <NetWorthOverTime />
-      <HStack spacing="2rem" align="stretch" flexDirection={{ base: "column", md: "row" }}>
-        <Card width={{ base: "100%", md: "50%" }} p="1.5rem" variant="outline">
-          <CardHeader>
+      <HStack
+        gap="2rem"
+        align="stretch"
+        flexDirection={{ base: "column", md: "row" }}
+      >
+        <Card.Root
+          width={{ base: "100%", md: "50%" }}
+          p="1.5rem"
+          variant="outline"
+        >
+          <Card.Header>
             <Heading as="h3" size="md">
               {formatCurrency(assetWorth)}
             </Heading>
             <Text fontSize="sm">Total Assets</Text>
-          </CardHeader>
-          <CardBody>
+          </Card.Header>
+          <Card.Body>
             <Grid
               templateRows="repeat(2, 1fr)"
               templateColumns="repeat(2, 1fr)"
@@ -78,29 +83,33 @@ const NetWorth = (props: NetWorthProps) => {
             >
               <GridItem>
                 <Text>
-                  <Icon as={FaMoneyBill} marginRight={2} />
+                  <ReactIcon icon={FaMoneyBill} marginRight={2} />
                   Cash
                 </Text>
               </GridItem>
               <GridItem>{formatCurrency(cash)}</GridItem>
               <GridItem>
                 <Text>
-                  <Icon as={FaMoneyBillTrendUp} marginRight={2} />
+                  <ReactIcon icon={FaMoneyBillTrendUp} marginRight={2} />
                   Investments
                 </Text>
               </GridItem>
               <GridItem>{formatCurrency(investment)}</GridItem>
             </Grid>
-          </CardBody>
-        </Card>
-        <Card width={{ base: "100%", md: "50%" }} p="1.5rem" variant="outline">
-          <CardHeader>
+          </Card.Body>
+        </Card.Root>
+        <Card.Root
+          width={{ base: "100%", md: "50%" }}
+          p="1.5rem"
+          variant="outline"
+        >
+          <Card.Header>
             <Heading as="h3" size="md">
               {formatCurrency(liabilityWorth)}
             </Heading>
             <Text fontSize="sm">Total Liabilities</Text>
-          </CardHeader>
-          <CardBody>
+          </Card.Header>
+          <Card.Body>
             <Grid
               templateRows="repeat(2, 1fr)"
               templateColumns="repeat(2, 1fr)"
@@ -108,21 +117,21 @@ const NetWorth = (props: NetWorthProps) => {
             >
               <GridItem>
                 <Text>
-                  <Icon as={FaCreditCard} marginRight={2} />
+                  <ReactIcon icon={FaCreditCard} marginRight={2} />
                   Credit
                 </Text>
               </GridItem>
               <GridItem>{formatCurrency(credit)}</GridItem>
               <GridItem>
                 <Text>
-                  <Icon as={FaSackDollar} marginRight={2} />
+                  <ReactIcon icon={FaSackDollar} marginRight={2} />
                   Loans
                 </Text>
               </GridItem>
               <GridItem>{formatCurrency(loan)}</GridItem>
             </Grid>
-          </CardBody>
-        </Card>
+          </Card.Body>
+        </Card.Root>
       </HStack>
     </Stack>
   );

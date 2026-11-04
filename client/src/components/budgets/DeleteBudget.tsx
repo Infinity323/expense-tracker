@@ -1,21 +1,17 @@
 import {
   Button,
-  Icon,
   IconButton,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  useDisclosure,
+  CloseButton,
+  Dialog,
+  Portal,
 } from "@chakra-ui/react";
+import { useState } from "react";
 import { FaRegTrashCan } from "react-icons/fa6";
 import { deleteBudget } from "../../services/budgetService";
+import { ReactIcon } from "../ui/ReactIcon";
 
 function DeleteBudget({ budgetDoc: budget, onDelete }) {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isOpen, setIsOpen] = useState(false);
 
   const removeBudget = async (event) => {
     event.preventDefault();
@@ -28,23 +24,33 @@ function DeleteBudget({ budgetDoc: budget, onDelete }) {
       <IconButton
         variant="ghost"
         size="sm"
-        onClick={onOpen}
-        icon={<Icon as={FaRegTrashCan} />}
-        aria-label=""
-      />
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Are you sure?</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>This action cannot be undone.</ModalBody>
-          <ModalFooter>
-            <Button colorScheme="red" onClick={removeBudget}>
-              Delete
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+        onClick={() => setIsOpen(true)}
+        aria-label="Delete budget"
+      >
+        <ReactIcon icon={FaRegTrashCan} />
+      </IconButton>
+      <Dialog.Root
+        open={isOpen}
+        onOpenChange={(event) => setIsOpen(event.open)}
+      >
+        <Portal>
+          <Dialog.Backdrop />
+          <Dialog.Positioner>
+            <Dialog.Content>
+              <Dialog.Header>Are you sure?</Dialog.Header>
+              <Dialog.CloseTrigger asChild>
+                <CloseButton size="sm" />
+              </Dialog.CloseTrigger>
+              <Dialog.Body>This action cannot be undone.</Dialog.Body>
+              <Dialog.Footer>
+                <Button colorPalette="red" onClick={removeBudget}>
+                  Delete
+                </Button>
+              </Dialog.Footer>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Portal>
+      </Dialog.Root>
     </>
   );
 }

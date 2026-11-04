@@ -1,13 +1,4 @@
-import {
-  AlertDialog,
-  AlertDialogBody,
-  AlertDialogCloseButton,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogOverlay,
-  Button,
-} from "@chakra-ui/react";
+import { Button, CloseButton, Dialog, Portal } from "@chakra-ui/react";
 import { useRef } from "react";
 import { useModal } from "../../context/GlobalModalProvider";
 import { ModalProps } from "../../types/modalProps";
@@ -36,27 +27,38 @@ const ConfirmationModal = (props: ModalProps) => {
   };
 
   return (
-    <AlertDialog
-      leastDestructiveRef={cancelRef}
-      onClose={onClose}
-      isOpen={isOpen}
-      isCentered
+    <Dialog.Root
+      initialFocusEl={() => cancelRef.current}
+      open={isOpen}
+      placement="center"
+      role="alertdialog"
+      onOpenChange={(e) => {
+        if (!e.open) {
+          onClose();
+        }
+      }}
     >
-      <AlertDialogOverlay />
-      <AlertDialogContent>
-        <AlertDialogHeader>{modalProps?.header}</AlertDialogHeader>
-        <AlertDialogCloseButton />
-        <AlertDialogBody>{modalProps?.body}</AlertDialogBody>
-        <AlertDialogFooter>
-          <Button ref={cancelRef} onClick={onClose}>
-            Cancel
-          </Button>
-          <Button colorScheme="red" ml={3} onClick={onConfirm}>
-            {modalProps?.confirmButton?.label}
-          </Button>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+      <Portal>
+        <Dialog.Backdrop />
+        <Dialog.Positioner>
+          <Dialog.Content>
+            <Dialog.Header>{modalProps?.header}</Dialog.Header>
+            <Dialog.CloseTrigger asChild>
+              <CloseButton size="sm" />
+            </Dialog.CloseTrigger>
+            <Dialog.Body>{modalProps?.body}</Dialog.Body>
+            <Dialog.Footer>
+              <Button ref={cancelRef} onClick={onClose}>
+                Cancel
+              </Button>
+              <Button colorPalette="red" ml={3} onClick={onConfirm}>
+                {modalProps?.confirmButton?.label}
+              </Button>
+            </Dialog.Footer>
+          </Dialog.Content>
+        </Dialog.Positioner>
+      </Portal>
+    </Dialog.Root>
   );
 };
 

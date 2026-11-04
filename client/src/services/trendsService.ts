@@ -29,7 +29,9 @@ export const getSpendingByCategory = async ({ queryKey }: any) => {
 };
 
 export const getIncomeVsExpenses = async () =>
-  await get<IncomeVsExpenses[]>({ uri: `${TRENDS_API}/income-vs-expenses` });
+  await get<IncomeVsExpenses[]>({
+    uri: `${TRENDS_API}/income-vs-expenses`,
+  });
 
 export const getCurrentMonthSpending = async () =>
   await get<CurrentMonthExpense[]>({

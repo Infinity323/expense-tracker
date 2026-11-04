@@ -1,10 +1,10 @@
 import {
   Center,
   ChakraProvider,
-  Divider,
   Spinner,
   Text,
   VStack,
+  Separator,
 } from "@chakra-ui/react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactNode, useState } from "react";
@@ -18,7 +18,9 @@ import {
 } from "react-router-dom";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
-import { useTheme } from "./hooks/useTheme";
+import { system } from "./hooks/useTheme";
+import { ColorModeProvider } from "./components/ui/ColorMode";
+import { Toaster } from "./components/ui/Toaster";
 import AccountManagement from "./pages/AccountManagement";
 import Accounts from "./pages/Accounts";
 import Budgets from "./pages/Budgets";
@@ -36,7 +38,10 @@ const UserQueryClient = ({ children }: { children: ReactNode }) => {
     () =>
       new QueryClient({
         defaultOptions: {
-          queries: { retry: false, refetchOnWindowFocus: false },
+          queries: {
+            retry: false,
+            refetchOnWindowFocus: false,
+          },
         },
       }),
   );
@@ -60,55 +65,64 @@ const RequireAuthentication = () => {
   return isAuthenticated ? (
     <Outlet />
   ) : (
-    <Navigate to="/login" replace state={{ from: location.pathname }} />
+    <Navigate
+      to="/login"
+      replace
+      state={{ from: location.pathname }}
+    />
   );
 };
 
 function App() {
   const { isLoading } = useAuth();
   return (
-    <ChakraProvider theme={useTheme()}>
-      <UserQueryCache>
-        <GlobalModalProvider>
+    <ChakraProvider value={system}>
+      <ColorModeProvider attribute="class" defaultTheme="system" enableSystem>
+        <Toaster />
+        <UserQueryCache>
+          <GlobalModalProvider>
           {isLoading ? (
-              <div style={{ height: "100vh", width: "100vw" }}>
-                <Center height="100%" width="100%">
-                  <VStack>
-                    <Spinner color="teal" size="xl" />
-                    <Text fontSize="lg" fontWeight="semibold">
-                      Loading...
-                    </Text>
-                  </VStack>
-                </Center>
-              </div>
+            <div
+              style={{ height: "100vh", width: "100vw" }}
+            >
+              <Center height="100%" width="100%">
+                <VStack>
+                  <Spinner color="teal" size="xl" />
+                  <Text fontSize="lg" fontWeight="semibold">
+                    Loading...
+                  </Text>
+                </VStack>
+              </Center>
+            </div>
           ) : (
-              <BrowserRouter>
-                <Navbar />
-                <Divider />
-                <main className="app-main">
-                  <Routes>
-                    <Route path="/" Component={Home} />
-                    <Route path="/login" Component={Login} />
-                    <Route path="/api" Component={Swagger} />
-                    <Route element={<RequireAuthentication />}>
-                      <Route path="/overview" Component={Overview} />
-                      <Route path="/insights" Component={Insights} />
-                      <Route path="/budgets" Component={Budgets} />
-                      <Route path="/transactions" Component={Transactions} />
-                      <Route path="/accounts" Component={Accounts} />
-                      <Route
-                        path="/account-management"
-                        Component={AccountManagement}
-                      />
-                    </Route>
-                  </Routes>
-                </main>
-                <Divider />
-                <Footer />
-              </BrowserRouter>
+            <BrowserRouter>
+              <Navbar />
+              <Separator />
+              <main className="app-main">
+                <Routes>
+                  <Route path="/" Component={Home} />
+                  <Route path="/login" Component={Login} />
+                  <Route path="/api" Component={Swagger} />
+                  <Route element={<RequireAuthentication />}>
+                    <Route path="/overview" Component={Overview} />
+                    <Route path="/insights" Component={Insights} />
+                    <Route path="/budgets" Component={Budgets} />
+                    <Route path="/transactions" Component={Transactions} />
+                    <Route path="/accounts" Component={Accounts} />
+                    <Route
+                      path="/account-management"
+                      Component={AccountManagement}
+                    />
+                  </Route>
+                </Routes>
+              </main>
+              <Separator />
+              <Footer />
+            </BrowserRouter>
           )}
-        </GlobalModalProvider>
-      </UserQueryCache>
+          </GlobalModalProvider>
+        </UserQueryCache>
+      </ColorModeProvider>
     </ChakraProvider>
   );
 }

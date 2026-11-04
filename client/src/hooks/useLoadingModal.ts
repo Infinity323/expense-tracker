@@ -11,7 +11,8 @@ export const useLoadingModal = ({
   const { openModal, closeModal } = useModal();
 
   useEffect(() => {
-    if (isLoading) openModal("loading", { body: body || "Loading..." });
+    if (isLoading)
+      openModal("loading", { body: body || "Loading..." });
     else closeModal("loading");
   }, [isLoading, openModal, closeModal, body]);
 };

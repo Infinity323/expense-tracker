@@ -13,14 +13,15 @@ export const useAccounts = () => {
     queryFn: getAccounts,
   });
 
-  const flattenedAccounts: ItemAccount[] = accounts?.flatMap((item) => {
-    const updated = item.accounts.map((account) => ({
-      ...account,
-      institutionId: item.institution_id,
-      itemId: item.item_id,
-    }));
-    return updated;
-  }) ?? [];
+  const flattenedAccounts: ItemAccount[] =
+    accounts?.flatMap((item) => {
+      const updated = item.accounts.map((account) => ({
+        ...account,
+        institutionId: item.institution_id,
+        itemId: item.item_id,
+      }));
+      return updated;
+    }) ?? [];
 
   return { accounts, flattenedAccounts, isLoading, isError, refetch };
 };

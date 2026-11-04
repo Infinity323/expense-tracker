@@ -1,10 +1,6 @@
 import {
   Card,
-  CardBody,
-  CardHeader,
   Center,
-  FormControl,
-  FormLabel,
   Heading,
   Skeleton,
   Switch,
@@ -13,16 +9,11 @@ import {
   Wrap,
   WrapItem,
   useBreakpointValue,
+  Field,
 } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
-import {
-  Cell,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-} from "recharts";
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { getCurrentMonthSpending } from "../../../services/trendsService";
 import { COLOR_MAP } from "../../../utils/ColorUtil";
 import { formatCurrency } from "../../../utils/CurrencyUtil";
@@ -35,9 +26,12 @@ const MonthlySpending = (props: MonthlySpendingProps) => {
     queryFn: getCurrentMonthSpending,
   });
   const [showSubcategories, setShowSubcategories] = useState<boolean>(false);
-  const chartHeight = useBreakpointValue({ base: 360, md: 500 }) ?? 360;
-  const outerRadius = useBreakpointValue({ base: 90, md: 150 }) ?? 90;
-  const innerRadius = useBreakpointValue({ base: 65, md: 130 }) ?? 65;
+  const chartHeight =
+    useBreakpointValue({ base: 360, md: 500 }) ?? 360;
+  const outerRadius =
+    useBreakpointValue({ base: 90, md: 150 }) ?? 90;
+  const innerRadius =
+    useBreakpointValue({ base: 65, md: 130 }) ?? 65;
 
   const categoryData = useMemo(
     () =>
@@ -83,42 +77,52 @@ const MonthlySpending = (props: MonthlySpendingProps) => {
 
   if (isLoading) {
     return (
-      <Card p="1.5rem" variant="outline">
-        <CardHeader>
+      <Card.Root p="1.5rem" variant="outline">
+        <Card.Header>
           <Heading size="lg">Spending Categories</Heading>
-        </CardHeader>
-        <CardBody>
+        </Card.Header>
+        <Card.Body>
           <Skeleton height="40vh" />
-        </CardBody>
-      </Card>
+        </Card.Body>
+      </Card.Root>
     );
   }
 
   if (!expenses?.length) {
     return (
-      <Card p="1.5rem" variant="outline">
-        <CardHeader>
+      <Card.Root p="1.5rem" variant="outline">
+        <Card.Header>
           <Heading size="lg">Spending Categories</Heading>
-        </CardHeader>
-        <CardBody>
+        </Card.Header>
+        <Card.Body>
           <Text>No spending data found.</Text>
-        </CardBody>
-      </Card>
+        </Card.Body>
+      </Card.Root>
     );
   }
 
   const data = showSubcategories ? subcategoryData : categoryData;
 
   return (
-    <Card p="1.5rem" variant="outline">
-      <CardHeader>
+    <Card.Root p="1.5rem" variant="outline">
+      <Card.Header>
         <Heading size="lg">Spending Categories</Heading>
-      </CardHeader>
-      <CardBody>
-        <FormControl display="flex" alignItems="center">
-          <FormLabel mb="0">Show by Subcategory</FormLabel>
-          <Switch onChange={() => setShowSubcategories((prev) => !prev)} />
-        </FormControl>
+      </Card.Header>
+      <Card.Body>
+        <Field.Root display="flex" alignItems="center">
+          <Field.Label mb="0">Show by Subcategory</Field.Label>
+          <Switch.Root
+            checked={showSubcategories}
+            onCheckedChange={(event) =>
+              setShowSubcategories(event.checked)
+            }
+          >
+            <Switch.HiddenInput />
+            <Switch.Control>
+              <Switch.Thumb />
+            </Switch.Control>
+          </Switch.Root>
+        </Field.Root>
         <Box width="100%">
           <Center width="100%" height={`${chartHeight}px`}>
             <ResponsiveContainer width="100%" height="100%">
@@ -148,7 +152,7 @@ const MonthlySpending = (props: MonthlySpendingProps) => {
               </PieChart>
             </ResponsiveContainer>
           </Center>
-          <Wrap justify="center" spacingX={4} spacingY={2} mt={2}>
+          <Wrap justify="center" columnGap={4} rowGap={2} mt={2}>
             {data.map((entry) => (
               <WrapItem key={entry.name}>
                 <Box display="inline-flex" alignItems="center" gap={2}>
@@ -166,8 +170,8 @@ const MonthlySpending = (props: MonthlySpendingProps) => {
             ))}
           </Wrap>
         </Box>
-      </CardBody>
-    </Card>
+      </Card.Body>
+    </Card.Root>
   );
 };
 

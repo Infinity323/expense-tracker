@@ -1,4 +1,3 @@
-import { useDisclosure } from "@chakra-ui/react";
 import { createContext, ReactNode, useContext, useState } from "react";
 import ConfirmationModal, {
   ConfirmationModalProps,
@@ -39,16 +38,8 @@ type GlobalModalProviderProps = {
 };
 
 export const GlobalModalProvider = ({ children }: GlobalModalProviderProps) => {
-  const {
-    isOpen: isLoadingOpen,
-    onOpen: onLoadingOpen,
-    onClose: onLoadingClose,
-  } = useDisclosure();
-  const {
-    isOpen: isConfirmationOpen,
-    onOpen: onConfirmationOpen,
-    onClose: onConfirmationClose,
-  } = useDisclosure();
+  const [isLoadingOpen, setIsLoadingOpen] = useState(false);
+  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
   const [props, setProps] = useState<any>();
 
   const openModal = <T extends GlobalModalType>(
@@ -56,18 +47,18 @@ export const GlobalModalProvider = ({ children }: GlobalModalProviderProps) => {
     props: GlobalModalProps<T>,
   ) => {
     if (type === "loading") {
-      onLoadingOpen();
+      setIsLoadingOpen(true);
     } else {
-      onConfirmationOpen();
+      setIsConfirmationOpen(true);
     }
     setProps(props);
   };
 
   const closeModal = (type: GlobalModalType) => {
     if (type === "loading") {
-      onLoadingClose();
+      setIsLoadingOpen(false);
     } else {
-      onConfirmationClose();
+      setIsConfirmationOpen(false);
     }
   };
 
@@ -75,9 +66,12 @@ export const GlobalModalProvider = ({ children }: GlobalModalProviderProps) => {
     <GlobalModalContext.Provider value={{ openModal, closeModal, props }}>
       <ConfirmationModal
         isOpen={isConfirmationOpen}
-        onClose={onConfirmationClose}
+        onClose={() => setIsConfirmationOpen(false)}
       />
-      <LoadingModal isOpen={isLoadingOpen} onClose={onLoadingClose} />
+      <LoadingModal
+        isOpen={isLoadingOpen}
+        onClose={() => setIsLoadingOpen(false)}
+      />
       {children}
     </GlobalModalContext.Provider>
   );

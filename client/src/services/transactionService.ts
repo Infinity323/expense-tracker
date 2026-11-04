@@ -28,11 +28,17 @@ export const getTransactionTags = async (): Promise<string[]> => {
 };
 
 export const postTransaction = async (transaction) => {
-  return await post({ uri: TRANSACTION_API, data: transaction });
+  return await post({
+    uri: TRANSACTION_API,
+    data: transaction,
+  });
 };
 
 export const putTransaction = async (transactionDoc) => {
-  return await put({ uri: TRANSACTION_API, data: transactionDoc });
+  return await put({
+    uri: TRANSACTION_API,
+    data: transactionDoc,
+  });
 };
 
 export const syncTransactions = async (itemId: string) =>

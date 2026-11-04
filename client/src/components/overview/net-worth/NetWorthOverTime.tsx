@@ -1,11 +1,8 @@
 import {
   Alert,
-  AlertIcon,
   Box,
   Button,
   Card,
-  CardBody,
-  CardHeader,
   Flex,
   Heading,
   Skeleton,
@@ -28,7 +25,8 @@ import { useTimeSeriesNavigation } from "../../../hooks/useTimeSeriesNavigation"
 import { formatCurrency } from "../../../utils/CurrencyUtil";
 
 function NetWorthOverTime() {
-  const chartHeight = useBreakpointValue({ base: 340, md: 420 }) ?? 340;
+  const chartHeight =
+    useBreakpointValue({ base: 340, md: 420 }) ?? 340;
   const { data, isLoading, isError } = useQuery({
     queryKey: ["netWorthHistory"],
     queryFn: getNetWorthHistory,
@@ -37,20 +35,20 @@ function NetWorthOverTime() {
     useTimeSeriesNavigation(data ?? []);
 
   return (
-    <Card variant="outline">
-      <CardHeader>
+    <Card.Root variant="outline">
+      <Card.Header>
         <Heading as="h3" size="md">
           Net Worth Over Time
         </Heading>
-      </CardHeader>
-      <CardBody>
+      </Card.Header>
+      <Card.Body>
         {isLoading ? (
           <Skeleton height={`${chartHeight}px`} />
         ) : isError ? (
-          <Alert status="error">
-            <AlertIcon />
+          <Alert.Root status="error">
+            <Alert.Indicator />
             Could not load net worth history. Please try again.
-          </Alert>
+          </Alert.Root>
         ) : !data?.length ? (
           <Text>No net worth history available yet.</Text>
         ) : (
@@ -71,12 +69,20 @@ function NetWorthOverTime() {
               ref={chartRef}
               aria-label="Net worth chart. Scroll to zoom, drag to pan, double-click to reset."
               {...interactionProps}
-              sx={{ touchAction: "pan-y", userSelect: "none" }}
+              css={{
+                "& touchAction": "pan-y",
+                "& userSelect": "none",
+              }}
             >
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
                   data={visibleData}
-                  margin={{ top: 12, right: 24, bottom: 8, left: 8 }}
+                  margin={{
+                    top: 12,
+                    right: 24,
+                    bottom: 8,
+                    left: 8,
+                  }}
                 >
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis
@@ -114,8 +120,8 @@ function NetWorthOverTime() {
             </Box>
           </>
         )}
-      </CardBody>
-    </Card>
+      </Card.Body>
+    </Card.Root>
   );
 }
 
