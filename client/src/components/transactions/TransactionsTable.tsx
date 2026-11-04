@@ -135,6 +135,21 @@ function TransactionsTable({
     if (accountId === "manual") return !transaction.accountId;
     return transaction.accountId === accountId;
   });
+  const refetchTransactionPage = async (transactionId: string) => {
+    const pageIndex =
+      data?.pages.findIndex((page) =>
+        page.items.some((item) => item.transactionId === transactionId),
+      ) ?? -1;
+    if (pageIndex < 0) {
+      await refetch();
+      return;
+    }
+
+    await refetch({
+      refetchPage: (_page, index) =>
+        index === pageIndex || (Boolean(tag) && index === 0),
+    });
+  };
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
@@ -374,7 +389,9 @@ function TransactionsTable({
                   <Td padding="0">
                     <EditTransaction
                       transactionDoc={transaction}
-                      refetch={refetch}
+                      refetch={() =>
+                        refetchTransactionPage(transaction.transactionId)
+                      }
                     />
                     <DeleteTransaction
                       transactionDoc={transaction}
