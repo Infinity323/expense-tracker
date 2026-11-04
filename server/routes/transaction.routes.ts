@@ -4,6 +4,7 @@ import {
   deleteAllTransactions,
   deleteTransaction,
   getAllTransactions,
+  getTransactionTags,
   putTransaction,
   syncTransactions,
 } from "../controllers/transaction.controller";
@@ -17,6 +18,7 @@ transactionRouter
   .put(putTransaction)
   .delete(deleteAllTransactions);
 
+transactionRouter.get("/tags", getTransactionTags);
 transactionRouter.delete("/:id", deleteTransaction);
 
 transactionRouter.put("/sync/:itemId", syncTransactions);

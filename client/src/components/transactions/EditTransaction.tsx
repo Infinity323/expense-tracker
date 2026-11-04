@@ -18,10 +18,12 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useState } from "react";
+import { useQueryClient } from "react-query";
 import { FaPencil } from "react-icons/fa6";
 import { putTransaction } from "../../services/transactionService";
 import BudgetsSelect from "../budgets/BudgetsSelect";
 import { getErrorMessage } from "../../utils/getErrorMessage";
+import TagsInput from "./TagsInput";
 
 interface EditTransactionProps {
   transactionDoc: TransactionDoc;
@@ -34,12 +36,14 @@ const EditTransaction = (props: EditTransactionProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const toast = useToast();
+  const queryClient = useQueryClient();
 
   const [date, setDate] = useState(transactionDoc.date);
   const [name, setName] = useState(transactionDoc.name);
   const [description, setDescription] = useState(transactionDoc.description);
   const [category, setCategory] = useState(transactionDoc.category);
   const [subcategory, setSubcategory] = useState(transactionDoc.subcategory);
+  const [tags, setTags] = useState(transactionDoc.tags ?? []);
   const [amount, setAmount] = useState(transactionDoc.amount.toString());
 
   const editTransaction = async (event) => {
@@ -53,8 +57,10 @@ const EditTransaction = (props: EditTransactionProps) => {
         description,
         category,
         subcategory,
+        tags,
         amount: parseFloat(amount),
       });
+      await queryClient.invalidateQueries(["transactionTags"]);
       await refetch();
       onClose();
     } catch (error) {
@@ -81,7 +87,7 @@ const EditTransaction = (props: EditTransactionProps) => {
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Add New Transaction</ModalHeader>
+          <ModalHeader>Edit Transaction</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <Stack>
@@ -108,6 +114,7 @@ const EditTransaction = (props: EditTransactionProps) => {
                 setCategory={setCategory}
                 setSubcategory={setSubcategory}
               />
+              <TagsInput tags={tags} setTags={setTags} />
               <InputGroup>
                 <InputLeftElement pointerEvents="none" color="gray.300">
                   $

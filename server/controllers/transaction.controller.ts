@@ -14,7 +14,9 @@ import {
   createTransaction,
   deleteById,
   deleteByUserId,
+  findTagsByUserId,
   findTransactionPage,
+  findTransactionSummary,
   updateSyncedTransaction,
   updateTransaction,
 } from "../db/repositories/transaction.repository";
@@ -35,12 +37,29 @@ const isValidTransaction = (body: any, requireId = false) => {
     body.category.trim().length > 0 &&
     typeof body.subcategory === "string" &&
     body.subcategory.trim().length > 0 &&
+    (body.tags === undefined ||
+      (Array.isArray(body.tags) &&
+        body.tags.length <= 20 &&
+        body.tags.every(
+          (tag: unknown) =>
+            typeof tag === "string" &&
+            tag.trim().length > 0 &&
+            tag.trim().length <= 50,
+        ))) &&
     (typeof body.amount === "number" ||
       (typeof body.amount === "string" && body.amount.trim().length > 0)) &&
     Number.isFinite(Number(body.amount)) &&
     (!requireId || typeof body.transactionId === "string")
   );
 };
+
+const normalizeTags = (tags: string[] | undefined) => [
+  ...new Set(
+    (tags ?? []).map((tag) =>
+      tag.trim().replace(/\s+/g, " ").toLowerCase(),
+    ),
+  ),
+];
 
 export const getAllTransactions = async (
   req: Request,
@@ -49,12 +68,20 @@ export const getAllTransactions = async (
 ) => {
   try {
     const userId = getUserId(req);
-    const month = typeof req.query.month === "string" ? req.query.month : undefined;
+    const month =
+      typeof req.query.month === "string" ? req.query.month : undefined;
     if (month && !/^\d{4}-(0[1-9]|1[0-2])$/.test(month)) {
       return res.status(400).json({ error: "Month must use YYYY-MM format" });
     }
     const accountId =
       typeof req.query.accountId === "string" ? req.query.accountId : "all";
+    const rawTag = typeof req.query.tag === "string" ? req.query.tag : undefined;
+    const tag = rawTag?.trim().replace(/\s+/g, " ").toLowerCase();
+    if (tag && tag.length > 50) {
+      return res
+        .status(400)
+        .json({ error: "Tag must be 50 characters or fewer" });
+    }
     const cursorToken =
       typeof req.query.cursor === "string" ? req.query.cursor : undefined;
     let cursor: Record<string, any> | undefined;
@@ -69,6 +96,7 @@ export const getAllTransactions = async (
           parsedCursor.userId !== userId ||
           parsedCursor.month !== (month ?? null) ||
           parsedCursor.accountId !== accountId ||
+          (parsedCursor.tag ?? null) !== (tag ?? null) ||
           !parsedCursor.key ||
           parsedCursor.key.userId !== userId
         ) {
@@ -80,24 +108,47 @@ export const getAllTransactions = async (
       }
     }
 
-    const page = await findTransactionPage({
+    const pageQuery = {
       userId,
-      limit: 50,
       accountId,
       month,
-      cursor,
-    });
+      tag,
+    };
+    const [page, summary] = await Promise.all([
+      findTransactionPage({ ...pageQuery, limit: 50, cursor }),
+      tag && !cursor
+        ? findTransactionSummary(pageQuery)
+        : Promise.resolve(undefined),
+    ]);
     const nextCursor = page.lastEvaluatedKey
       ? Buffer.from(
           JSON.stringify({
             userId,
             month: month ?? null,
             accountId,
+            tag: tag ?? null,
             key: page.lastEvaluatedKey,
           }),
         ).toString("base64url")
       : null;
-    res.json({ items: page.items, nextCursor });
+    res.json({
+      items: page.items,
+      nextCursor,
+      ...(summary ? { summary } : {}),
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getTransactionTags = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const tags = await findTagsByUserId(getUserId(req));
+    res.json({ tags });
   } catch (err) {
     next(err);
   }
@@ -118,6 +169,7 @@ export const addTransaction = async (
       description: req.body.description,
       category: req.body.category,
       subcategory: req.body.subcategory,
+      tags: normalizeTags(req.body.tags),
       amount: req.body.amount,
       userId: getUserId(req),
     });
@@ -146,6 +198,8 @@ export const putTransaction = async (
       description: req.body.description,
       category: req.body.category,
       subcategory: req.body.subcategory,
+      tags:
+        req.body.tags === undefined ? undefined : normalizeTags(req.body.tags),
       amount: req.body.amount,
       userId: getUserId(req),
     });

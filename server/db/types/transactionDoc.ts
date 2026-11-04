@@ -9,6 +9,7 @@ export interface TransactionDoc {
   pending: boolean;
   category: string;
   subcategory: string;
+  tags?: string[];
   categoryManuallyOverridden?: boolean;
   amount: number;
   userId: string;

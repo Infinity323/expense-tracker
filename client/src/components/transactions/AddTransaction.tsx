@@ -15,20 +15,24 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useState } from "react";
+import { useQueryClient } from "react-query";
 import { postTransaction } from "../../services/transactionService";
 import BudgetsSelect from "../budgets/BudgetsSelect";
 import { getErrorMessage } from "../../utils/getErrorMessage";
+import TagsInput from "./TagsInput";
 
 function AddTransaction({ setReload }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const toast = useToast();
+  const queryClient = useQueryClient();
 
   const [date, setDate] = useState<string>();
   const [name, setName] = useState<string>();
   const [description, setDescription] = useState<string>();
   const [category, setCategory] = useState<string>();
   const [subcategory, setSubcategory] = useState<string>();
+  const [tags, setTags] = useState<string[]>([]);
   const [amount, setAmount] = useState<string>();
 
   const addTransaction = async (event) => {
@@ -41,13 +45,16 @@ function AddTransaction({ setReload }) {
         description,
         category,
         subcategory,
+        tags,
         amount: Number(amount),
       });
+      await queryClient.invalidateQueries(["transactionTags"]);
       setDate(undefined);
       setName(undefined);
       setDescription(undefined);
       setCategory(undefined);
       setSubcategory(undefined);
+      setTags([]);
       setAmount(undefined);
       onClose();
       setReload(true);
@@ -98,6 +105,7 @@ function AddTransaction({ setReload }) {
                 setCategory={setCategory}
                 setSubcategory={setSubcategory}
               />
+              <TagsInput tags={tags} setTags={setTags} />
               <InputGroup>
                 <InputLeftElement pointerEvents="none" color="gray.300">
                   $

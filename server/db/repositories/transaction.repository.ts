@@ -53,20 +53,57 @@ export const findIncomeByUserId = async (userId: string) => {
   return result.Items as TransactionDoc[];
 };
 
+export const findTagsByUserId = async (userId: string) => {
+  const tags = new Set<string>();
+  let cursor: Record<string, any> | undefined;
+
+  do {
+    const result = await db.send(
+      new QueryCommand({
+        TableName,
+        IndexName: "userId-date-index",
+        KeyConditionExpression: "userId = :userId",
+        ExpressionAttributeValues: {
+          ":userId": userId,
+        },
+        ProjectionExpression: "#tags",
+        ExpressionAttributeNames: {
+          "#tags": "tags",
+        },
+        Limit: 100,
+        ExclusiveStartKey: cursor,
+      }),
+    );
+    for (const item of result.Items ?? []) {
+      if (Array.isArray(item.tags)) {
+        for (const tag of item.tags) {
+          if (typeof tag === "string" && tag.trim()) tags.add(tag);
+        }
+      }
+    }
+    cursor = result.LastEvaluatedKey;
+  } while (cursor);
+
+  return [...tags].sort((a, b) => a.localeCompare(b));
+};
+
 interface TransactionPageQuery {
   userId: string;
-  limit: number;
   accountId: string;
   month?: string;
+  tag?: string;
+}
+
+interface TransactionPageRequest extends TransactionPageQuery {
+  limit: number;
   cursor?: Record<string, any>;
 }
 
-export const findTransactionPage = async ({
+const buildTransactionQuery = ({
   userId,
-  limit,
   accountId,
   month,
-  cursor,
+  tag,
 }: TransactionPageQuery) => {
   const expressionAttributeNames: Record<string, string> = {};
   const expressionAttributeValues: Record<string, any> = {
@@ -93,6 +130,31 @@ export const findTransactionPage = async ({
     filters.push("#accountId = :accountId");
   }
 
+  if (tag) {
+    expressionAttributeNames["#tags"] = "tags";
+    expressionAttributeValues[":tag"] = tag;
+    filters.push("contains(#tags, :tag)");
+  }
+
+  return {
+    keyConditionExpression,
+    expressionAttributeNames,
+    expressionAttributeValues,
+    filters,
+  };
+};
+
+export const findTransactionPage = async ({
+  limit,
+  cursor,
+  ...query
+}: TransactionPageRequest) => {
+  const {
+    keyConditionExpression,
+    expressionAttributeNames,
+    expressionAttributeValues,
+    filters,
+  } = buildTransactionQuery(query);
   const result = await db.send(
     new QueryCommand({
       TableName,
@@ -112,6 +174,46 @@ export const findTransactionPage = async ({
     items: (result.Items ?? []) as TransactionDoc[],
     lastEvaluatedKey: result.LastEvaluatedKey,
   };
+};
+
+export const findTransactionSummary = async (query: TransactionPageQuery) => {
+  const {
+    keyConditionExpression,
+    expressionAttributeNames,
+    expressionAttributeValues,
+    filters,
+  } = buildTransactionQuery(query);
+  const names = { ...expressionAttributeNames, "#amount": "amount" };
+  let cursor: Record<string, any> | undefined;
+  let count = 0;
+  let totalCents = 0;
+
+  do {
+    const result = await db.send(
+      new QueryCommand({
+        TableName,
+        IndexName: "userId-date-index",
+        KeyConditionExpression: keyConditionExpression,
+        ...(filters.length ? { FilterExpression: filters.join(" AND ") } : {}),
+        ExpressionAttributeNames: names,
+        ExpressionAttributeValues: expressionAttributeValues,
+        ProjectionExpression: "#amount",
+        Select: "SPECIFIC_ATTRIBUTES",
+        Limit: 100,
+        ExclusiveStartKey: cursor,
+        ScanIndexForward: false,
+      }),
+    );
+    for (const item of result.Items ?? []) {
+      count += 1;
+      if (typeof item.amount === "number") {
+        totalCents += Math.round(item.amount * 100);
+      }
+    }
+    cursor = result.LastEvaluatedKey;
+  } while (cursor);
+
+  return { count, total: totalCents / 100 };
 };
 
 export const findByUserId = async (userId: string) => {
@@ -185,6 +287,7 @@ export const createTransaction = async ({
   merchantName,
   merchantEntityId,
   pending,
+  tags,
   userId,
 }: Partial<TransactionDoc>) => {
   const transaction = {
@@ -198,6 +301,7 @@ export const createTransaction = async ({
     pending,
     category,
     subcategory,
+    tags: tags ?? [],
     amount,
     userId,
   } as TransactionDoc;
@@ -217,39 +321,49 @@ export const updateTransaction = async ({
   description,
   category,
   subcategory,
+  tags,
   amount,
   pending,
   userId,
 }: Partial<TransactionDoc>) => {
+  const expressionAttributeNames: Record<string, string> = {
+    "#date": "date",
+    "#name": "name",
+    "#description": "description",
+    "#pending": "pending",
+    "#category": "category",
+    "#subcategory": "subcategory",
+    "#categoryManuallyOverridden": "categoryManuallyOverridden",
+    "#amount": "amount",
+    "#userId": "userId",
+  };
+  const expressionAttributeValues: Record<string, any> = {
+    ":date": date,
+    ":name": name,
+    ":description": description ?? "",
+    ":pending": pending ?? false,
+    ":category": category,
+    ":subcategory": subcategory,
+    ":categoryManuallyOverridden": true,
+    ":amount": parseFloat(amount as any),
+    ":userId": userId,
+  };
+  let updateExpression =
+    "SET #date = :date, #name = :name, #description = :description, #pending = :pending, #category = :category, #subcategory = :subcategory, #categoryManuallyOverridden = :categoryManuallyOverridden, #amount = :amount";
+  if (tags !== undefined) {
+    expressionAttributeNames["#tags"] = "tags";
+    expressionAttributeValues[":tags"] = tags;
+    updateExpression += ", #tags = :tags";
+  }
+
   const result = (await db.send(
     new UpdateCommand({
       TableName,
       Key: { transactionId },
-      UpdateExpression:
-        "SET #date = :date, #name = :name, #description = :description, #pending = :pending, #category = :category, #subcategory = :subcategory, #categoryManuallyOverridden = :categoryManuallyOverridden, #amount = :amount",
+      UpdateExpression: updateExpression,
       ConditionExpression: "#userId = :userId",
-      ExpressionAttributeNames: {
-        "#date": "date",
-        "#name": "name",
-        "#description": "description",
-        "#pending": "pending",
-        "#category": "category",
-        "#subcategory": "subcategory",
-        "#categoryManuallyOverridden": "categoryManuallyOverridden",
-        "#amount": "amount",
-        "#userId": "userId",
-      },
-      ExpressionAttributeValues: {
-        ":date": date,
-        ":name": name,
-        ":description": description ?? "",
-        ":pending": pending ?? false,
-        ":category": category,
-        ":subcategory": subcategory,
-        ":categoryManuallyOverridden": true,
-        ":amount": parseFloat(amount as any),
-        ":userId": userId,
-      },
+      ExpressionAttributeNames: expressionAttributeNames,
+      ExpressionAttributeValues: expressionAttributeValues,
       ReturnValues: "ALL_NEW",
     })
   )) as IUpdateCommandOutput<TransactionDoc>;

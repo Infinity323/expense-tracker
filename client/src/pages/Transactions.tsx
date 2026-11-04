@@ -13,6 +13,7 @@ import {
 import { useState } from "react";
 import AddTransaction from "../components/transactions/AddTransaction";
 import SyncTransactions from "../components/transactions/SyncTransactions";
+import TagFilterInput from "../components/transactions/TagFilterInput";
 import TransactionsTable from "../components/transactions/TransactionsTable";
 import { useAccounts } from "../hooks/useAccounts";
 
@@ -20,7 +21,11 @@ function Transactions() {
   const [reload, setReload] = useState<boolean>(false);
   const [month, setMonth] = useState<string>();
   const [accountId, setAccountId] = useState("all");
+  const [tag, setTag] = useState("");
   const { flattenedAccounts } = useAccounts();
+  const selectTag = (selectedTag: string) => {
+    setTag(selectedTag);
+  };
 
   return (
     <Stack spacing="3rem">
@@ -42,6 +47,7 @@ function Transactions() {
             />
           </FormControl>
         </Box>
+        <TagFilterInput selectedTag={tag} onSelect={selectTag} />
         <Box width={{ base: "100%", sm: "266px" }}>
           <FormControl>
             <FormLabel>Filter by Account</FormLabel>
@@ -74,6 +80,8 @@ function Transactions() {
         setReload={setReload}
         month={month}
         accountId={accountId}
+        tag={tag || undefined}
+        onTagSelect={selectTag}
       />
     </Stack>
   );

@@ -6,14 +6,25 @@ const TRANSACTION_API = "/api/transaction";
 export interface TransactionPage {
   items: TransactionDoc[];
   nextCursor: string | null;
+  summary?: {
+    count: number;
+    total: number;
+  };
 }
 
 export const getTransactions = async ({ queryKey, pageParam }: any) => {
-  const [, { month, accountId }] = queryKey;
+  const [, { month, accountId, tag }] = queryKey;
   return await get<TransactionPage>({
     uri: TRANSACTION_API,
-    params: { month, accountId, cursor: pageParam },
+    params: { month, accountId, tag, cursor: pageParam },
   });
+};
+
+export const getTransactionTags = async (): Promise<string[]> => {
+  const response = await get<{ tags: string[] }>({
+    uri: `${TRANSACTION_API}/tags`,
+  });
+  return response.tags;
 };
 
 export const postTransaction = async (transaction) => {

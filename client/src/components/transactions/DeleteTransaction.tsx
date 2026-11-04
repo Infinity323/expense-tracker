@@ -13,6 +13,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useState } from "react";
+import { useQueryClient } from "react-query";
 import { FaRegTrashCan } from "react-icons/fa6";
 import { deleteTransaction } from "../../services/transactionService";
 import { getErrorMessage } from "../../utils/getErrorMessage";
@@ -21,11 +22,13 @@ function DeleteTransaction({ transactionDoc: transaction, refetch }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isDeleting, setIsDeleting] = useState(false);
   const toast = useToast();
+  const queryClient = useQueryClient();
 
   const removeTransaction = async () => {
     setIsDeleting(true);
     try {
       await deleteTransaction(transaction.transactionId);
+      await queryClient.invalidateQueries(["transactionTags"]);
       await refetch();
       onClose();
     } catch (error) {

@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Table,
   TableContainer,
@@ -35,6 +36,7 @@ const TRANSACTION_COLUMNS = [
   { id: "description", label: "Description", minWidth: 100 },
   { id: "category", label: "Category", minWidth: 88 },
   { id: "subcategory", label: "Subcategory", minWidth: 88 },
+  { id: "tags", label: "Tags", minWidth: 88 },
   { id: "amount", label: "Amount", minWidth: 88 },
 ] as const;
 
@@ -50,6 +52,7 @@ const DEFAULT_COLUMN_WIDTHS: ColumnWidths = {
   description: 220,
   category: 150,
   subcategory: 150,
+  tags: 150,
   amount: 120,
 };
 
@@ -83,6 +86,8 @@ interface TransactionsTableProps {
   setReload: Dispatch<SetStateAction<boolean>>;
   month?: string;
   accountId: string;
+  tag?: string;
+  onTagSelect: (tag: string) => void;
 }
 
 function TransactionsTable({
@@ -90,6 +95,8 @@ function TransactionsTable({
   setReload,
   month,
   accountId,
+  tag,
+  onTagSelect,
 }: TransactionsTableProps) {
   const {
     data,
@@ -100,7 +107,7 @@ function TransactionsTable({
     isFetchingNextPage,
     fetchNextPage,
   } = useInfiniteQuery({
-    queryKey: ["transactions", { month, accountId }],
+    queryKey: ["transactions", { month, accountId, tag }],
     queryFn: getTransactions,
     getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
   });
@@ -118,6 +125,7 @@ function TransactionsTable({
     Object.values(columnWidths).reduce((total, width) => total + width, 0) +
     ACTIONS_COLUMN_WIDTH;
   const transactions = data?.pages.flatMap((page) => page.items) ?? [];
+  const summary = data?.pages[0]?.summary;
   const { flattenedAccounts } = useAccounts();
   const accountNames = new Map(
     flattenedAccounts.map((account) => [account.account_id, account.name]),
@@ -226,144 +234,180 @@ function TransactionsTable({
   };
 
   return (
-    <TableContainer width="100%" maxWidth="100%" overflowX="auto">
-      <Table
-        size="sm"
-        variant="striped"
-        sx={{
-          tableLayout: "fixed",
-          "& tbody td": {
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-          },
-        }}
-        width={`${tableWidth}px`}
-        minWidth={`${tableWidth}px`}
-      >
-        <colgroup>
-          {TRANSACTION_COLUMNS.map((column) => (
-            <col
-              key={column.id}
-              style={{ width: `${columnWidths[column.id]}px` }}
-            />
-          ))}
-          <col style={{ width: `${ACTIONS_COLUMN_WIDTH}px` }} />
-        </colgroup>
-        <Thead>
-          <Tr>
-            {TRANSACTION_COLUMNS.map((column) => (
-              <Th key={column.id} position="relative">
-                {column.label}
-                <Button
-                  type="button"
-                  aria-label={`Resize ${column.label} column`}
-                  title={`Drag to resize ${column.label} column`}
-                  position="absolute"
-                  top={0}
-                  right={0}
-                  width="12px"
-                  height="100%"
-                  minWidth={0}
-                  padding={0}
-                  cursor="col-resize"
-                  variant="unstyled"
-                  borderLeftWidth="1px"
-                  borderColor="gray.300"
-                  sx={{ touchAction: "none" }}
-                  _hover={{ borderColor: "teal.400" }}
-                  _dark={{ borderColor: "whiteAlpha.300" }}
-                  onPointerDown={(event) => startResize(event, column.id)}
-                  onPointerMove={resizeColumn}
-                  onPointerUp={finishResize}
-                  onPointerCancel={finishResize}
-                />
-              </Th>
-            ))}
-            <Th>Actions</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {isLoading ? (
-            Array.from({ length: 5 }, (_, rowIndex) => (
-              <Tr key={`transaction-skeleton-${rowIndex}`}>
-                {Array.from({ length: 8 }, (_, columnIndex) => (
-                  <Td key={`transaction-skeleton-${rowIndex}-${columnIndex}`}>
-                    <Skeleton height="14px" />
-                  </Td>
-                ))}
-              </Tr>
-            ))
-          ) : isError && transactions.length === 0 ? (
-            <Tr>
-              <Td colSpan={8}>
-                <Alert status="error">
-                  <AlertIcon />
-                  Could not load transactions. Please try again.
-                </Alert>
-              </Td>
-            </Tr>
-          ) : visibleTransactions.length ? (
-            visibleTransactions.map((transaction) => (
-              <Tr key={transaction.transactionId}>
-                <Td>{transaction.date}</Td>
-                <Td>{transaction.name}</Td>
-                <Td
-                  maxWidth="12rem"
-                  overflow="hidden"
-                  textOverflow="ellipsis"
-                  whiteSpace="nowrap"
-                >
-                  {transaction.accountId
-                    ? accountNames.get(transaction.accountId) ??
-                      "Linked account"
-                    : "Manual"}
-                </Td>
-                <Td>{transaction.description}</Td>
-                <Td maxWidth="5" overflowX="hidden">
-                  {transaction.category}
-                </Td>
-                <Td maxWidth="5" overflowX="hidden">
-                  {transaction.subcategory}
-                </Td>
-                <Td isNumeric>{formatCurrency(transaction.amount)}</Td>
-                <Td padding="0">
-                  <EditTransaction
-                    transactionDoc={transaction}
-                    refetch={refetch}
-                  />
-                  <DeleteTransaction
-                    transactionDoc={transaction}
-                    refetch={refetch}
-                  />
-                </Td>
-              </Tr>
-            ))
-          ) : hasNextPage ? (
-            <Tr>
-              <Td colSpan={100}>Loading transactions...</Td>
-            </Tr>
-          ) : (
-            <Tr>
-              <Td colSpan={100}>No transactions found.</Td>
-            </Tr>
-          )}
-        </Tbody>
-      </Table>
-      {isError && transactions.length > 0 && (
-        <Alert status="error" mt={2}>
+    <Box>
+      {tag && (
+        <Alert status="info" mb={3}>
           <AlertIcon />
-          Could not load more transactions.
+          {summary ? (
+            <Text>
+              <strong>{tag}</strong> · {summary.count} transactions · Net total{" "}
+              {formatCurrency(summary.total)}
+            </Text>
+          ) : isError ? (
+            <Text>Could not calculate the tag total. Please try again.</Text>
+          ) : (
+            <Text>Calculating the total for {tag}...</Text>
+          )}
         </Alert>
       )}
-      {isFetchingNextPage && (
-        <Text py={3} textAlign="center">
-          <Spinner size="sm" mr={2} />
-          Loading more transactions...
-        </Text>
-      )}
-      <div ref={sentinelRef} aria-hidden="true" style={{ height: 1 }} />
-    </TableContainer>
+      <TableContainer width="100%" maxWidth="100%" overflowX="auto">
+        <Table
+          size="sm"
+          variant="striped"
+          sx={{
+            tableLayout: "fixed",
+            "& tbody td": {
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            },
+          }}
+          width={`${tableWidth}px`}
+          minWidth={`${tableWidth}px`}
+        >
+          <colgroup>
+            {TRANSACTION_COLUMNS.map((column) => (
+              <col
+                key={column.id}
+                style={{ width: `${columnWidths[column.id]}px` }}
+              />
+            ))}
+            <col style={{ width: `${ACTIONS_COLUMN_WIDTH}px` }} />
+          </colgroup>
+          <Thead>
+            <Tr>
+              {TRANSACTION_COLUMNS.map((column) => (
+                <Th key={column.id} position="relative">
+                  {column.label}
+                  <Button
+                    type="button"
+                    aria-label={`Resize ${column.label} column`}
+                    title={`Drag to resize ${column.label} column`}
+                    position="absolute"
+                    top={0}
+                    right={0}
+                    width="12px"
+                    height="100%"
+                    minWidth={0}
+                    padding={0}
+                    cursor="col-resize"
+                    variant="unstyled"
+                    borderLeftWidth="1px"
+                    borderColor="gray.300"
+                    sx={{ touchAction: "none" }}
+                    _hover={{ borderColor: "teal.400" }}
+                    _dark={{ borderColor: "whiteAlpha.300" }}
+                    onPointerDown={(event) => startResize(event, column.id)}
+                    onPointerMove={resizeColumn}
+                    onPointerUp={finishResize}
+                    onPointerCancel={finishResize}
+                  />
+                </Th>
+              ))}
+              <Th>Actions</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {isLoading ? (
+              Array.from({ length: 5 }, (_, rowIndex) => (
+                <Tr key={`transaction-skeleton-${rowIndex}`}>
+                  {Array.from(
+                    { length: TRANSACTION_COLUMNS.length + 1 },
+                    (_, columnIndex) => (
+                      <Td
+                        key={`transaction-skeleton-${rowIndex}-${columnIndex}`}
+                      >
+                        <Skeleton height="14px" />
+                      </Td>
+                    ),
+                  )}
+                </Tr>
+              ))
+            ) : isError && transactions.length === 0 ? (
+              <Tr>
+                <Td colSpan={TRANSACTION_COLUMNS.length + 1}>
+                  <Alert status="error">
+                    <AlertIcon />
+                    Could not load transactions. Please try again.
+                  </Alert>
+                </Td>
+              </Tr>
+            ) : visibleTransactions.length ? (
+              visibleTransactions.map((transaction) => (
+                <Tr key={transaction.transactionId}>
+                  <Td>{transaction.date}</Td>
+                  <Td>{transaction.name}</Td>
+                  <Td
+                    maxWidth="12rem"
+                    overflow="hidden"
+                    textOverflow="ellipsis"
+                    whiteSpace="nowrap"
+                  >
+                    {transaction.accountId
+                      ? accountNames.get(transaction.accountId) ??
+                        "Linked account"
+                      : "Manual"}
+                  </Td>
+                  <Td>{transaction.description}</Td>
+                  <Td maxWidth="5" overflowX="hidden">
+                    {transaction.category}
+                  </Td>
+                  <Td maxWidth="5" overflowX="hidden">
+                    {transaction.subcategory}
+                  </Td>
+                  <Td>
+                    {transaction.tags?.map((transactionTag) => (
+                      <Button
+                        key={transactionTag}
+                        variant="link"
+                        size="xs"
+                        colorScheme="teal"
+                        mr={2}
+                        onClick={() => onTagSelect(transactionTag)}
+                      >
+                        {transactionTag}
+                      </Button>
+                    ))}
+                  </Td>
+                  <Td isNumeric>{formatCurrency(transaction.amount)}</Td>
+                  <Td padding="0">
+                    <EditTransaction
+                      transactionDoc={transaction}
+                      refetch={refetch}
+                    />
+                    <DeleteTransaction
+                      transactionDoc={transaction}
+                      refetch={refetch}
+                    />
+                  </Td>
+                </Tr>
+              ))
+            ) : hasNextPage ? (
+              <Tr>
+                <Td colSpan={100}>Loading transactions...</Td>
+              </Tr>
+            ) : (
+              <Tr>
+                <Td colSpan={100}>No transactions found.</Td>
+              </Tr>
+            )}
+          </Tbody>
+        </Table>
+        {isError && transactions.length > 0 && (
+          <Alert status="error" mt={2}>
+            <AlertIcon />
+            Could not load more transactions.
+          </Alert>
+        )}
+        {isFetchingNextPage && (
+          <Text py={3} textAlign="center">
+            <Spinner size="sm" mr={2} />
+            Loading more transactions...
+          </Text>
+        )}
+        <div ref={sentinelRef} aria-hidden="true" style={{ height: 1 }} />
+      </TableContainer>
+    </Box>
   );
 }
 
