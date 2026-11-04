@@ -5,12 +5,14 @@ import {
   Button,
   FormControl,
   FormLabel,
+  IconButton,
   Input,
   InputGroup,
   InputRightElement,
-  Text,
+  Spinner,
 } from "@chakra-ui/react";
 import { KeyboardEvent, useEffect, useId, useMemo, useState } from "react";
+import { FaXmark } from "react-icons/fa6";
 import { useQuery } from "react-query";
 import { getTransactionTags } from "../../services/transactionService";
 
@@ -41,7 +43,13 @@ function TagFilterInput({ selectedTag, onSelect }: TagFilterInputProps) {
   }, [tags, value]);
 
   const applyTag = () => {
-    onSelect(value.trim().replace(/\s+/g, " ").toLowerCase());
+    const normalizedValue = value.trim().replace(/\s+/g, " ");
+    const existingTag = tags.find(
+      (tag) => tag === normalizedValue,
+    );
+    const selectedTag = existingTag ?? normalizedValue;
+    setValue(selectedTag);
+    onSelect(selectedTag);
     setIsOpen(false);
     setActiveIndex(-1);
   };
@@ -106,7 +114,7 @@ function TagFilterInput({ selectedTag, onSelect }: TagFilterInputProps) {
             }}
             onFocus={() => setIsOpen(true)}
             onKeyDown={handleKeyDown}
-            placeholder="Search tags"
+            placeholder="Search tags and press Enter"
             maxLength={50}
             role="combobox"
             aria-autocomplete="list"
@@ -119,9 +127,22 @@ function TagFilterInput({ selectedTag, onSelect }: TagFilterInputProps) {
             }
           />
           <InputRightElement width="4.5rem">
-            <Button type="submit" size="sm">
-              Apply
-            </Button>
+            {isLoading && <Spinner size="sm" mr={value ? 2 : 0} />}
+            {value && (
+              <IconButton
+                type="button"
+                aria-label="Clear tag filter"
+                icon={<FaXmark />}
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  setValue("");
+                  onSelect("");
+                  setIsOpen(false);
+                  setActiveIndex(-1);
+                }}
+              />
+            )}
           </InputRightElement>
         </InputGroup>
         {isOpen && suggestions.length > 0 && (
@@ -162,29 +183,11 @@ function TagFilterInput({ selectedTag, onSelect }: TagFilterInputProps) {
             ))}
           </Box>
         )}
-        {isLoading && (
-          <Text fontSize="sm" mt={1} color="gray.500">
-            Loading tags...
-          </Text>
-        )}
         {isError && (
           <Alert status="error" mt={2} size="sm">
             <AlertIcon />
-            Could not load tag suggestions. You can still type a tag and apply it.
+            Could not load tag suggestions. Press Enter to filter by the typed tag.
           </Alert>
-        )}
-        {selectedTag && (
-          <Button
-            type="button"
-            variant="link"
-            size="sm"
-            onClick={() => {
-              setValue("");
-              onSelect("");
-            }}
-          >
-            Clear tag filter
-          </Button>
         )}
       </FormControl>
     </Box>

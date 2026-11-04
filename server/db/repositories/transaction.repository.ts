@@ -54,7 +54,7 @@ export const findIncomeByUserId = async (userId: string) => {
 };
 
 export const findTagsByUserId = async (userId: string) => {
-  const tags = new Set<string>();
+  const tags = new Map<string, string>();
   let cursor: Record<string, any> | undefined;
 
   do {
@@ -77,14 +77,19 @@ export const findTagsByUserId = async (userId: string) => {
     for (const item of result.Items ?? []) {
       if (Array.isArray(item.tags)) {
         for (const tag of item.tags) {
-          if (typeof tag === "string" && tag.trim()) tags.add(tag);
+          if (typeof tag === "string" && tag.trim()) {
+            const normalizedTag = tag.trim().replace(/\s+/g, " ");
+            if (!tags.has(normalizedTag)) {
+              tags.set(normalizedTag, normalizedTag);
+            }
+          }
         }
       }
     }
     cursor = result.LastEvaluatedKey;
   } while (cursor);
 
-  return [...tags].sort((a, b) => a.localeCompare(b));
+  return [...tags.values()].sort((a, b) => a.localeCompare(b));
 };
 
 interface TransactionPageQuery {

@@ -359,9 +359,10 @@ function TransactionsTable({
                     {transaction.tags?.map((transactionTag) => (
                       <Button
                         key={transactionTag}
-                        variant="link"
+                        variant="solid"
                         size="xs"
                         colorScheme="teal"
+                        borderRadius="full"
                         mr={2}
                         onClick={() => onTagSelect(transactionTag)}
                       >

@@ -53,13 +53,17 @@ const isValidTransaction = (body: any, requireId = false) => {
   );
 };
 
-const normalizeTags = (tags: string[] | undefined) => [
-  ...new Set(
-    (tags ?? []).map((tag) =>
-      tag.trim().replace(/\s+/g, " ").toLowerCase(),
-    ),
-  ),
-];
+const normalizeTags = (tags: string[] | undefined) => {
+  const seen = new Set<string>();
+  return (tags ?? []).reduce<string[]>((normalizedTags, tag) => {
+    const normalizedTag = tag.trim().replace(/\s+/g, " ");
+    if (!seen.has(normalizedTag)) {
+      seen.add(normalizedTag);
+      normalizedTags.push(normalizedTag);
+    }
+    return normalizedTags;
+  }, []);
+};
 
 export const getAllTransactions = async (
   req: Request,
