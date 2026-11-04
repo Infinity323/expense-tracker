@@ -129,9 +129,9 @@ const CategorySpendingOverTimeChart = () => {
             data={visibleData}
             margin={{
               top: 24,
-              left: 8,
-              right: 24,
-              bottom: isMobile ? 40 : 24,
+              left: 16,
+              right: 32,
+              bottom: isMobile ? 64 : 32,
             }}
             stackOffset="sign"
           >
@@ -142,13 +142,13 @@ const CategorySpendingOverTimeChart = () => {
               interval="preserveStartEnd"
               angle={isMobile ? -35 : 0}
               textAnchor={isMobile ? "end" : "middle"}
-              height={isMobile ? 58 : 30}
+              height={isMobile ? 72 : 30}
               tick={{ fontSize: 11 }}
             />
             <YAxis
               domain={["auto", "auto"]}
               tickFormatter={(value, _) => formatCurrency(value)}
-              width={88}
+              width={104}
               tick={{ fontSize: 11 }}
             />
             <Tooltip
@@ -193,10 +193,12 @@ const CategorySpendingOverTimeChart = () => {
                     width="10px"
                     height="10px"
                     flexShrink={0}
-                    borderRadius="sm"
+                    borderRadius="full"
                     backgroundColor={color}
                   />
-                  <Text fontSize="sm">{category}</Text>
+                  <Text fontSize="sm" color="fg">
+                    {category}
+                  </Text>
                 </button>
               </Box>
             </WrapItem>

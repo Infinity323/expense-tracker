@@ -4,6 +4,7 @@ import {
   Alert,
   Button,
   Flex,
+  HStack,
   Skeleton,
   Spacer,
   Text,
@@ -14,7 +15,6 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
-  Legend,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -90,9 +90,9 @@ function IncomeVsSpendingOverTime() {
             data={visibleData}
             margin={{
               top: 30,
-              left: 8,
-              right: 24,
-              bottom: chartHeight === 360 ? 40 : 24,
+              left: 16,
+              right: 32,
+              bottom: chartHeight === 360 ? 64 : 32,
             }}
           >
             <CartesianGrid strokeDasharray="3 3" />
@@ -102,16 +102,15 @@ function IncomeVsSpendingOverTime() {
               interval="preserveStartEnd"
               angle={chartHeight === 360 ? -35 : 0}
               textAnchor={chartHeight === 360 ? "end" : "middle"}
-              height={chartHeight === 360 ? 58 : 30}
+              height={chartHeight === 360 ? 72 : 30}
               tick={{ fontSize: 11 }}
             />
             <YAxis
               domain={["auto", "auto"]}
               tickFormatter={(value, _) => formatCurrency(value)}
-              width={88}
+              width={104}
               tick={{ fontSize: 11 }}
             />
-            <Legend height={36} wrapperStyle={{ paddingTop: 8 }} />
             <Tooltip
               content={<CustomTooltip />}
               cursor={{ fill: "black", opacity: 0.2 }}
@@ -121,6 +120,30 @@ function IncomeVsSpendingOverTime() {
           </BarChart>
         </ResponsiveContainer>
       </Box>
+      <HStack justify="center" gap={6} mt={2}>
+        <Flex align="center" gap={2} color="fg">
+          <Box
+            aria-hidden="true"
+            width="10px"
+            height="10px"
+            flexShrink={0}
+            borderRadius="full"
+            backgroundColor="green"
+          />
+          <Text fontSize="sm">Income</Text>
+        </Flex>
+        <Flex align="center" gap={2} color="fg">
+          <Box
+            aria-hidden="true"
+            width="10px"
+            height="10px"
+            flexShrink={0}
+            borderRadius="full"
+            backgroundColor="red"
+          />
+          <Text fontSize="sm">Expenses</Text>
+        </Flex>
+      </HStack>
     </Box>
   );
 }
