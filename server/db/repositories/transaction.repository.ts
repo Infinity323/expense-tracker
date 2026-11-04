@@ -12,16 +12,26 @@ import { IUpdateCommandOutput } from "../types/iCommandOutput";
 import { TransactionDoc } from "../types/transactionDoc";
 
 const TableName = "Transactions";
+const NON_EXPENSE_CATEGORIES = ["Income", "Transfer In", "Transfer Out"];
+
+export const isExpenseCategory = (category: string) =>
+  !NON_EXPENSE_CATEGORIES.includes(category);
 
 export const findExpensesByUserId = async (userId: string) => {
   const result = await db.send(
     new ScanCommand({
       TableName,
       IndexName: "userId-category-index",
-      FilterExpression: "category <> :category AND userId = :userId",
+      FilterExpression:
+        "userId = :userId AND #category <> :income AND #category <> :transferIn AND #category <> :transferOut",
+      ExpressionAttributeNames: {
+        "#category": "category",
+      },
       ExpressionAttributeValues: {
-        ":category": "Income",
         ":userId": userId,
+        ":income": "Income",
+        ":transferIn": "Transfer In",
+        ":transferOut": "Transfer Out",
       },
     })
   );

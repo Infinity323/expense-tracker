@@ -2,6 +2,7 @@ import {
   findByCurrentMonthAndUserId,
   findExpensesByUserId,
   findIncomeByUserId,
+  isExpenseCategory,
 } from "../db/repositories/transaction.repository";
 import { findNetWorthSnapshotsByUserId } from "../db/repositories/netWorthSnapshot.repository";
 import { CurrentMonthExpense } from "../types/currentMonthExpense";
@@ -219,7 +220,7 @@ export const getCurrentMonthSpending = async (req, res, next) => {
   try {
     const transactionDocs = await findByCurrentMonthAndUserId(userId);
     const expenses: CurrentMonthExpense[] = transactionDocs
-      .filter((doc) => doc.category !== "Income")
+      .filter((doc) => isExpenseCategory(doc.category))
       .map((doc) => ({
         name: doc.name,
         category: doc.category,

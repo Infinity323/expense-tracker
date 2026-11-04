@@ -33,7 +33,7 @@ function NetWorthOverTime() {
     queryKey: ["netWorthHistory"],
     queryFn: getNetWorthHistory,
   });
-  const { visibleData, reset, isZoomed, interactionProps } =
+  const { visibleData, reset, isZoomed, chartRef, interactionProps } =
     useTimeSeriesNavigation(data ?? []);
 
   return (
@@ -68,6 +68,7 @@ function NetWorthOverTime() {
             <Box
               width="100%"
               height={`${chartHeight}px`}
+              ref={chartRef}
               aria-label="Net worth chart. Scroll to zoom, drag to pan, double-click to reset."
               {...interactionProps}
               sx={{ touchAction: "pan-y", userSelect: "none" }}

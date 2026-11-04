@@ -50,6 +50,7 @@ const CategorySpendingOverTimeChart = () => {
     visibleData,
     reset,
     isZoomed,
+    chartRef,
     interactionProps,
   } = useTimeSeriesNavigation(spendingData ?? []);
 
@@ -103,6 +104,7 @@ const CategorySpendingOverTimeChart = () => {
       <Box
         width="100%"
         height={chartHeight}
+        ref={chartRef}
         aria-label="Category spending chart. Scroll to zoom, drag to pan, double-click to reset."
         {...interactionProps}
         sx={{ touchAction: "pan-y", userSelect: "none" }}

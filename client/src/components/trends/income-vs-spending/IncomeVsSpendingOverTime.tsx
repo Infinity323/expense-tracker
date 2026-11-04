@@ -31,7 +31,7 @@ function IncomeVsSpendingOverTime() {
     queryKey: ["incomeVsExpenses"],
     queryFn: getIncomeVsExpenses,
   });
-  const { visibleData, reset, isZoomed, interactionProps } =
+  const { visibleData, reset, isZoomed, chartRef, interactionProps } =
     useTimeSeriesNavigation(data ?? []);
 
   if (isLoading) {
@@ -65,6 +65,7 @@ function IncomeVsSpendingOverTime() {
       <Box
         width="100%"
         height={chartHeight}
+        ref={chartRef}
         aria-label="Income and expenses chart. Scroll to zoom, drag to pan, double-click to reset."
         {...interactionProps}
         sx={{ touchAction: "pan-y", userSelect: "none" }}
