@@ -131,10 +131,10 @@ function TransactionsTable({
     useState<ColumnWidths>(loadColumnWidths);
   const resizeRef = useRef<{
     columnId: ResizableColumnId;
-    adjacentColumnId: ResizableColumnId;
+    adjacentColumnId: ResizableColumnId | null;
     startX: number;
     startWidth: number;
-    startAdjacentWidth: number;
+    startAdjacentWidth: number | null;
   } | null>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const tableWidth =
@@ -222,17 +222,17 @@ function TransactionsTable({
       (column) => column.id === columnId,
     );
     const adjacentColumn =
-      TRANSACTION_COLUMNS[
-        columnIndex === TRANSACTION_COLUMNS.length - 1
-          ? columnIndex - 1
-          : columnIndex + 1
-      ];
+      columnIndex === TRANSACTION_COLUMNS.length - 1
+        ? null
+        : TRANSACTION_COLUMNS[columnIndex + 1];
     resizeRef.current = {
       columnId,
-      adjacentColumnId: adjacentColumn.id,
+      adjacentColumnId: adjacentColumn?.id ?? null,
       startX: event.clientX,
       startWidth: columnWidths[columnId],
-      startAdjacentWidth: columnWidths[adjacentColumn.id],
+      startAdjacentWidth: adjacentColumn
+        ? columnWidths[adjacentColumn.id]
+        : null,
     };
   };
 
@@ -243,12 +243,25 @@ function TransactionsTable({
     const column = TRANSACTION_COLUMNS.find(
       (candidate) => candidate.id === resize.columnId,
     );
+    if (!column) return undefined;
+
+    const delta = clientX - resize.startX;
+    if (!resize.adjacentColumnId || resize.startAdjacentWidth === null) {
+      const width = Math.max(
+        column.minWidth,
+        Math.min(resize.startWidth + delta, 800),
+      );
+      return {
+        ...columnWidths,
+        [resize.columnId]: width,
+      };
+    }
+
     const adjacentColumn = TRANSACTION_COLUMNS.find(
       (candidate) => candidate.id === resize.adjacentColumnId,
     );
-    if (!column || !adjacentColumn) return undefined;
+    if (!adjacentColumn) return undefined;
 
-    const delta = clientX - resize.startX;
     const minDelta = Math.max(
       column.minWidth - resize.startWidth,
       resize.startAdjacentWidth - 800,

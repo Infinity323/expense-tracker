@@ -5,7 +5,6 @@ import {
   Grid,
   GridItem,
   Heading,
-  HStack,
   Skeleton,
   Stack,
   Text,
@@ -58,14 +57,14 @@ const NetWorth = (props: NetWorthProps) => {
         </Heading>
         <Text>Total Net Worth</Text>
       </Box>
-      <NetWorthOverTime />
-      <HStack
+      <Grid
+        templateColumns={{
+          base: "minmax(0, 1fr)",
+          md: "repeat(2, minmax(0, 1fr))",
+        }}
         gap="2rem"
-        align="stretch"
-        flexDirection={{ base: "column", md: "row" }}
       >
         <Card.Root
-          width={{ base: "100%", md: "50%" }}
           p="1.5rem"
           variant="outline"
         >
@@ -99,7 +98,6 @@ const NetWorth = (props: NetWorthProps) => {
           </Card.Body>
         </Card.Root>
         <Card.Root
-          width={{ base: "100%", md: "50%" }}
           p="1.5rem"
           variant="outline"
         >
@@ -132,7 +130,8 @@ const NetWorth = (props: NetWorthProps) => {
             </Grid>
           </Card.Body>
         </Card.Root>
-      </HStack>
+      </Grid>
+      <NetWorthOverTime />
     </Stack>
   );
 };
