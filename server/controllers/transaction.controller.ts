@@ -254,13 +254,10 @@ export const syncTransactions = async (
     }
     console.log(`Added ${added.length} transactions for item ${itemId}`);
     for (const transaction of modified) {
-      const budget = getBudget(transaction);
       await updateSyncedTransaction({
         transactionId: transaction.transaction_id,
         date: transaction.date,
         name: transaction.name,
-        category: budget.category,
-        subcategory: budget.subcategory,
         amount: transaction.amount,
         pending: transaction.pending,
         userId,

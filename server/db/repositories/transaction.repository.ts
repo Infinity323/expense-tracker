@@ -260,89 +260,35 @@ export const updateSyncedTransaction = async ({
   transactionId,
   date,
   name,
-  description,
-  category,
-  subcategory,
   amount,
   pending,
   userId,
 }: Partial<TransactionDoc>) => {
-  const expressionAttributeNames = {
-    "#date": "date",
-    "#name": "name",
-    "#description": "description",
-    "#pending": "pending",
-    "#category": "category",
-    "#subcategory": "subcategory",
-    "#categoryManuallyOverridden": "categoryManuallyOverridden",
-    "#amount": "amount",
-    "#userId": "userId",
-  };
-  const expressionAttributeValues = {
-    ":date": date,
-    ":name": name,
-    ":description": description ?? "",
-    ":pending": pending ?? false,
-    ":category": category,
-    ":subcategory": subcategory,
-    ":false": false,
-    ":amount": parseFloat(amount as any),
-    ":userId": userId,
-  };
-  const overridePreservingNames = {
-    "#date": expressionAttributeNames["#date"],
-    "#name": expressionAttributeNames["#name"],
-    "#description": expressionAttributeNames["#description"],
-    "#pending": expressionAttributeNames["#pending"],
-    "#amount": expressionAttributeNames["#amount"],
-    "#userId": expressionAttributeNames["#userId"],
-  };
-  const overridePreservingValues = {
-    ":date": expressionAttributeValues[":date"],
-    ":name": expressionAttributeValues[":name"],
-    ":description": expressionAttributeValues[":description"],
-    ":pending": expressionAttributeValues[":pending"],
-    ":amount": expressionAttributeValues[":amount"],
-    ":userId": expressionAttributeValues[":userId"],
-  };
-
-  try {
-    const result = await db.send(
-      new UpdateCommand({
-        TableName,
-        Key: { transactionId },
-        UpdateExpression:
-          "SET #date = :date, #name = :name, #description = :description, #pending = :pending, #category = :category, #subcategory = :subcategory, #amount = :amount",
-        ConditionExpression:
-          "#userId = :userId AND (attribute_not_exists(#categoryManuallyOverridden) OR #categoryManuallyOverridden = :false)",
-        ExpressionAttributeNames: expressionAttributeNames,
-        ExpressionAttributeValues: expressionAttributeValues,
-        ReturnValues: "ALL_NEW",
-      }),
-    );
-    return result.Attributes as TransactionDoc | undefined;
-  } catch (error) {
-    if (
-      !(error instanceof Error) ||
-      error.name !== "ConditionalCheckFailedException"
-    ) {
-      throw error;
-    }
-
-    const result = await db.send(
-      new UpdateCommand({
-        TableName,
-        Key: { transactionId },
-        UpdateExpression:
-          "SET #date = :date, #name = :name, #description = :description, #pending = :pending, #amount = :amount",
-        ConditionExpression: "#userId = :userId",
-        ExpressionAttributeNames: overridePreservingNames,
-        ExpressionAttributeValues: overridePreservingValues,
-        ReturnValues: "ALL_NEW",
-      }),
-    );
-    return result.Attributes as TransactionDoc | undefined;
-  }
+  const result = await db.send(
+    new UpdateCommand({
+      TableName,
+      Key: { transactionId },
+      UpdateExpression:
+        "SET #date = :date, #name = :name, #pending = :pending, #amount = :amount",
+      ConditionExpression: "#userId = :userId",
+      ExpressionAttributeNames: {
+        "#date": "date",
+        "#name": "name",
+        "#pending": "pending",
+        "#amount": "amount",
+        "#userId": "userId",
+      },
+      ExpressionAttributeValues: {
+        ":date": date,
+        ":name": name,
+        ":pending": pending ?? false,
+        ":amount": parseFloat(amount as any),
+        ":userId": userId,
+      },
+      ReturnValues: "ALL_NEW",
+    }),
+  );
+  return result.Attributes as TransactionDoc | undefined;
 };
 
 export const deleteById = async (
