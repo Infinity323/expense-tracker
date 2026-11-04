@@ -289,6 +289,22 @@ export const updateSyncedTransaction = async ({
     ":amount": parseFloat(amount as any),
     ":userId": userId,
   };
+  const overridePreservingNames = {
+    "#date": expressionAttributeNames["#date"],
+    "#name": expressionAttributeNames["#name"],
+    "#description": expressionAttributeNames["#description"],
+    "#pending": expressionAttributeNames["#pending"],
+    "#amount": expressionAttributeNames["#amount"],
+    "#userId": expressionAttributeNames["#userId"],
+  };
+  const overridePreservingValues = {
+    ":date": expressionAttributeValues[":date"],
+    ":name": expressionAttributeValues[":name"],
+    ":description": expressionAttributeValues[":description"],
+    ":pending": expressionAttributeValues[":pending"],
+    ":amount": expressionAttributeValues[":amount"],
+    ":userId": expressionAttributeValues[":userId"],
+  };
 
   try {
     const result = await db.send(
@@ -320,8 +336,8 @@ export const updateSyncedTransaction = async ({
         UpdateExpression:
           "SET #date = :date, #name = :name, #description = :description, #pending = :pending, #amount = :amount",
         ConditionExpression: "#userId = :userId",
-        ExpressionAttributeNames: expressionAttributeNames,
-        ExpressionAttributeValues: expressionAttributeValues,
+        ExpressionAttributeNames: overridePreservingNames,
+        ExpressionAttributeValues: overridePreservingValues,
         ReturnValues: "ALL_NEW",
       }),
     );
