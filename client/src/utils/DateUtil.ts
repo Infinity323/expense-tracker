@@ -1,13 +1,17 @@
-import { format, fromUnixTime } from 'date-fns';
-
 export const dateToString = (value) => {
-  let date = new Date(value);
-  return `${date.toLocaleString("default", {
+  const date = new Date(Number(value));
+  const month = new Intl.DateTimeFormat(undefined, {
     month: "long",
-  })} ${date.getFullYear()}`;
+    timeZone: "UTC",
+  }).format(date);
+  return `${month} ${date.getUTCFullYear()}`;
 };
 
 export const dateToMMMYYYY = (value: string): string => {
-  const date = fromUnixTime(parseInt(value) / 1000);
-  return format(date, 'MMM yyyy');
+  const date = new Date(Number(value));
+  return new Intl.DateTimeFormat(undefined, {
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(date);
 }

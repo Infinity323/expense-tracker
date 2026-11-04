@@ -67,6 +67,7 @@ export const getSpendingOverTime = async (req, res, next) => {
       });
       resultArray.push(dateResult);
     });
+    resultArray.sort((a, b) => Number(a.date) - Number(b.date));
     res.json(resultArray);
   } catch (err) {
     next(err);
@@ -75,13 +76,13 @@ export const getSpendingOverTime = async (req, res, next) => {
 
 const getTimeKey = (division, date) => {
   if (division == "monthly") {
-    return new Date(date.getFullYear(), date.getMonth()).getTime();
+    return Date.UTC(date.getUTCFullYear(), date.getUTCMonth());
   } else if (division == "quarterly") {
-    let quarter = Math.floor((date.getMonth() + 3) / 3);
+    let quarter = Math.floor((date.getUTCMonth() + 3) / 3);
     let monthIndex = quarter * 3 - 3;
-    return new Date(date.getFullYear(), monthIndex).getTime();
-  } else if (division == "yearly") {
-    return new Date(date.getFullYear(), 0).getTime();
+    return Date.UTC(date.getUTCFullYear(), monthIndex);
+  } else if (division == "yearly" || division == "annually") {
+    return Date.UTC(date.getUTCFullYear(), 0);
   } else {
     return 0;
   }
