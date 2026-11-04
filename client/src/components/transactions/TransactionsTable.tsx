@@ -13,11 +13,13 @@ import {
   Skeleton,
   Spinner,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 import {
   Dispatch,
   PointerEvent as ReactPointerEvent,
   SetStateAction,
+  useCallback,
   useEffect,
   useRef,
   useState,
@@ -111,6 +113,7 @@ function TransactionsTable({
     queryFn: getTransactions,
     getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
   });
+  const toast = useToast();
   const [columnWidths, setColumnWidths] =
     useState<ColumnWidths>(loadColumnWidths);
   const resizeRef = useRef<{
@@ -135,21 +138,43 @@ function TransactionsTable({
     if (accountId === "manual") return !transaction.accountId;
     return transaction.accountId === accountId;
   });
-  const refetchTransactionPage = async (transactionId: string) => {
+  const showRefetchError = useCallback(() => {
+    toast({
+      title: "Could not refresh transactions",
+      description:
+        "Your changes may have been saved, but the list could not be refreshed. Please try again.",
+      status: "error",
+      isClosable: true,
+    });
+  }, [toast]);
+  const refetchTransactions = useCallback(async () => {
+    try {
+      const result = await refetch();
+      if (result.isError) showRefetchError();
+    } catch {
+      showRefetchError();
+    }
+  }, [refetch, showRefetchError]);
+  const refetchTransactionPage = useCallback(async (transactionId: string) => {
     const pageIndex =
       data?.pages.findIndex((page) =>
         page.items.some((item) => item.transactionId === transactionId),
       ) ?? -1;
     if (pageIndex < 0) {
-      await refetch();
+      await refetchTransactions();
       return;
     }
 
-    await refetch({
-      refetchPage: (_page, index) =>
-        index === pageIndex || (Boolean(tag) && index === 0),
-    });
-  };
+    try {
+      const result = await refetch({
+        refetchPage: (_page, index) =>
+          index === pageIndex || (Boolean(tag) && index === 0),
+      });
+      if (result.isError) showRefetchError();
+    } catch {
+      showRefetchError();
+    }
+  }, [data?.pages, refetch, refetchTransactions, showRefetchError, tag]);
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
@@ -167,10 +192,10 @@ function TransactionsTable({
 
   useEffect(() => {
     if (reload) {
-      refetch();
+      void refetchTransactions();
       setReload(false);
     }
-  }, [reload, setReload, refetch]);
+  }, [reload, setReload, refetchTransactions]);
 
   const startResize = (
     event: ReactPointerEvent<HTMLButtonElement>,
