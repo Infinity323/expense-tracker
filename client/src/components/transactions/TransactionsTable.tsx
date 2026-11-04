@@ -311,8 +311,8 @@ function TransactionsTable({
           variant="line"
           striped
           css={{
-            "& tableLayout": "fixed",
-            "& & tbody td": {
+            tableLayout: "fixed",
+            "& tbody td": {
               overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
@@ -349,7 +349,7 @@ function TransactionsTable({
                     cursor="col-resize"
                     borderLeftWidth="1px"
                     borderColor="gray.300"
-                    css={{ "& touchAction": "none" }}
+                    css={{ touchAction: "none" }}
                     _hover={{ borderColor: "teal.400" }}
                     _dark={{ borderColor: "whiteAlpha.300" }}
                     onPointerDown={(event) => startResize(event, column.id)}
